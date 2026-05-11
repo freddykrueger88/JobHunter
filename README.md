@@ -16,7 +16,7 @@
 
 ## What is JobHunter?
 
-JobHunter is a fully local job application tracker with AI assistance. All data stays on your machine – no accounts, no subscriptions, no cloud. Powered by [Ollama](https://ollama.com) for local LLM inference.
+JobHunter is a fully local job application tracker with AI assistance. All data stays on your machine – no accounts, no subscriptions, no cloud. AI runs locally via [Ollama](https://ollama.com) inside Docker.
 
 ---
 
@@ -74,22 +74,41 @@ JobHunter is a fully local job application tracker with AI assistance. All data 
 
 ## 🚀 Quickstart
 
+**Prerequisites:** Docker, Docker Compose, Python 3 (for key generation)
+
 ```bash
+# 1. Clone repository
 git clone https://github.com/freddykrueger88/JobHunter.git
 cd JobHunter
+
+# 2. Create .env file
 cp .env.example .env
+```
 
-# Generate encryption key and add to .env:
-python3 -c "import secrets, base64; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
+Now edit `.env` and fill in the three required values:
 
-# Pull an AI model (Mistral recommended):
-ollama pull mistral
+```bash
+# Generate DB_PASSWORD (any secure string, e.g.):
+python3 -c "import secrets; print(secrets.token_hex(16))"
 
-# Start:
+# Generate SECRET_KEY:
+python3 -c "import secrets; print(secrets.token_hex(32))"
+
+# Generate ENCRYPTION_KEY (must be a Fernet key):
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+```bash
+# 3. Start all services (backend, frontend, database, ollama)
 docker compose up -d
+
+# 4. Pull an AI model into the Ollama container (Mistral recommended)
+docker exec jobhunter-ollama ollama pull mistral
 ```
 
 🌍 Open **http://localhost:3000**
+
+> **GPU support (NVIDIA):** Uncomment the `deploy` section in `docker-compose.yml` under the `ollama` service.
 
 ---
 

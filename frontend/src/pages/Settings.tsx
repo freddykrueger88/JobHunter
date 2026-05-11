@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
+import { useA11y, type Density } from '../context/AccessibilityContext'
 import { Save, Eye, EyeOff, ExternalLink, Download, Upload } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -14,21 +15,24 @@ interface SettingsData {
 }
 
 const THEMES: { value: Theme; label: string; desc: string }[] = [
-  { value: 'dark',     label: '🌙 Dark Mode',     desc: 'Dunkel, klassisch' },
-  { value: 'light',    label: '☀️ Light Mode',    desc: 'Hell, klar' },
-  { value: 'boys',     label: '💙 Boys Mode',     desc: 'Dark Blue' },
-  { value: 'girls',    label: '🌸 Girls Mode',    desc: 'Pink Fluffy Wonderfully ✨' },
-  { value: 'dyslexic', label: '📚 Legasthenie',   desc: 'OpenDyslexic – Leseoptimiert' },
+  { value: 'dark',     label: '🌙 Dark Mode',   desc: 'Dunkel, klassisch' },
+  { value: 'light',    label: '☀️ Light Mode',  desc: 'Hell, klar' },
+  { value: 'boys',     label: '💙 Boys Mode',   desc: 'Dark Blue' },
+  { value: 'girls',    label: '🌸 Girls Mode',  desc: 'Pink Fluffy Wonderfully ✨' },
+  { value: 'dyslexic', label: '📚 Legasthenie', desc: 'OpenDyslexic – Leseoptimiert' },
 ]
-
 const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
-  { value: 'none',          label: 'Kein Filter',     desc: 'Standard' },
-  { value: 'deuteranopia',  label: 'Deuteranopie',    desc: 'Grün-Schwäche (~6% Männer)' },
-  { value: 'protanopia',    label: 'Protanopie',      desc: 'Rot-Schwäche (~2% Männer)' },
-  { value: 'tritanopia',    label: 'Tritanopie',      desc: 'Blau-Gelb-Schwäche' },
-  { value: 'achromatopsia', label: 'Achromatopsie',   desc: 'Vollständige Farbenblindheit' },
+  { value: 'none',          label: 'Kein Filter',   desc: 'Standard' },
+  { value: 'deuteranopia',  label: 'Deuteranopie',  desc: 'Grün-Schwäche (~6% Männer)' },
+  { value: 'protanopia',    label: 'Protanopie',    desc: 'Rot-Schwäche (~2% Männer)' },
+  { value: 'tritanopia',    label: 'Tritanopie',    desc: 'Blau-Gelb-Schwäche' },
+  { value: 'achromatopsia', label: 'Achromatopsie', desc: 'Vollständige Farbenblindheit' },
 ]
-
+const DENSITY_OPTIONS: { value: Density; label: string; desc: string }[] = [
+  { value: 'normal',  label: 'Normal',   desc: 'Standardabstände' },
+  { value: 'compact', label: 'Kompakt',  desc: 'Weniger Whitespace' },
+  { value: 'minimal', label: 'Minimal',  desc: 'Maximale Informationsdichte' },
+]
 const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
   adzuna: 'https://developer.adzuna.com/',
@@ -39,6 +43,7 @@ const API_LINKS: Record<string, string> = {
 export default function Settings() {
   const { t, i18n } = useTranslation()
   const { theme, setTheme, colorBlindMode, setColorBlindMode } = useTheme()
+  const { focusMode, setFocusMode, density, setDensity, reduceMotion, setReduceMotion, adhdMode, setAdhdMode } = useA11y()
   const qc = useQueryClient()
 
   const { data: remote } = useQuery<SettingsData>({ queryKey: ['settings'], queryFn: () => axios.get('/api/settings/').then(r => r.data) })
@@ -105,6 +110,22 @@ export default function Settings() {
       {children}
     </section>
   )
+  const Toggle = ({ label, desc, value, onChange }: { label: string; desc?: string; value: boolean; onChange: (v: boolean) => void }) => (
+    <label className="flex items-center justify-between cursor-pointer gap-4 py-1">
+      <div>
+        <span className="text-sm font-medium">{label}</span>
+        {desc && <p className="text-xs text-gray-400">{desc}</p>}
+      </div>
+      <button
+        role="switch" aria-checked={value}
+        onClick={() => onChange(!value)}
+        className={clsx('relative w-11 h-6 rounded-full transition-colors shrink-0',
+          value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600')}>
+        <span className={clsx('absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform',
+          value ? 'translate-x-5' : 'translate-x-0')} />
+      </button>
+    </label>
+  )
 
   return (
     <div className="max-w-2xl">
@@ -117,8 +138,7 @@ export default function Settings() {
         </button>
       </div>
 
-      {/* Theme */}
-      <Section title={`🎨 ${t('settings.theme')}`}>
+      <Section title="🎨 Erscheinungsbild">
         <div className="grid grid-cols-2 gap-3">
           {THEMES.map(opt => (
             <button key={opt.value} onClick={() => setTheme(opt.value)}
@@ -126,18 +146,13 @@ export default function Settings() {
                 theme === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
               aria-pressed={theme === opt.value}>
               <div className="font-medium">{opt.label}</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">{opt.desc}</div>
+              <div className="text-sm text-gray-500">{opt.desc}</div>
             </button>
           ))}
         </div>
       </Section>
 
-      {/* Farbenblindheit */}
       <Section title="👁️ Farbenblindheits-Filter">
-        <p className="text-sm text-gray-500 mb-3">
-          Passt die Darstellung an verschiedene Formen der Farbenblindheit an.
-          Der Filter wird zusätzlich zum Theme angewendet.
-        </p>
         <div className="grid grid-cols-1 gap-2">
           {COLOR_BLIND_MODES.map(opt => (
             <button key={opt.value} onClick={() => setColorBlindMode(opt.value)}
@@ -151,7 +166,28 @@ export default function Settings() {
         </div>
       </Section>
 
-      {/* Sprache */}
+      <Section title="🧠 ADHS & Kognition">
+        <div className="space-y-1 mb-4">
+          <Toggle label="ADHS-Modus" desc="Aktiviert Fokus-Modus + reduzierte Bewegung" value={adhdMode} onChange={setAdhdMode} />
+          <Toggle label="Fokus-Modus" desc="Navigation wird ausgeblendet, nur aktiver Bereich sichtbar" value={focusMode} onChange={setFocusMode} />
+          <Toggle label="Animationen deaktivieren" desc="Alle Transitions und Animationen ausschalten" value={reduceMotion} onChange={setReduceMotion} />
+        </div>
+        <div>
+          <label className="text-sm text-gray-500 block mb-2">Informationsdichte</label>
+          <div className="flex gap-2">
+            {DENSITY_OPTIONS.map(opt => (
+              <button key={opt.value} onClick={() => setDensity(opt.value)}
+                className={clsx('flex-1 rounded-lg py-2 text-sm font-medium border-2 transition-all',
+                  density === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
+                aria-pressed={density === opt.value}>
+                <div>{opt.label}</div>
+                <div className="text-xs text-gray-400 font-normal">{opt.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       <Section title={`🌍 ${t('settings.language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
@@ -165,7 +201,6 @@ export default function Settings() {
         </div>
       </Section>
 
-      {/* KI */}
       <Section title={`🤖 ${t('settings.ai')}`}>
         <div className="space-y-4">
           <div>
@@ -189,7 +224,6 @@ export default function Settings() {
         </div>
       </Section>
 
-      {/* Stellensuche */}
       <Section title="🔍 Stellensuche">
         <div className="space-y-3">
           <div className="flex gap-3">
@@ -213,7 +247,6 @@ export default function Settings() {
         </div>
       </Section>
 
-      {/* Erinnerungen */}
       <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
@@ -222,7 +255,6 @@ export default function Settings() {
         </div>
       </Section>
 
-      {/* API Keys */}
       <Section title="🔑 API Keys">
         <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
         {([
@@ -256,7 +288,6 @@ export default function Settings() {
         ))}
       </Section>
 
-      {/* Export/Import */}
       <Section title="📦 Daten Export / Import">
         <div className="space-y-4">
           <div>

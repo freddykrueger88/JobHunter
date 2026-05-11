@@ -6,67 +6,64 @@
 @font-face {
   font-family: 'OpenDyslexic';
   src: url('/fonts/OpenDyslexic/OpenDyslexic-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+  font-weight: 400; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'OpenDyslexic';
   src: url('/fonts/OpenDyslexic/OpenDyslexic-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+  font-weight: 700; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'OpenDyslexic';
   src: url('/fonts/OpenDyslexic/OpenDyslexic-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
+  font-weight: 400; font-style: italic; font-display: swap;
 }
 
-html {
-  font-size: 16px;
-}
+html { font-size: 16px; }
 
 /* ===== Fokus-Indikator (WCAG 2.1 AA) ===== */
-*:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
+*:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
 /* ===== Reduzierte Bewegung (WCAG 2.1 2.3.3) ===== */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+/* Manueller reduce-motion Toggle (ADHS-Modus) */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* ===== ADHS-Modus ===== */
+/* Fokus-Modus: Nav minimiert, Ablenkungen ausblenden */
+html.focus-mode nav { opacity: 0.3; transition: opacity 0.2s; }
+html.focus-mode nav:hover,
+html.focus-mode nav:focus-within { opacity: 1; }
+html.focus-mode .dashboard-widget:not(.dashboard-widget--primary) { display: none; }
+
+/* Kompaktansicht */
+html.density-compact .kanban-card { padding: 0.5rem !important; }
+html.density-compact h1 { font-size: 1.25rem !important; }
+html.density-compact .gap-6 { gap: 0.75rem !important; }
+html.density-compact .mb-6 { margin-bottom: 0.75rem !important; }
+html.density-minimal .kanban-card { padding: 0.35rem !important; }
+html.density-minimal h1 { font-size: 1rem !important; }
+html.density-minimal .text-sm { font-size: 0.7rem !important; }
 
 /* ===== Legasthenie-Theme ===== */
 .dyslexic {
   font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
-  font-size: 17px;
-  line-height: 1.8 !important;
-  letter-spacing: 0.05em !important;
-  word-spacing: 0.1em !important;
-  background-color: #fffef5 !important;
-  color: #1a1a1a !important;
+  font-size: 17px; line-height: 1.8 !important;
+  letter-spacing: 0.05em !important; word-spacing: 0.1em !important;
+  background-color: #fffef5 !important; color: #1a1a1a !important;
 }
-.dyslexic p,
-.dyslexic li,
-.dyslexic td,
-.dyslexic label,
-.dyslexic span {
-  max-width: 65ch;
-}
-/* Kein hartes Weiß, kein hartes Schwarz im Legasthenie-Modus */
+.dyslexic p, .dyslexic li, .dyslexic td, .dyslexic label, .dyslexic span { max-width: 65ch; }
 .dyslexic .bg-white { background-color: #fffef0 !important; }
 .dyslexic .dark\:bg-gray-800 { background-color: #2a2a1f !important; }
-.dyslexic .text-gray-900 { color: #1a1a1a !important; }
 
 /* ===== Farbenblindheits-Filter ===== */
-/* Werden als CSS-Klassen auf <html> angewendet */
 html.cb-deuteranopia  { filter: url(#cb-deuteranopia);  }
 html.cb-protanopia    { filter: url(#cb-protanopia);    }
 html.cb-tritanopia    { filter: url(#cb-tritanopia);    }
@@ -74,34 +71,19 @@ html.cb-achromatopsia { filter: url(#cb-achromatopsia); }
 
 /* ===== Skip-Link (Screenreader) ===== */
 .skip-link {
-  position: absolute;
-  top: -100%;
-  left: 0;
-  background: #1d4ed8;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  font-size: 1rem;
-  z-index: 9999;
-  border-radius: 0 0 6px 0;
-  transition: top 0.1s;
+  position: absolute; top: -100%; left: 0;
+  background: #1d4ed8; color: #fff;
+  padding: 0.75rem 1.5rem; font-weight: 600; font-size: 1rem;
+  z-index: 9999; border-radius: 0 0 6px 0; transition: top 0.1s;
 }
-.skip-link:focus {
-  top: 0;
-}
+.skip-link:focus { top: 0; }
 
 /* ===== Mindest-Touch-Target (WCAG 2.5.5) ===== */
 button, a, [role="menuitem"], [role="button"] {
-  min-height: 44px;
-  min-width: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 44px; min-width: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.icon-btn-sm {
-  min-height: 32px;
-  min-width: 32px;
-}
+.icon-btn-sm { min-height: 32px; min-width: 32px; }
 
 /* ===== Scrollbar Dark ===== */
 .dark ::-webkit-scrollbar { width: 6px; }

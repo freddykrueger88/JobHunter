@@ -112,6 +112,20 @@ docker exec jobhunter-ollama ollama pull mistral
 
 ---
 
+> ### 📋 Detailed Installation Guide
+> New here or running into problems? The **[INSTALL.md](INSTALL.md)** covers everything step by step:
+> - ✅ All prerequisites with version check commands
+> - ✅ Generating secure keys for `.env`
+> - ✅ Docker setup & manual setup (without Docker)
+> - ✅ Installing & verifying the Mistral AI model
+> - ✅ First-start checklist
+> - ✅ Updating the app
+> - ✅ Troubleshooting (8 common issues with solutions)
+>
+> **→ [Open full installation guide](INSTALL.md)**
+
+---
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -126,6 +140,7 @@ docker exec jobhunter-ollama ollama pull mistral
 
 ## 📖 Documentation
 
+- [📋 Installation Guide](INSTALL.md)
 - [🛠️ Setup Guide](docs/setup.md)
 - [♿ Accessibility](docs/accessibility.md)
 - [🔒 Privacy & GDPR](docs/dsgvo.md)

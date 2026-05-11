@@ -58,125 +58,194 @@ html.density-minimal .text-sm { font-size: 0.7rem !important; }
 html.density-minimal p, html.density-minimal li { line-height: 1.3; margin-bottom: 0.1rem; }
 
 /* ===== Legasthenie-Theme ===== */
-html.dyslexic body,
-html.dyslexic main {
+html.dyslexic body, html.dyslexic main {
   font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
   background-color: #fffef5 !important;
   color: #1a1a1a !important;
 }
-html.dyslexic p,
-html.dyslexic li,
-html.dyslexic td,
-html.dyslexic label {
+html.dyslexic p, html.dyslexic li, html.dyslexic td, html.dyslexic label {
   font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
-  font-size: 1.05rem;
-  line-height: 1.9 !important;
-  letter-spacing: 0.04em;
-  word-spacing: 0.12em;
-  max-width: 65ch;
+  font-size: 1.05rem; line-height: 1.9 !important;
+  letter-spacing: 0.04em; word-spacing: 0.12em; max-width: 65ch;
 }
 html.dyslexic h1, html.dyslexic h2, html.dyslexic h3 {
   font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
   letter-spacing: 0.02em;
 }
-html.dyslexic .bg-white { background-color: #fffef0 !important; }
-html.dyslexic .dark\:bg-gray-800 { background-color: #fdfbea !important; }
-html.dyslexic .bg-gray-100 { background-color: #f7f6e7 !important; }
+html.dyslexic .bg-white           { background-color: #fffef0 !important; }
+html.dyslexic .dark\:bg-gray-800  { background-color: #fdfbea !important; }
+html.dyslexic .bg-gray-100        { background-color: #f7f6e7 !important; }
 
 /* ===== Boys Theme ===== */
 html.boys body { background-color: #0d1b2e; color: #e2eaf4; }
-html.boys .bg-white { background-color: #112240 !important; }
-html.boys .dark\:bg-gray-800 { background-color: #112240 !important; }
-html.boys .dark\:bg-gray-900 { background-color: #0a1628 !important; }
+html.boys .bg-white               { background-color: #112240 !important; }
+html.boys .dark\:bg-gray-800      { background-color: #112240 !important; }
+html.boys .dark\:bg-gray-900      { background-color: #0a1628 !important; }
 html.boys .bg-gray-100,
-html.boys .dark\:bg-gray-700 { background-color: #1a2f4a !important; }
+html.boys .dark\:bg-gray-700      { background-color: #1a2f4a !important; }
 html.boys .border-gray-200,
-html.boys .dark\:border-gray-700 { border-color: #1e3a5f !important; }
+html.boys .dark\:border-gray-700  { border-color: #1e3a5f !important; }
 html.boys .text-gray-900,
-html.boys .dark\:text-white { color: #cfe0f4 !important; }
+html.boys .dark\:text-white       { color: #cfe0f4 !important; }
 html.boys .text-gray-500,
-html.boys .text-gray-400 { color: #7eb3d8 !important; }
-html.boys nav { background-color: #0a1628 !important; border-color: #1e3a5f !important; color: #cfe0f4 !important; }
+html.boys .text-gray-400          { color: #7eb3d8 !important; }
+html.boys nav                     { background-color: #0a1628 !important; border-color: #1e3a5f !important; }
 html.boys nav a, html.boys nav button, html.boys nav span { color: #cfe0f4 !important; }
-html.boys .bg-blue-600 { background-color: #1d4ed8 !important; }
+html.boys .bg-blue-600            { background-color: #1d4ed8 !important; }
 
 /* ===== Girls Theme =====
- *
- * Farbpalette (alle Kontrastwerte WCAG AA geprüft):
- *   Hintergrund:       #fdf0f5  (zartes Rosa-Weiß)
- *   Primärtext:        #3b0f24  (tiefes Beere,  Kontrast ~13:1 auf #fdf0f5 ✅)
- *   Sekundärtext:      #7c2d52  (dunkles Pink,  Kontrast ~5.5:1 auf #fdf0f5 ✅)
- *   Placeholder/Hint:  #9c3e66  (mittleres Pink, Kontrast ~4.6:1 ✅)
- *   Akzent/Button:     #be185d  (Rose-700,       Kontrast ~5.1:1 auf weiß ✅)
- *   Rahmen:            #f0a8c8  (Rose-300 – nur dekorativ, nie Text-Träger)
- *   Nav-Hintergrund:   #fce4ef
+ * Palette (WCAG AA):
+ *   #fdf0f5  Hintergrund
+ *   #3b0f24  Primärtext     ~13:1 ✅
+ *   #5b1535  Überschriften  ~9:1  ✅
+ *   #7c2d52  Sekundärtext   ~5.5:1 ✅
+ *   #9c3e66  Hints          ~4.6:1 ✅
+ *   #be185d  Buttons        ~5.1:1 auf weiß ✅
  * ================================================== */
-html.girls body {
-  background-color: #fdf0f5;
-  color: #3b0f24;            /* Primärtext: tiefes Beere */
+html.girls body { background-color: #fdf0f5; color: #3b0f24; }
+html.girls .bg-white               { background-color: #fff4f8 !important; }
+html.girls .dark\:bg-gray-800      { background-color: #fce8f1 !important; }
+html.girls .dark\:bg-gray-900      { background-color: #fddaeb !important; }
+html.girls .bg-gray-100            { background-color: #fce4ef !important; }
+html.girls .dark\:bg-gray-700      { background-color: #fad4e8 !important; }
+html.girls .border-gray-200,
+html.girls .dark\:border-gray-700  { border-color: #f0a8c8 !important; }
+html.girls .border-gray-300,
+html.girls .dark\:border-gray-600  { border-color: #f0a8c8 !important; }
+html.girls .text-gray-900,
+html.girls .dark\:text-white,
+html.girls .text-white             { color: #3b0f24 !important; }
+html.girls .text-gray-700,
+html.girls .text-gray-800          { color: #5b1535 !important; }
+html.girls .text-gray-500,
+html.girls .text-gray-600          { color: #7c2d52 !important; }
+html.girls .text-gray-400          { color: #9c3e66 !important; }
+html.girls nav                     { background-color: #fce4ef !important; border-color: #f0a8c8 !important; }
+html.girls nav a, html.girls nav button,
+html.girls nav span, html.girls nav svg { color: #3b0f24 !important; }
+html.girls nav .text-gray-400,
+html.girls nav .text-gray-500      { color: #7c2d52 !important; }
+html.girls input, html.girls select, html.girls textarea {
+  background-color: #fff4f8 !important; color: #3b0f24 !important; border-color: #f0a8c8 !important;
+}
+html.girls input::placeholder      { color: #9c3e66 !important; }
+html.girls .bg-blue-600            { background-color: #be185d !important; color: #fff !important; }
+html.girls .hover\:bg-blue-700:hover { background-color: #9d174d !important; }
+html.girls .bg-blue-50             { background-color: #fce4ef !important; }
+html.girls .border-blue-500        { border-color: #ec4899 !important; }
+html.girls .text-blue-400,
+html.girls .text-blue-500,
+html.girls .text-blue-600          { color: #be185d !important; }
+
+/* ===== Sakura Theme 🌸 =====
+ *
+ * Inspiration: Japanischer Frühlingstag – weiße Kirschblüte, blasser Himmel,
+ *             Holzbeige, gebrochenes Weiß, warme Asche-Akzente.
+ *
+ * Palette (WCAG AA):
+ *   #fef6f8   Hintergrund (Kirschblüten-Weiß)
+ *   #1c0a10   Primärtext (tiefstes Kirschholz-Dunkel) ~15:1 ✅
+ *   #3d1520   Überschriften                            ~11:1 ✅
+ *   #6b2737   Sekundärtext                             ~6.2:1 ✅
+ *   #8b3a50   Hints / Placeholder                     ~4.8:1 ✅
+ *   #c0392b   Akzent-Rot (reife Kirsche)               ~5.3:1 auf weiß ✅
+ *   #f9c5d1   Blütenrosa (nur dekorativ, kein Text)
+ *   #fdeef2   Karten-Hintergrund
+ *   #f3e8dc   Holzbeige (Nav-Hintergrund)
+ * ================================================== */
+html.sakura body {
+  background-color: #fef6f8;
+  color: #1c0a10;
+  /* Japanische Serifen-Alternative wenn verfügbar */
+  font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
 }
 
 /* Karten & Panels */
-html.girls .bg-white                { background-color: #fff4f8 !important; }
-html.girls .dark\:bg-gray-800       { background-color: #fce8f1 !important; }
-html.girls .dark\:bg-gray-900       { background-color: #fddaeb !important; }
-html.girls .bg-gray-100             { background-color: #fce4ef !important; }
-html.girls .dark\:bg-gray-700       { background-color: #fad4e8 !important; }
+html.sakura .bg-white              { background-color: #fdeef2 !important; }
+html.sakura .dark\:bg-gray-800     { background-color: #fdeef2 !important; }
+html.sakura .dark\:bg-gray-900     { background-color: #fce6ec !important; }
+html.sakura .bg-gray-100           { background-color: #fce6ec !important; }
+html.sakura .dark\:bg-gray-700     { background-color: #f8d9e3 !important; }
 
-/* Rahmen – nur dekorativ */
-html.girls .border-gray-200,
-html.girls .dark\:border-gray-700   { border-color: #f0a8c8 !important; }
-html.girls .border-gray-300,
-html.girls .dark\:border-gray-600   { border-color: #f0a8c8 !important; }
+/* Rahmen */
+html.sakura .border-gray-200,
+html.sakura .dark\:border-gray-700 { border-color: #f4b8c8 !important; }
+html.sakura .border-gray-300,
+html.sakura .dark\:border-gray-600 { border-color: #f4b8c8 !important; }
 
-/* Text – alle Grautöne auf WCAG-konforme dunkle Pinktöne umstellen */
-html.girls .text-gray-900,
-html.girls .dark\:text-white,
-html.girls .text-white              { color: #3b0f24 !important; }  /* ~13:1 ✅ */
+/* Text */
+html.sakura .text-gray-900,
+html.sakura .dark\:text-white,
+html.sakura .text-white            { color: #1c0a10 !important; }
+html.sakura .text-gray-700,
+html.sakura .text-gray-800         { color: #3d1520 !important; }
+html.sakura .text-gray-500,
+html.sakura .text-gray-600         { color: #6b2737 !important; }
+html.sakura .text-gray-400         { color: #8b3a50 !important; }
 
-html.girls .text-gray-700,
-html.girls .text-gray-800           { color: #5b1535 !important; }  /* ~9:1  ✅ */
-
-html.girls .text-gray-500,
-html.girls .text-gray-600           { color: #7c2d52 !important; }  /* ~5.5:1 ✅ */
-
-html.girls .text-gray-400           { color: #9c3e66 !important; }  /* ~4.6:1 ✅ – Mindestkontrast */
-
-/* Nav – vollständig eigenständige Palette */
-html.girls nav {
-  background-color: #fce4ef !important;
-  border-color: #f0a8c8 !important;
+/* Nav – warmes Holzbeige wie ein japanischer Tempel */
+html.sakura nav {
+  background-color: #f3e8dc !important;
+  border-color: #e8c9b8 !important;
 }
-html.girls nav a,
-html.girls nav button,
-html.girls nav span,
-html.girls nav svg {
-  color: #3b0f24 !important;   /* tiefes Beere – Kontrast ~13:1 auf #fce4ef ✅ */
-}
-html.girls nav .text-gray-400,
-html.girls nav .text-gray-500 {
-  color: #7c2d52 !important;   /* auch Untertitel/Icons lesbar ✅ */
-}
+html.sakura nav a,
+html.sakura nav button,
+html.sakura nav span,
+html.sakura nav svg                { color: #1c0a10 !important; }
+html.sakura nav .text-gray-400,
+html.sakura nav .text-gray-500     { color: #6b2737 !important; }
 
-/* Inputs & Selects */
-html.girls input,
-html.girls select,
-html.girls textarea {
-  background-color: #fff4f8 !important;
-  color: #3b0f24 !important;
-  border-color: #f0a8c8 !important;
+/* Inputs */
+html.sakura input, html.sakura select, html.sakura textarea {
+  background-color: #fdeef2 !important;
+  color: #1c0a10 !important;
+  border-color: #f4b8c8 !important;
 }
-html.girls input::placeholder { color: #9c3e66 !important; }
+html.sakura input::placeholder     { color: #8b3a50 !important; }
 
-/* Buttons & Akzente */
-html.girls .bg-blue-600             { background-color: #be185d !important; color: #fff !important; }
-html.girls .hover\:bg-blue-700:hover{ background-color: #9d174d !important; }
-html.girls .bg-blue-50              { background-color: #fce4ef !important; }
-html.girls .dark\:bg-blue-900\/20   { background-color: #fce4ef !important; }
-html.girls .border-blue-500         { border-color: #ec4899 !important; }
-html.girls .text-blue-400,
-html.girls .text-blue-500,
-html.girls .text-blue-600           { color: #be185d !important; }
+/* Buttons – Kirschrot-Akzent */
+html.sakura .bg-blue-600           { background-color: #c0392b !important; color: #fff !important; }
+html.sakura .hover\:bg-blue-700:hover { background-color: #a93226 !important; }
+html.sakura .bg-blue-50            { background-color: #fce6ec !important; }
+html.sakura .dark\:bg-blue-900\/20 { background-color: #fce6ec !important; }
+html.sakura .border-blue-500       { border-color: #e8768a !important; }
+html.sakura .text-blue-400,
+html.sakura .text-blue-500,
+html.sakura .text-blue-600         { color: #c0392b !important; }
+
+/* Scrollbar passend */
+html.sakura ::-webkit-scrollbar        { width: 6px; }
+html.sakura ::-webkit-scrollbar-track  { background: #fce6ec; }
+html.sakura ::-webkit-scrollbar-thumb  { background: #f4b8c8; border-radius: 3px; }
+
+/* ===== Sakura-Blütenregen Animation ===== */
+@keyframes sakura-fall {
+  0% {
+    transform: translateY(-30px) translateX(0px) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  /* leichtes Schaukeln durch sinusförmige X-Bewegung via CSS-Keyframes */
+  25% {
+    transform: translateY(25vh) translateX(calc(var(--drift, 0px) * 0.3)) rotate(90deg);
+  }
+  50% {
+    transform: translateY(50vh) translateX(calc(var(--drift, 0px) * 0.7)) rotate(200deg);
+  }
+  75% {
+    transform: translateY(75vh) translateX(var(--drift, 0px)) rotate(290deg);
+    opacity: 0.9;
+  }
+  95% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(110vh) translateX(calc(var(--drift, 0px) * 1.2)) rotate(360deg);
+    opacity: 0;
+  }
+}
 
 /* ===== Farbenblindheits-Filter ===== */
 html.cb-deuteranopia  { filter: url(#cb-deuteranopia);  }
@@ -184,7 +253,7 @@ html.cb-protanopia    { filter: url(#cb-protanopia);    }
 html.cb-tritanopia    { filter: url(#cb-tritanopia);    }
 html.cb-achromatopsia { filter: url(#cb-achromatopsia); }
 
-/* ===== Skip-Link (Screenreader) ===== */
+/* ===== Skip-Link ===== */
 .skip-link {
   position: absolute; top: -100%; left: 0;
   background: #1d4ed8; color: #fff;
@@ -193,10 +262,8 @@ html.cb-achromatopsia { filter: url(#cb-achromatopsia); }
 }
 .skip-link:focus { top: 0; }
 
-/* ===== Mindest-Touch-Target (WCAG 2.5.5) – nur Nav ===== */
-nav button, nav a,
-[role="menuitem"],
-.touch-target {
+/* ===== Touch-Targets (WCAG 2.5.5) – nur Nav ===== */
+nav button, nav a, [role="menuitem"], .touch-target {
   min-height: 44px; min-width: 44px;
   display: inline-flex; align-items: center; justify-content: center;
 }

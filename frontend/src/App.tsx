@@ -6,6 +6,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import TopNav from './components/TopNav'
 import ShortcutOverlay from './components/ShortcutOverlay'
 import UndoToast from './components/UndoToast'
+import SakuraPetals from './components/SakuraPetals'
 import Dashboard from './pages/Dashboard'
 import Jobs from './pages/Jobs'
 import Kanban from './pages/Kanban'
@@ -45,6 +46,9 @@ function AppInner() {
       {/* Globale Overlays */}
       <ShortcutOverlay isOpen={shortcutOpen} onClose={() => setShortcutOpen(false)} />
       <UndoToast state={undoState} onUndo={undo} onDismiss={dismiss} />
+
+      {/* Sakura Blütenblätter – nur aktiv wenn theme === 'sakura' */}
+      <SakuraPetals />
     </div>
   )
 }

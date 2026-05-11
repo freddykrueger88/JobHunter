@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 
-export type Theme = 'dark' | 'light' | 'boys' | 'girls' | 'dyslexic'
+export type Theme = 'dark' | 'light' | 'boys' | 'girls' | 'sakura' | 'dyslexic'
 export type ColorBlindMode = 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'achromatopsia'
 
 const CB_CLASSES: ColorBlindMode[] = ['deuteranopia', 'protanopia', 'tritanopia', 'achromatopsia']
+const ALL_THEMES: Theme[] = ['dark', 'light', 'boys', 'girls', 'sakura', 'dyslexic']
 
 interface ThemeContextType {
   theme: Theme
@@ -27,9 +28,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const applyTheme = (t: Theme) => {
     const html = document.documentElement
-    // Dark/Light-Klasse
-    html.classList.remove('dark', 'light', 'boys', 'girls', 'dyslexic')
-    html.classList.add(t === 'dark' || t === 'boys' || t === 'dyslexic' ? 'dark' : 'light')
+    html.classList.remove(...ALL_THEMES, 'dark', 'light')
+    // dark-Modus-Klasse für Tailwind dark: Varianten
+    const isDark = t === 'dark' || t === 'boys' || t === 'dyslexic'
+    html.classList.add(isDark ? 'dark' : 'light')
     html.classList.add(t)
   }
 

@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Basis-Schriftgröße in rem für Skalierbarkeit (Accessibility) */
+html {
+  font-size: 16px;
+}
+
+/* Fokus-Indikator für Tastaturnavigation (WCAG) */
+*:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Scrollbar Dark */
+.dark ::-webkit-scrollbar { width: 6px; }
+.dark ::-webkit-scrollbar-track { background: #161b22; }
+.dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }

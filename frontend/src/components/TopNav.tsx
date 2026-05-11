@@ -1,8 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LayoutDashboard, Search, KanbanSquare, History, Settings, Bell } from 'lucide-react'
-import { useTheme } from '../context/ThemeContext'
-import type { Theme } from '../context/ThemeContext'
 import clsx from 'clsx'
 
 const navItems = [
@@ -14,16 +12,8 @@ const navItems = [
   { to: '/settings',  icon: Settings,        key: 'settings' },
 ]
 
-const themeOptions: { value: Theme; label: string }[] = [
-  { value: 'dark',  label: '🌙 Dark' },
-  { value: 'light', label: '☀️ Light' },
-  { value: 'boys',  label: '💙 Boys' },
-  { value: 'girls', label: '🌸 Girls' },
-]
-
 export default function TopNav() {
   const { t, i18n } = useTranslation()
-  const { theme, setTheme } = useTheme()
 
   return (
     <nav
@@ -57,23 +47,18 @@ export default function TopNav() {
         ))}
       </ul>
 
-      <div className="flex items-center gap-2">
-        <select
-          value={theme}
-          onChange={e => setTheme(e.target.value as Theme)}
-          className="bg-gray-700 text-white text-sm rounded px-2 py-1 border-0 focus:ring-2"
-          aria-label="Design wählen"
-        >
-          {themeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <button
-          onClick={() => { const n = i18n.language === 'de' ? 'en' : 'de'; i18n.changeLanguage(n); localStorage.setItem('lang', n) }}
-          className="text-sm text-gray-300 hover:text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors"
-          aria-label="Sprache wechseln"
-        >
-          {i18n.language === 'de' ? '🇬🇧 EN' : '🇩🇪 DE'}
-        </button>
-      </div>
+      {/* Sprache – schneller Wechsel ohne Umweg über Einstellungen */}
+      <button
+        onClick={() => {
+          const next = i18n.language === 'de' ? 'en' : 'de'
+          i18n.changeLanguage(next)
+          localStorage.setItem('lang', next)
+        }}
+        className="text-sm text-gray-300 hover:text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors"
+        aria-label="Sprache wechseln"
+      >
+        {i18n.language === 'de' ? '🇬🇧 EN' : '🇩🇪 DE'}
+      </button>
     </nav>
   )
 }

@@ -16,7 +16,7 @@
 
 ## Was ist JobHunter?
 
-JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung. Alle Daten bleiben auf deinem Rechner – kein Account, kein Abo, keine Cloud. Die KI läuft lokal über [Ollama](https://ollama.com).
+JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung. Alle Daten bleiben auf deinem Rechner – kein Account, kein Abo, keine Cloud. Die KI läuft lokal über [Ollama](https://ollama.com) direkt in Docker.
 
 ---
 
@@ -74,22 +74,41 @@ JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung.
 
 ## 🚀 Schnellstart
 
+**Voraussetzungen:** Docker, Docker Compose, Python 3 (für die Schlüssel-Generierung)
+
 ```bash
+# 1. Repository klonen
 git clone https://github.com/freddykrueger88/JobHunter.git
 cd JobHunter
+
+# 2. .env-Datei erstellen
 cp .env.example .env
+```
 
-# Verschlüsselungsschlüssel generieren und in .env eintragen:
-python3 -c "import secrets, base64; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
+Jetzt `.env` öffnen und die drei Pflichtfelder befüllen:
 
-# KI-Modell laden (Mistral empfohlen):
-ollama pull mistral
+```bash
+# DB_PASSWORD generieren (beliebiger sicherer String):
+python3 -c "import secrets; print(secrets.token_hex(16))"
 
-# Starten:
+# SECRET_KEY generieren:
+python3 -c "import secrets; print(secrets.token_hex(32))"
+
+# ENCRYPTION_KEY generieren (muss ein Fernet-Key sein):
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+```bash
+# 3. Alle Dienste starten (Backend, Frontend, Datenbank, Ollama)
 docker compose up -d
+
+# 4. KI-Modell in den Ollama-Container laden (Mistral empfohlen)
+docker exec jobhunter-ollama ollama pull mistral
 ```
 
 🌍 **http://localhost:3000** öffnen
+
+> **GPU-Unterstützung (NVIDIA):** Den `deploy`-Block in der `docker-compose.yml` unter dem `ollama`-Service auskommentieren.
 
 ---
 

@@ -1,4 +1,92 @@
-# Barrierefreiheit (WCAG 2.1 AA)
+# ♿ Accessibility (WCAG 2.1 AA) / Barrierefreiheit
+
+🇩🇪 [Deutsche Version](#deutsch) | 🇬🇧 [English Version](#english)
+
+---
+
+## English
+
+JobHunter was developed according to the **WCAG 2.1 Level AA** guidelines and includes additional inclusion features beyond the standard.
+
+## Supported Inclusion Themes
+
+| Feature | Implementation |
+|---------|----------|
+| 🌙 Dark / ☀️ Light / 💙 Boys / 🌸 Girls Mode | 4 visual themes |
+| 📚 Dyslexia Theme | OpenDyslexic font + reading optimizations |
+| 👁️ Deuteranopia (green weakness) | SVG `feColorMatrix` filter |
+| 👁️ Protanopia (red weakness) | SVG `feColorMatrix` filter |
+| 👁️ Tritanopia (blue-yellow weakness) | SVG `feColorMatrix` filter |
+| 👁️ Achromatopsia (complete color blindness) | `feColorMatrix saturate=0` |
+| ♿ Screen Reader | Skip link, aria-live, focus management |
+
+## Dyslexia Theme (OpenDyslexic)
+
+- **Font**: OpenDyslexic (SIL Open Font License, locally hosted, GDPR-compliant)
+- **Line spacing**: 1.8 (instead of 1.5)
+- **Letter spacing**: +0.05em
+- **Word spacing**: +0.1em
+- **Line length**: max. 65 characters
+- **Background**: Cream white #fffef5 (no harsh white – reduces flickering)
+
+### Font Installation
+```bash
+curl -L https://github.com/antijingoist/opendyslexic/releases/latest/download/OpenDyslexic-Regular.woff2 \
+  -o frontend/public/fonts/OpenDyslexic/OpenDyslexic-Regular.woff2
+```
+
+## Color Blindness Filters
+
+All filters are rendered as SVG `feColorMatrix` directly in the browser – no JavaScript, no external dependency.
+They are applied as CSS classes on `<html>` and can be combined with all themes.
+
+## Screen Reader Support
+
+### Skip Link
+First DOM element in `index.html`: `<a href="#main-content">Skip to main content</a>`.
+Only visible via Tab key, shown on focus.
+
+### aria-live Regions
+Two global regions in `index.html`:
+- `#sr-announcer` (`aria-live="polite"`) – non-critical updates
+- `#sr-alert` (`role="alert"`) – errors and critical messages
+
+Usage in code via `useAnnounce()` hook:
+```tsx
+const { announce, alert } = useAnnounce()
+announce('12 new jobs loaded')   // Screen reader reads on next pause
+alert('Connection error')         // Screen reader reads immediately
+```
+
+### Focus Management
+Modals use `useFocusTrap(isOpen)` hook:
+- Focus is drawn in when opening (first focusable element)
+- Tab navigation stays within the modal
+- On close: focus returns to the triggering button
+
+## Keyboard Navigation
+- All interactive elements reachable via `Tab`
+- Active focus always visible via `focus-visible` (2px outline)
+- Drag & Drop in Kanban alternatively operable via status buttons
+- `Escape` closes modals and inline editors
+
+## Color Contrast
+- Dark Mode: Text `#c9d1d9` on `#0d1117` → Contrast 13:1 ✅
+- Light Mode: Text `#111827` on `#ffffff` → Contrast 19:1 ✅
+- Girls Mode: Text `#7a1a4b` on `#fff0f7` → Contrast 8:1 ✅
+- Dyslexia: Text `#1a1a1a` on `#fffef5` → Contrast 18:1 ✅
+
+## Testing Tools
+- [axe DevTools](https://www.deque.com/axe/)
+- [WAVE](https://wave.webaim.org/)
+- NVDA + Firefox (Windows)
+- VoiceOver + Safari (macOS / iOS)
+- Lighthouse Accessibility Score: **98/100**
+
+---
+---
+
+## Deutsch
 
 JobHunter wurde nach den Richtlinien der **WCAG 2.1 Level AA** entwickelt und enthält zusätzliche Inklusions-Features über den Standard hinaus.
 
@@ -25,7 +113,6 @@ JobHunter wurde nach den Richtlinien der **WCAG 2.1 Level AA** entwickelt und en
 
 ### Font-Installation
 ```bash
-# Einmalig beim ersten Start (oder via Dockerfile):
 curl -L https://github.com/antijingoist/opendyslexic/releases/latest/download/OpenDyslexic-Regular.woff2 \
   -o frontend/public/fonts/OpenDyslexic/OpenDyslexic-Regular.woff2
 ```
@@ -33,51 +120,30 @@ curl -L https://github.com/antijingoist/opendyslexic/releases/latest/download/Op
 ## Farbenblindheits-Filter
 
 Alle Filter werden als SVG `feColorMatrix` direkt im Browser gerendert – kein JavaScript, keine externe Abhängigkeit.
-Sie werden als CSS-Klassen auf `<html>` angewendet und können mit allen Themes kombiniert werden.
-
-### Hintergrund zu feColorMatrix-Werten
-Die Matrizen simulieren die veränderte Farbwahrnehmung durch Anpassung der RGB-Kanal-Gewichtung.
-Sie sind keine Simulation für Entwickler, sondern **echte Accessibility-Filter** für Nutzer.
 
 ## Screenreader-Unterstützung
 
 ### Skip-Link
 Erstes DOM-Element in `index.html`: `<a href="#main-content">Zum Hauptinhalt springen</a>`.
-Nur per Tab-Taste sichtbar, im Fokus eingeblendet.
 
 ### aria-live Regionen
-Zwei globale Regionen in `index.html`:
 - `#sr-announcer` (`aria-live="polite"`) – nicht-kritische Updates
 - `#sr-alert` (`role="alert"`) – Fehler und kritische Meldungen
 
-Verwendung im Code via `useAnnounce()` Hook:
 ```tsx
 const { announce, alert } = useAnnounce()
-announce('12 neue Stellen geladen')  // Screenreader liest beim nächsten Pause-Moment
-alert('Verbindungsfehler')            // Screenreader liest sofort
+announce('12 neue Stellen geladen')
+alert('Verbindungsfehler')
 ```
-
-### Fokus-Management
-Modale verwenden `useFocusTrap(isOpen)` Hook:
-- Fokus wird beim Öffnen hineingezogen (erstes fokussierbares Element)
-- Tab-Navigation bleibt innerhalb des Modals
-- Beim Schließen: Fokus kehrt zur auslösenden Schaltfläche zurück
 
 ## Tastaturnavigation
 - Alle interaktiven Elemente per `Tab` erreichbar
-- Aktiver Fokus immer sichtbar via `focus-visible` (2px Outline)
-- Drag & Drop im Kanban alternativ per Status-Buttons bedienbar
-- `Escape` schließt Modale und Inline-Editoren
+- Fokus immer sichtbar via `focus-visible` (2px Outline)
+- `Escape` schließt Modale
 
 ## Farbkontrast
-- Dark Mode: Text `#c9d1d9` auf `#0d1117` → Kontrast 13:1 ✅
-- Light Mode: Text `#111827` auf `#ffffff` → Kontrast 19:1 ✅
-- Girls Mode: Text `#7a1a4b` auf `#fff0f7` → Kontrast 8:1 ✅
-- Legasthenie: Text `#1a1a1a` auf `#fffef5` → Kontrast 18:1 ✅
+- Dark Mode: 13:1 ✅ | Light Mode: 19:1 ✅ | Girls Mode: 8:1 ✅ | Legasthenie: 18:1 ✅
 
 ## Prüftools
-- [axe DevTools](https://www.deque.com/axe/)
-- [WAVE](https://wave.webaim.org/)
-- NVDA + Firefox (Windows)
-- VoiceOver + Safari (macOS / iOS)
+- [axe DevTools](https://www.deque.com/axe/) · [WAVE](https://wave.webaim.org/) · NVDA · VoiceOver
 - Lighthouse Accessibility Score: **98/100**

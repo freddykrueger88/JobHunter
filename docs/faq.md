@@ -1,63 +1,56 @@
-# ❓ FAQ & Schnellhilfe
+# ❓ FAQ & Quick Help / Schnellhilfe
 
-Häufige Probleme und Lösungen beim Einrichten und Betreiben von JobHunter.
+🇩🇪 [Deutsche Version](#deutsch) | 🇬🇧 [English Version](#english)
 
 ---
 
-## 🚀 Installation & Start
+## English
 
-### `ModuleNotFoundError: No module named 'cryptography'`
+Common problems and solutions when setting up and running JobHunter.
 
-Das Python-Paket `cryptography` ist nicht system-weit installiert. Lösung: Den ENCRYPTION_KEY direkt aus dem Backend-Container generieren:
+---
+
+### 🚀 Installation & Start
+
+#### `ModuleNotFoundError: No module named 'cryptography'`
 
 ```bash
 docker compose run --rm backend python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
-Alternativ systemweit installieren:
-
-```bash
+# or install globally:
 pip3 install cryptography
 ```
 
 ---
 
-### `Bind for 0.0.0.0:3000 failed: port is already allocated`
-
-Ein anderer Container oder Prozess belegt Port 3000. Prüfen:
+#### `Bind for 0.0.0.0:3000 failed: port is already allocated`
 
 ```bash
 docker ps
 ss -tlnp | grep :3000
 ```
 
-**Option A** – anderen Container stoppen:
+**Option A** – Stop other container:
 ```bash
 docker stop <container-name>
 docker compose up -d
 ```
 
-**Option B** – JobHunter auf anderem Port starten, in `docker-compose.yml`:
+**Option B** – Use different port in `docker-compose.yml`:
 ```yaml
-# frontend:
-#   ports:
-#     - "3001:3000"   ← statt 3000:3000
+# ports:
+#   - "3001:3000"
 ```
-→ Dann erreichbar unter **http://localhost:3001**
+→ Then available at **http://localhost:3001**
 
 ---
 
-### Frontend startet nicht / `Restarting`-Schleife
+#### Frontend not starting / `Restarting` loop
 
-Prüfe die Logs:
 ```bash
 docker logs jobhunter-frontend --tail 50
 ```
 
-**Häufigste Ursache: fehlendes npm-Paket** (z.B. `Cannot find module 'vite-plugin-pwa'`)
-
-Das passiert wenn das `node_modules`-Volume-Mount den Container-Inhalt überschreibt. Lösung: Image neu bauen:
-
+Most common cause: missing npm package. Fix:
 ```bash
 docker compose down
 docker compose build --no-cache frontend
@@ -66,104 +59,71 @@ docker compose up -d
 
 ---
 
-### Alle Container stoppen und sauber neu starten
+#### Stop all containers and restart cleanly
 
 ```bash
 docker compose down
 docker compose up -d
-```
-
-Mit komplettem Rebuild (z.B. nach Code-Änderungen):
-```bash
-docker compose down
-docker compose build --no-cache
-docker compose up -d
+# With full rebuild:
+docker compose down && docker compose build --no-cache && docker compose up -d
 ```
 
 ---
 
-## 🤖 Ollama / KI
+### 🤖 Ollama / AI
 
-### KI-Modell laden (nach dem ersten Start)
-
-Ollama läuft als Docker-Container. Das Modell muss **in den Container** geladen werden:
+#### Load AI model (after first start)
 
 ```bash
 docker exec jobhunter-ollama ollama pull mistral
-```
-
-Andere empfohlene Modelle:
-```bash
+# Other recommended models:
 docker exec jobhunter-ollama ollama pull llama3
 docker exec jobhunter-ollama ollama pull phi3
 ```
 
-### KI antwortet nicht / Timeout
+#### AI not responding / Timeout
 
-1. Prüfen ob Ollama läuft: `docker ps | grep ollama`
-2. Modell geladen? `docker exec jobhunter-ollama ollama list`
-3. Logs prüfen: `docker logs jobhunter-ollama --tail 30`
-4. Ollama neu starten: `docker restart jobhunter-ollama`
+1. Check if Ollama is running: `docker ps | grep ollama`
+2. Model loaded? `docker exec jobhunter-ollama ollama list`
+3. Check logs: `docker logs jobhunter-ollama --tail 30`
+4. Restart: `docker restart jobhunter-ollama`
 
-### GPU-Unterstützung aktivieren (NVIDIA)
+#### Enable GPU support (NVIDIA)
 
-In `docker-compose.yml` den `deploy`-Block unter `ollama` auskommentieren:
-
-```yaml
-# deploy:
-#   resources:
-#     reservations:
-#       devices:
-#         - driver: nvidia
-#           count: 1
-#           capabilities: [gpu]
-```
-
-→ Dann `docker compose up -d` erneut ausführen.
+Uncomment `deploy` block under `ollama` in `docker-compose.yml`, then `docker compose up -d`.
 
 ---
 
-## 🔒 Konfiguration
+### 🔒 Configuration
 
-### Welche Werte müssen in `.env` gesetzt werden?
+#### Which values must be set in `.env`?
 
-| Variable | Beschreibung | Generieren mit |
+| Variable | Description | Generate with |
 |---|---|---|
-| `DB_PASSWORD` | PostgreSQL-Passwort | `python3 -c "import secrets; print(secrets.token_hex(16))"` |
-| `SECRET_KEY` | JWT-Signing-Key | `python3 -c "import secrets; print(secrets.token_hex(32))"` |
-| `ENCRYPTION_KEY` | Fernet-Key für API-Keys | `docker compose run --rm backend python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
-| `OLLAMA_BASE_URL` | Ollama-Adresse | Standard: `http://ollama:11434` (nicht ändern bei Docker) |
-
-### Backend startet nicht wegen Datenbankfehler
-
-Die Datenbank braucht beim ersten Start etwas länger. Der Backend-Container wartet automatisch bis PostgreSQL `healthy` ist. Falls trotzdem Fehler:
-
-```bash
-docker logs jobhunter-backend --tail 30
-docker logs jobhunter-db --tail 20
-```
+| `DB_PASSWORD` | PostgreSQL password | `python3 -c "import secrets; print(secrets.token_hex(16))"` |
+| `SECRET_KEY` | JWT signing key | `python3 -c "import secrets; print(secrets.token_hex(32))"` |
+| `ENCRYPTION_KEY` | Fernet key for API keys | `docker compose run --rm backend python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
+| `OLLAMA_BASE_URL` | Ollama address | Default: `http://ollama:11434` (don't change with Docker) |
 
 ---
 
-## 📊 Daten & Backup
+### 📊 Data & Backup
 
-### Wo werden die Daten gespeichert?
+#### Where is data stored?
 
-Alle Daten liegen in Docker-Volumes auf deinem Rechner:
-- `pgdata` – PostgreSQL-Datenbank
-- `ollama-data` – KI-Modelle
-- `uploads` – hochgeladene Dateien (Lebensläufe, Fotos)
+All data lives in Docker volumes on your machine:
+- `pgdata` – PostgreSQL database
+- `ollama-data` – AI models
+- `uploads` – uploaded files (CVs, photos)
 
-### Datenbank-Volumes löschen (kompletter Reset)
+#### Delete database volumes (full reset)
 
 ```bash
 docker compose down -v
 ```
-⚠️ **Achtung:** Löscht alle gespeicherten Bewerbungen und Einstellungen.
+⚠️ **Warning:** Deletes all saved applications and settings.
 
-### Backup erstellen
-
-JobHunter sichert täglich automatisch alle Daten als `.json.gz` im Container. Manuelles Backup auslösen:
+#### Create backup
 
 ```bash
 docker exec jobhunter-backend python -c "from services.backup import run_backup; import asyncio; asyncio.run(run_backup())"
@@ -171,15 +131,111 @@ docker exec jobhunter-backend python -c "from services.backup import run_backup;
 
 ---
 
-## 🔄 Updates
-
-### JobHunter auf neue Version aktualisieren
+### 🔄 Updates
 
 ```bash
 git pull origin main
 docker compose down
 docker compose build --no-cache
 docker compose up -d
+```
+
+---
+
+*Problem not listed? → [Create an Issue](https://github.com/freddykrueger88/JobHunter/issues/new)*
+
+---
+---
+
+## Deutsch
+
+Häufige Probleme und Lösungen beim Einrichten und Betreiben von JobHunter.
+
+---
+
+### 🚀 Installation & Start
+
+#### `ModuleNotFoundError: No module named 'cryptography'`
+
+```bash
+docker compose run --rm backend python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# oder systemweit:
+pip3 install cryptography
+```
+
+---
+
+#### `Bind for 0.0.0.0:3000 failed: port is already allocated`
+
+```bash
+docker ps
+ss -tlnp | grep :3000
+```
+
+**Option A** – anderen Container stoppen:
+```bash
+docker stop <container-name> && docker compose up -d
+```
+
+**Option B** – anderen Port in `docker-compose.yml` setzen:
+```yaml
+# ports:
+#   - "3001:3000"
+```
+
+---
+
+#### Frontend startet nicht / `Restarting`-Schleife
+
+```bash
+docker logs jobhunter-frontend --tail 50
+docker compose down && docker compose build --no-cache frontend && docker compose up -d
+```
+
+---
+
+### 🤖 Ollama / KI
+
+#### KI-Modell laden
+
+```bash
+docker exec jobhunter-ollama ollama pull mistral
+docker exec jobhunter-ollama ollama pull llama3
+docker exec jobhunter-ollama ollama pull phi3
+```
+
+#### KI antwortet nicht
+
+1. `docker ps | grep ollama`
+2. `docker exec jobhunter-ollama ollama list`
+3. `docker logs jobhunter-ollama --tail 30`
+4. `docker restart jobhunter-ollama`
+
+---
+
+### 🔒 Konfiguration
+
+| Variable | Beschreibung | Generieren mit |
+|---|---|---|
+| `DB_PASSWORD` | PostgreSQL-Passwort | `python3 -c "import secrets; print(secrets.token_hex(16))"` |
+| `SECRET_KEY` | JWT-Signing-Key | `python3 -c "import secrets; print(secrets.token_hex(32))"` |
+| `ENCRYPTION_KEY` | Fernet-Key | `docker compose run --rm backend python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
+| `OLLAMA_BASE_URL` | Ollama-Adresse | Standard: `http://ollama:11434` |
+
+---
+
+### 📊 Daten & Backup
+
+- Daten in Docker-Volumes: `pgdata`, `ollama-data`, `uploads`
+- Manuelles Backup: `docker exec jobhunter-backend python -c "from services.backup import run_backup; import asyncio; asyncio.run(run_backup())"`
+- Alles zurücksetzen: `docker compose down -v` ⚠️
+
+---
+
+### 🔄 Updates
+
+```bash
+git pull origin main && docker compose down && docker compose build --no-cache && docker compose up -d
 ```
 
 ---

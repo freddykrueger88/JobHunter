@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Save, Eye, EyeOff, ExternalLink, Download, Upload } from 'lucide-react'
+import { Save, Eye, EyeOff, ExternalLink, Download, Upload, Check } from 'lucide-react'
 import clsx from 'clsx'
 
 interface SettingsData {
@@ -14,14 +14,64 @@ interface SettingsData {
   has_adzuna_key: boolean; has_linkedin_key: boolean; has_arbeitsagentur_key: boolean
 }
 
-const THEMES: { value: Theme; label: string; preview: string }[] = [
-  { value: 'dark',     label: '🌙 Dark Mode',    preview: 'bg-gray-900 text-white' },
-  { value: 'light',    label: '☀️ Light Mode',   preview: 'bg-white text-gray-900 border border-gray-200' },
-  { value: 'boys',     label: '💙 Boys Mode',    preview: 'bg-blue-950 text-blue-100' },
-  { value: 'girls',    label: '🌸 Girls Mode',   preview: 'bg-pink-100 text-pink-900' },
-  { value: 'sakura',   label: '🌸 Sakura',       preview: 'bg-rose-50 text-rose-900 border border-rose-200' },
-  { value: 'dyslexic', label: '📚 Legasthenie',  preview: 'bg-amber-50 text-gray-900 border border-amber-200' },
+// Jedes Theme hat einen Mini-Mockup: nav-Farbe, body-Farbe, text-Farbe, accent-Farbe
+const THEMES: {
+  value: Theme
+  emoji: string
+  label: string
+  sublabel: string
+  nav: string      // Hintergrund Nav-Balken
+  navText: string  // Textfarbe im Nav
+  body: string     // Hintergrund Inhaltsbereich
+  card: string     // Karten-Hintergrund
+  cardText: string // Text auf Karten
+  accent: string   // Akzentfarbe (Button-Simulation)
+  accentText: string
+}[] = [
+  {
+    value: 'dark',
+    emoji: '🌙', label: 'Dark', sublabel: 'Dunkel & klassisch',
+    nav: '#0d1117', navText: '#c9d1d9',
+    body: '#161b22', card: '#21262d', cardText: '#e6edf3',
+    accent: '#2563eb', accentText: '#fff',
+  },
+  {
+    value: 'light',
+    emoji: '☀️', label: 'Hell', sublabel: 'Sauber & klar',
+    nav: '#ffffff', navText: '#111827',
+    body: '#f9fafb', card: '#ffffff', cardText: '#111827',
+    accent: '#2563eb', accentText: '#fff',
+  },
+  {
+    value: 'boys',
+    emoji: '🌊', label: 'Ocean', sublabel: 'Tiefes Marineblau',
+    nav: '#0a1628', navText: '#cfe0f4',
+    body: '#0d1b2e', card: '#112240', cardText: '#e2eaf4',
+    accent: '#1d4ed8', accentText: '#fff',
+  },
+  {
+    value: 'girls',
+    emoji: '🌺', label: 'Rose', sublabel: 'Warmes Rosa',
+    nav: '#fce4ef', navText: '#3b0f24',
+    body: '#fdf0f5', card: '#fff4f8', cardText: '#3b0f24',
+    accent: '#be185d', accentText: '#fff',
+  },
+  {
+    value: 'sakura',
+    emoji: '🌸', label: 'Sakura', sublabel: 'Kirschblüte & Japan',
+    nav: '#f3e8dc', navText: '#1c0a10',
+    body: '#fef6f8', card: '#fdeef2', cardText: '#1c0a10',
+    accent: '#c0392b', accentText: '#fff',
+  },
+  {
+    value: 'dyslexic',
+    emoji: '📖', label: 'Lese-Modus', sublabel: 'Legasthenie-optimiert',
+    nav: '#f7f6e7', navText: '#1a1a1a',
+    body: '#fffef5', card: '#fffef0', cardText: '#1a1a1a',
+    accent: '#7c6f1e', accentText: '#fff',
+  },
 ]
+
 const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
   { value: 'none',          label: 'Kein Filter',   desc: 'Standard' },
   { value: 'deuteranopia',  label: 'Deuteranopie',  desc: 'Grün-Schwäche (~6% Männer)' },
@@ -41,12 +91,94 @@ const API_LINKS: Record<string, string> = {
   linkedin: 'https://developer.linkedin.com/',
 }
 
+/** Mini-Mockup: zeigt wie das Theme aussieht – Nav-Balken + Inhaltsbereich + Karte + Button */
+function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boolean }) {
+  return (
+    <button
+      onClick={() => {}}
+      aria-pressed={active}
+      aria-label={`Theme ${opt.label} auswählen`}
+      style={{
+        background: opt.body,
+        borderColor: active ? '#3b82f6' : 'transparent',
+        boxShadow: active ? '0 0 0 3px rgba(59,130,246,0.35)' : undefined,
+      }}
+      className="relative w-full rounded-2xl border-2 overflow-hidden transition-all hover:scale-[1.02] focus-visible:outline-none text-left"
+    >
+      {/* Aktiv-Badge */}
+      {active && (
+        <span
+          className="absolute top-2 right-2 z-10 flex items-center justify-center w-5 h-5 rounded-full bg-blue-500"
+          aria-hidden
+        >
+          <Check size={12} strokeWidth={3} color="#fff" />
+        </span>
+      )}
+
+      {/* Nav-Simulation */}
+      <div
+        style={{ background: opt.nav, borderBottom: `1px solid ${opt.navText}22` }}
+        className="flex items-center gap-1.5 px-3 py-2"
+      >
+        {/* 3 dot-Flächen als Nav-Links-Simulation */}
+        {[40, 28, 34].map((w, i) => (
+          <span
+            key={i}
+            style={{ width: w, height: 6, background: opt.navText, opacity: i === 0 ? 0.9 : 0.4, borderRadius: 3 }}
+          />
+        ))}
+        {/* Rechts: Avatar-Kreis */}
+        <span
+          style={{ width: 16, height: 16, background: opt.accent, borderRadius: '50%', marginLeft: 'auto' }}
+        />
+      </div>
+
+      {/* Body-Simulation */}
+      <div style={{ background: opt.body }} className="px-3 py-3 space-y-2">
+        {/* Karte */}
+        <div
+          style={{ background: opt.card, borderRadius: 6, padding: '6px 8px' }}
+          className="space-y-1.5"
+        >
+          {/* Titelzeile */}
+          <span style={{ display: 'block', width: '70%', height: 7, background: opt.cardText, opacity: 0.85, borderRadius: 3 }} />
+          {/* Subzeile */}
+          <span style={{ display: 'block', width: '50%', height: 5, background: opt.cardText, opacity: 0.35, borderRadius: 3 }} />
+          {/* Button-Simulation */}
+          <span
+            style={{ display: 'inline-block', background: opt.accent, color: opt.accentText, borderRadius: 4, fontSize: 8, padding: '2px 7px', marginTop: 2, fontWeight: 600 }}
+          >
+            Öffnen
+          </span>
+        </div>
+        {/* zweite schmale Karte */}
+        <div
+          style={{ background: opt.card, borderRadius: 6, padding: '5px 8px', display: 'flex', alignItems: 'center', gap: 5 }}
+        >
+          <span style={{ width: 10, height: 10, background: opt.accent, borderRadius: '50%', flexShrink: 0 }} />
+          <span style={{ flex: 1, height: 5, background: opt.cardText, opacity: 0.5, borderRadius: 3 }} />
+        </div>
+      </div>
+
+      {/* Label unterhalb des Mockups */}
+      <div
+        style={{ background: opt.nav, borderTop: `1px solid ${opt.navText}18`, padding: '8px 12px' }}
+      >
+        <span style={{ color: opt.navText, fontWeight: 700, fontSize: 13 }}>
+          {opt.emoji} {opt.label}
+        </span>
+        <span style={{ color: opt.navText, opacity: 0.6, fontSize: 11, display: 'block', marginTop: 1 }}>
+          {opt.sublabel}
+        </span>
+      </div>
+    </button>
+  )
+}
+
 function ToggleSwitch({ value, onChange, id }: { value: boolean; onChange: (v: boolean) => void; id: string }) {
   return (
     <button
-      id={id}
-      role="switch"
-      aria-checked={value}
+      id={id} role="switch" aria-checked={value}
       onClick={() => onChange(!value)}
       style={{ minHeight: 'unset', minWidth: 'unset' }}
       className={clsx(
@@ -86,21 +218,21 @@ export default function Settings() {
     queryFn: () => axios.get('/api/settings/').then(r => r.data),
   })
 
-  const [aiModel, setAiModel] = useState('mistral')
-  const [aiTone, setAiTone] = useState('formell')
-  const locationInitialized = useRef(false)
+  const [aiModel, setAiModel]       = useState('mistral')
+  const [aiTone, setAiTone]         = useState('formell')
+  const locationInitialized         = useRef(false)
   const [defaultLocation, setDefaultLocation] = useState('')
-  const [defaultRadius, setDefaultRadius] = useState(25)
-  const [hideAusbildung, setHideAusbildung] = useState(true)
-  const [reminderDays, setReminderDays] = useState(7)
-  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
-  const [keys, setKeys] = useState<Record<string, string>>({
+  const [defaultRadius, setDefaultRadius]     = useState(25)
+  const [hideAusbildung, setHideAusbildung]   = useState(true)
+  const [reminderDays, setReminderDays]       = useState(7)
+  const [showKeys, setShowKeys]     = useState<Record<string, boolean>>({})
+  const [keys, setKeys]             = useState<Record<string, string>>({
     adzuna_app_id: '', adzuna_api_key: '', linkedin_api_key: '',
     arbeitsagentur_client_id: '', arbeitsagentur_client_secret: '',
   })
-  const [saved, setSaved] = useState(false)
-  const [importing, setImporting] = useState(false)
-  const [importMsg, setImportMsg] = useState('')
+  const [saved, setSaved]           = useState(false)
+  const [importing, setImporting]   = useState(false)
+  const [importMsg, setImportMsg]   = useState('')
 
   const { data: models = [] } = useQuery<string[]>({
     queryKey: ['ai-models'],
@@ -175,29 +307,20 @@ export default function Settings() {
         </button>
       </div>
 
+      {/* ── Erscheinungsbild ── */}
       <Section title="🎨 Erscheinungsbild">
-        <div className="grid grid-cols-2 gap-3">
+        {/* 3-spaltig auf breiten Screens, 2-spaltig auf mobil */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {THEMES.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setTheme(opt.value)}
-              aria-pressed={theme === opt.value}
-              className={clsx(
-                'rounded-xl p-4 text-left border-2 transition-all overflow-hidden',
-                theme === opt.value
-                  ? 'border-blue-500 ring-2 ring-blue-400/30'
-                  : 'border-transparent hover:border-gray-400'
-              )}
-            >
-              <div className={clsx('rounded-lg px-3 py-2 mb-2 text-sm font-semibold', opt.preview)}>
-                Aa 123
-              </div>
-              <div className="font-medium text-sm">{opt.label}</div>
-            </button>
+            // Wrapper-div fängt onClick ab und delegiert an setTheme
+            <div key={opt.value} onClick={() => setTheme(opt.value)} className="cursor-pointer">
+              <ThemeMockup t={opt} active={theme === opt.value} />
+            </div>
           ))}
         </div>
       </Section>
 
+      {/* ── Farbenblindheits-Filter ── */}
       <Section title="👁️ Farbenblindheits-Filter">
         <div className="grid grid-cols-1 gap-2">
           {COLOR_BLIND_MODES.map(opt => (
@@ -219,6 +342,7 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── ADHS & Kognition ── */}
       <Section title="🧠 ADHS & Kognition">
         <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-5">
           <ToggleRow label="ADHS-Modus" desc="Aktiviert Fokus-Modus + reduzierte Bewegung" value={adhdMode} onChange={setAdhdMode} />
@@ -248,6 +372,7 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── Sprache ── */}
       <Section title={`🌍 ${t('settings.language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
@@ -260,6 +385,7 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── KI ── */}
       <Section title={`🤖 ${t('settings.ai')}`}>
         <div className="space-y-4">
           <div>
@@ -283,6 +409,7 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── Stellensuche ── */}
       <Section title="🔍 Stellensuche">
         <div className="space-y-3">
           <div className="flex gap-3">
@@ -307,6 +434,7 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── Erinnerungen ── */}
       <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
@@ -315,14 +443,15 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── API Keys ── */}
       <Section title="🔑 API Keys">
         <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
         {([
-          { key: 'adzuna_app_id',                label: 'Adzuna App ID',            portal: 'adzuna',          hasKey: remote?.has_adzuna_key },
-          { key: 'adzuna_api_key',               label: 'Adzuna API Key',           portal: 'adzuna',          hasKey: remote?.has_adzuna_key },
-          { key: 'arbeitsagentur_client_id',     label: 'Arbeitsagentur Client ID', portal: 'arbeitsagentur',  hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'arbeitsagentur_client_secret', label: 'Arbeitsagentur Secret',    portal: 'arbeitsagentur',  hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'linkedin_api_key',             label: 'LinkedIn API Key',         portal: 'linkedin',        hasKey: remote?.has_linkedin_key },
+          { key: 'adzuna_app_id',                label: 'Adzuna App ID',            portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
+          { key: 'adzuna_api_key',               label: 'Adzuna API Key',           portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
+          { key: 'arbeitsagentur_client_id',     label: 'Arbeitsagentur Client ID', portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
+          { key: 'arbeitsagentur_client_secret', label: 'Arbeitsagentur Secret',    portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
+          { key: 'linkedin_api_key',             label: 'LinkedIn API Key',         portal: 'linkedin',       hasKey: remote?.has_linkedin_key },
         ] as const).map(({ key, label, portal, hasKey }) => (
           <div key={key} className="mb-3">
             <div className="flex items-center gap-2 mb-1">
@@ -350,6 +479,7 @@ export default function Settings() {
         ))}
       </Section>
 
+      {/* ── Export / Import ── */}
       <Section title="📦 Daten Export / Import">
         <div className="space-y-4">
           <div>

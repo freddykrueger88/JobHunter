@@ -28,7 +28,6 @@ html { font-size: 16px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
-/* Manueller reduce-motion Toggle (ADHS-Modus) */
 html.reduce-motion *,
 html.reduce-motion *::before,
 html.reduce-motion *::after {
@@ -37,31 +36,87 @@ html.reduce-motion *::after {
 }
 
 /* ===== ADHS-Modus ===== */
-/* Fokus-Modus: Nav minimiert, Ablenkungen ausblenden */
 html.focus-mode nav { opacity: 0.3; transition: opacity 0.2s; }
 html.focus-mode nav:hover,
 html.focus-mode nav:focus-within { opacity: 1; }
 html.focus-mode .dashboard-widget:not(.dashboard-widget--primary) { display: none; }
 
-/* Kompaktansicht */
+/* ===== Informationsdichte ===== */
+/* Normal: explizit großzügige Abstände */
+html.density-normal .kanban-card { padding: 1rem; }
+html.density-normal .space-y-1 > * + * { margin-top: 0.5rem; }
+html.density-normal p, html.density-normal li { line-height: 1.75; margin-bottom: 0.5rem; }
+
+/* Kompakt */
 html.density-compact .kanban-card { padding: 0.5rem !important; }
 html.density-compact h1 { font-size: 1.25rem !important; }
-html.density-compact .gap-6 { gap: 0.75rem !important; }
-html.density-compact .mb-6 { margin-bottom: 0.75rem !important; }
+html.density-compact .gap-6 { gap: 1rem !important; }
+html.density-compact .mb-6 { margin-bottom: 1rem !important; }
+html.density-compact p, html.density-compact li { line-height: 1.5; margin-bottom: 0.25rem; }
+
+/* Minimal */
 html.density-minimal .kanban-card { padding: 0.35rem !important; }
 html.density-minimal h1 { font-size: 1rem !important; }
 html.density-minimal .text-sm { font-size: 0.7rem !important; }
+html.density-minimal p, html.density-minimal li { line-height: 1.3; margin-bottom: 0.1rem; }
 
 /* ===== Legasthenie-Theme ===== */
-.dyslexic {
+/* Schrift und Lesbarkeit – KEIN layout-breченdes line-height auf allen Elementen */
+html.dyslexic body,
+html.dyslexic main {
   font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
-  font-size: 17px; line-height: 1.8 !important;
-  letter-spacing: 0.05em !important; word-spacing: 0.1em !important;
-  background-color: #fffef5 !important; color: #1a1a1a !important;
+  background-color: #fffef5 !important;
+  color: #1a1a1a !important;
 }
-.dyslexic p, .dyslexic li, .dyslexic td, .dyslexic label, .dyslexic span { max-width: 65ch; }
-.dyslexic .bg-white { background-color: #fffef0 !important; }
-.dyslexic .dark\:bg-gray-800 { background-color: #2a2a1f !important; }
+html.dyslexic p,
+html.dyslexic li,
+html.dyslexic td,
+html.dyslexic label {
+  font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
+  font-size: 1.05rem;
+  line-height: 1.9 !important;
+  letter-spacing: 0.04em;
+  word-spacing: 0.12em;
+  max-width: 65ch;
+}
+html.dyslexic h1, html.dyslexic h2, html.dyslexic h3 {
+  font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
+  letter-spacing: 0.02em;
+}
+/* Hintergrundfarben nur auf Karten-Ebene – keine !important auf flex/grid containers */
+html.dyslexic .bg-white { background-color: #fffef0 !important; }
+html.dyslexic .dark\:bg-gray-800 { background-color: #fdfbea !important; }
+html.dyslexic .bg-gray-100 { background-color: #f7f6e7 !important; }
+/* Kein overflow / kein Verschieben durch globale Padding-Änderungen */
+
+/* ===== Boys Theme ===== */
+html.boys {
+  --color-primary: #1e3a5f;
+  --color-accent: #2563eb;
+}
+html.boys body { background-color: #0d1b2e; color: #e2eaf4; }
+html.boys .bg-white { background-color: #112240 !important; }
+html.boys .dark\:bg-gray-800 { background-color: #112240 !important; }
+html.boys .dark\:bg-gray-900 { background-color: #0a1628 !important; }
+html.boys .border-gray-200,
+html.boys .dark\:border-gray-700 { border-color: #1e3a5f !important; }
+html.boys .text-gray-900,
+html.boys .dark\:text-white { color: #cfe0f4 !important; }
+html.boys .bg-blue-600 { background-color: #1d4ed8 !important; }
+
+/* ===== Girls Theme ===== */
+html.girls body { background-color: #fdf0f5; color: #5b1d3a; }
+html.girls .bg-white { background-color: #fff4f8 !important; }
+html.girls .dark\:bg-gray-800 { background-color: #fce8f1 !important; }
+html.girls .dark\:bg-gray-900 { background-color: #fddaeb !important; }
+html.girls .border-gray-200,
+html.girls .dark\:border-gray-700 { border-color: #f0a8c8 !important; }
+html.girls .text-gray-900,
+html.girls .dark\:text-white { color: #6b1f40 !important; }
+html.girls .text-gray-400 { color: #c47a99 !important; }
+html.girls .bg-blue-600 { background-color: #db2777 !important; }
+html.girls .border-blue-500 { border-color: #ec4899 !important; }
+html.girls nav { background-color: #fce8f1 !important; border-color: #f0a8c8 !important; }
 
 /* ===== Farbenblindheits-Filter ===== */
 html.cb-deuteranopia  { filter: url(#cb-deuteranopia);  }
@@ -79,11 +134,14 @@ html.cb-achromatopsia { filter: url(#cb-achromatopsia); }
 .skip-link:focus { top: 0; }
 
 /* ===== Mindest-Touch-Target (WCAG 2.5.5) ===== */
-button, a, [role="menuitem"], [role="button"] {
+/* Nur auf interaktive Elemente – NICHT pauschal auf alle buttons ===== */
+nav button, nav a,
+[role="menuitem"],
+.touch-target {
   min-height: 44px; min-width: 44px;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.icon-btn-sm { min-height: 32px; min-width: 32px; }
+.icon-btn-sm { min-height: 32px !important; min-width: 32px !important; }
 
 /* ===== Scrollbar Dark ===== */
 .dark ::-webkit-scrollbar { width: 6px; }

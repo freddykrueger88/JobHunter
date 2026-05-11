@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
@@ -14,12 +14,12 @@ interface SettingsData {
   has_adzuna_key: boolean; has_linkedin_key: boolean; has_arbeitsagentur_key: boolean
 }
 
-const THEMES: { value: Theme; label: string; desc: string }[] = [
-  { value: 'dark',     label: '🌙 Dark Mode',   desc: 'Dunkel, klassisch' },
-  { value: 'light',    label: '☀️ Light Mode',  desc: 'Hell, klar' },
-  { value: 'boys',     label: '💙 Boys Mode',   desc: 'Dark Blue' },
-  { value: 'girls',    label: '🌸 Girls Mode',  desc: 'Pink Fluffy Wonderfully ✨' },
-  { value: 'dyslexic', label: '📚 Legasthenie', desc: 'OpenDyslexic – Leseoptimiert' },
+const THEMES: { value: Theme; label: string; preview: string }[] = [
+  { value: 'dark',     label: '🌙 Dark Mode',   preview: 'bg-gray-900 text-white' },
+  { value: 'light',    label: '☀️ Light Mode',  preview: 'bg-white text-gray-900 border border-gray-200' },
+  { value: 'boys',     label: '💙 Boys Mode',   preview: 'bg-blue-950 text-blue-100' },
+  { value: 'girls',    label: '🌸 Girls Mode',  preview: 'bg-pink-100 text-pink-900' },
+  { value: 'dyslexic', label: '📚 Legasthenie', preview: 'bg-amber-50 text-gray-900 border border-amber-200' },
 ]
 const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
   { value: 'none',          label: 'Kein Filter',   desc: 'Standard' },
@@ -29,9 +29,9 @@ const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[
   { value: 'achromatopsia', label: 'Achromatopsie', desc: 'Vollständige Farbenblindheit' },
 ]
 const DENSITY_OPTIONS: { value: Density; label: string; desc: string }[] = [
-  { value: 'normal',  label: 'Normal',   desc: 'Standardabstände' },
-  { value: 'compact', label: 'Kompakt',  desc: 'Weniger Whitespace' },
-  { value: 'minimal', label: 'Minimal',  desc: 'Maximale Informationsdichte' },
+  { value: 'normal',  label: 'Normal',   desc: 'Komfortabler Abstand' },
+  { value: 'compact', label: 'Kompakt',  desc: 'Etwas weniger Abstand' },
+  { value: 'minimal', label: 'Minimal',  desc: 'Maximale Dichte' },
 ]
 const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
@@ -40,15 +40,56 @@ const API_LINKS: Record<string, string> = {
   linkedin: 'https://developer.linkedin.com/',
 }
 
+/** Schlanker Toggle-Schalter ohne min-height-Konflikt */
+function ToggleSwitch({ value, onChange, id }: { value: boolean; onChange: (v: boolean) => void; id: string }) {
+  return (
+    <button
+      id={id}
+      role="switch"
+      aria-checked={value}
+      onClick={() => onChange(!value)}
+      style={{ minHeight: 'unset', minWidth: 'unset' }}
+      className={clsx(
+        'relative flex-shrink-0 w-11 h-6 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+        value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+      )}
+    >
+      <span className={clsx(
+        'absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform',
+        value ? 'translate-x-5' : 'translate-x-0'
+      )} />
+    </button>
+  )
+}
+
+function ToggleRow({ label, desc, value, onChange }: { label: string; desc?: string; value: boolean; onChange: (v: boolean) => void }) {
+  const id = `toggle-${label.replace(/\s+/g, '-').toLowerCase()}`
+  return (
+    <div className="flex items-center justify-between gap-4 py-2">
+      <label htmlFor={id} className="cursor-pointer flex-1">
+        <span className="text-sm font-medium block">{label}</span>
+        {desc && <span className="text-xs text-gray-400">{desc}</span>}
+      </label>
+      <ToggleSwitch id={id} value={value} onChange={onChange} />
+    </div>
+  )
+}
+
 export default function Settings() {
   const { t, i18n } = useTranslation()
   const { theme, setTheme, colorBlindMode, setColorBlindMode } = useTheme()
   const { focusMode, setFocusMode, density, setDensity, reduceMotion, setReduceMotion, adhdMode, setAdhdMode } = useA11y()
   const qc = useQueryClient()
 
-  const { data: remote } = useQuery<SettingsData>({ queryKey: ['settings'], queryFn: () => axios.get('/api/settings/').then(r => r.data) })
+  const { data: remote } = useQuery<SettingsData>({
+    queryKey: ['settings'],
+    queryFn: () => axios.get('/api/settings/').then(r => r.data),
+  })
+
   const [aiModel, setAiModel] = useState('mistral')
   const [aiTone, setAiTone] = useState('formell')
+  // Bug-Fix: useRef verhindert, dass remote den laufenden Input-State überschreibt
+  const locationInitialized = useRef(false)
   const [defaultLocation, setDefaultLocation] = useState('')
   const [defaultRadius, setDefaultRadius] = useState(25)
   const [hideAusbildung, setHideAusbildung] = useState(true)
@@ -62,13 +103,21 @@ export default function Settings() {
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState('')
 
-  const { data: models = [] } = useQuery<string[]>({ queryKey: ['ai-models'], queryFn: () => axios.get('/api/ai/models').then(r => r.data.models) })
+  const { data: models = [] } = useQuery<string[]>({
+    queryKey: ['ai-models'],
+    queryFn: () => axios.get('/api/ai/models').then(r => r.data.models),
+  })
 
   useEffect(() => {
     if (remote) {
-      setAiModel(remote.ai_model); setAiTone(remote.ai_tone)
-      setDefaultLocation(remote.default_location ?? '')
-      setDefaultRadius(remote.default_radius_km)
+      setAiModel(remote.ai_model)
+      setAiTone(remote.ai_tone)
+      // Ort + Radius nur beim ersten Laden setzen, nicht bei jedem Re-fetch
+      if (!locationInitialized.current) {
+        setDefaultLocation(remote.default_location ?? '')
+        setDefaultRadius(remote.default_radius_km)
+        locationInitialized.current = true
+      }
       setHideAusbildung(remote.hide_ausbildung)
       setReminderDays(remote.reminder_default_days)
     }
@@ -84,7 +133,8 @@ export default function Settings() {
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['settings'] })
-      setSaved(true); setTimeout(() => setSaved(false), 2500)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
       setKeys(k => Object.fromEntries(Object.entries(k).map(([key]) => [key, ''])))
     },
   })
@@ -110,55 +160,63 @@ export default function Settings() {
       {children}
     </section>
   )
-  const Toggle = ({ label, desc, value, onChange }: { label: string; desc?: string; value: boolean; onChange: (v: boolean) => void }) => (
-    <label className="flex items-center justify-between cursor-pointer gap-4 py-1">
-      <div>
-        <span className="text-sm font-medium">{label}</span>
-        {desc && <p className="text-xs text-gray-400">{desc}</p>}
-      </div>
-      <button
-        role="switch" aria-checked={value}
-        onClick={() => onChange(!value)}
-        className={clsx('relative w-11 h-6 rounded-full transition-colors shrink-0',
-          value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600')}>
-        <span className={clsx('absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform',
-          value ? 'translate-x-5' : 'translate-x-0')} />
-      </button>
-    </label>
-  )
 
   return (
     <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
-        <button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}
-          className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-            saved ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50')}>
+        <button
+          onClick={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending}
+          className={clsx(
+            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+            saved ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
+          )}
+        >
           <Save size={15} aria-hidden />{saved ? 'Gespeichert ✅' : t('common.save')}
         </button>
       </div>
 
+      {/* ── Erscheinungsbild ── */}
       <Section title="🎨 Erscheinungsbild">
         <div className="grid grid-cols-2 gap-3">
           {THEMES.map(opt => (
-            <button key={opt.value} onClick={() => setTheme(opt.value)}
-              className={clsx('rounded-xl p-4 text-left border-2 transition-all',
-                theme === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-              aria-pressed={theme === opt.value}>
-              <div className="font-medium">{opt.label}</div>
-              <div className="text-sm text-gray-500">{opt.desc}</div>
+            <button
+              key={opt.value}
+              onClick={() => setTheme(opt.value)}
+              aria-pressed={theme === opt.value}
+              className={clsx(
+                'rounded-xl p-4 text-left border-2 transition-all overflow-hidden',
+                theme === opt.value
+                  ? 'border-blue-500 ring-2 ring-blue-400/30'
+                  : 'border-transparent hover:border-gray-400'
+              )}
+            >
+              {/* Farbvorschau-Streifen */}
+              <div className={clsx('rounded-lg px-3 py-2 mb-2 text-sm font-semibold', opt.preview)}>
+                Aa 123
+              </div>
+              <div className="font-medium text-sm">{opt.label}</div>
             </button>
           ))}
         </div>
       </Section>
 
+      {/* ── Farbenblindheits-Filter ── */}
       <Section title="👁️ Farbenblindheits-Filter">
         <div className="grid grid-cols-1 gap-2">
           {COLOR_BLIND_MODES.map(opt => (
-            <button key={opt.value} onClick={() => setColorBlindMode(opt.value)}
-              className={clsx('rounded-xl px-4 py-3 text-left border-2 transition-all flex items-center justify-between',
-                colorBlindMode === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-              aria-pressed={colorBlindMode === opt.value}>
+            <button
+              key={opt.value}
+              onClick={() => setColorBlindMode(opt.value)}
+              aria-pressed={colorBlindMode === opt.value}
+              className={clsx(
+                'rounded-xl px-4 py-3 text-left border-2 transition-all flex items-center justify-between',
+                colorBlindMode === opt.value
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400'
+              )}
+            >
               <span className="font-medium text-sm">{opt.label}</span>
               <span className="text-xs text-gray-400">{opt.desc}</span>
             </button>
@@ -166,47 +224,85 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* ── ADHS & Kognition ── */}
       <Section title="🧠 ADHS & Kognition">
-        <div className="space-y-1 mb-4">
-          <Toggle label="ADHS-Modus" desc="Aktiviert Fokus-Modus + reduzierte Bewegung" value={adhdMode} onChange={setAdhdMode} />
-          <Toggle label="Fokus-Modus" desc="Navigation wird ausgeblendet, nur aktiver Bereich sichtbar" value={focusMode} onChange={setFocusMode} />
-          <Toggle label="Animationen deaktivieren" desc="Alle Transitions und Animationen ausschalten" value={reduceMotion} onChange={setReduceMotion} />
+        <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-5">
+          <ToggleRow
+            label="ADHS-Modus"
+            desc="Aktiviert Fokus-Modus + reduzierte Bewegung"
+            value={adhdMode}
+            onChange={setAdhdMode}
+          />
+          <ToggleRow
+            label="Fokus-Modus"
+            desc="Navigation wird ausgeblendet, nur aktiver Bereich sichtbar"
+            value={focusMode}
+            onChange={setFocusMode}
+          />
+          <ToggleRow
+            label="Animationen deaktivieren"
+            desc="Alle Transitions und Animationen ausschalten"
+            value={reduceMotion}
+            onChange={setReduceMotion}
+          />
         </div>
+
+        {/* Informationsdichte */}
         <div>
-          <label className="text-sm text-gray-500 block mb-2">Informationsdichte</label>
-          <div className="flex gap-2">
+          <p className="text-sm text-gray-500 mb-3">Informationsdichte</p>
+          <div className="flex gap-3">
             {DENSITY_OPTIONS.map(opt => (
-              <button key={opt.value} onClick={() => setDensity(opt.value)}
-                className={clsx('flex-1 rounded-lg py-2 text-sm font-medium border-2 transition-all',
-                  density === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-                aria-pressed={density === opt.value}>
-                <div>{opt.label}</div>
-                <div className="text-xs text-gray-400 font-normal">{opt.desc}</div>
+              <button
+                key={opt.value}
+                onClick={() => setDensity(opt.value)}
+                aria-pressed={density === opt.value}
+                className={clsx(
+                  'flex-1 rounded-xl border-2 transition-all text-left px-3 py-3',
+                  density === opt.value
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400'
+                )}
+              >
+                <div className="text-sm font-semibold mb-1">{opt.label}</div>
+                <div className="text-xs text-gray-400 leading-snug">{opt.desc}</div>
               </button>
             ))}
           </div>
         </div>
       </Section>
 
+      {/* ── Sprache ── */}
       <Section title={`🌍 ${t('settings.language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
-            <button key={lang} onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
-              className={clsx('px-6 py-2 rounded-lg font-medium border-2 transition-all',
-                i18n.language === lang ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-              aria-pressed={i18n.language === lang}>
+            <button
+              key={lang}
+              onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+              aria-pressed={i18n.language === lang}
+              className={clsx(
+                'px-6 py-2 rounded-lg font-medium border-2 transition-all',
+                i18n.language === lang
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400'
+              )}
+            >
               {lang === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}
             </button>
           ))}
         </div>
       </Section>
 
+      {/* ── KI ── */}
       <Section title={`🤖 ${t('settings.ai')}`}>
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
-            <select value={aiModel} onChange={e => setAiModel(e.target.value)}
-              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="KI-Modell">
+            <select
+              value={aiModel}
+              onChange={e => setAiModel(e.target.value)}
+              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+              aria-label="KI-Modell"
+            >
               {(models.length ? models : ['mistral', 'llama3', 'phi3']).map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -214,73 +310,111 @@ export default function Settings() {
             <label className="text-sm text-gray-500 block mb-1">KI-Ton</label>
             <div className="flex gap-2 flex-wrap">
               {TONES.map(tn => (
-                <button key={tn} onClick={() => setAiTone(tn)}
-                  className={clsx('text-sm px-3 py-1 rounded-full border transition-colors capitalize',
-                    aiTone === tn ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700')}
-                  aria-pressed={aiTone === tn}>{tn}</button>
+                <button
+                  key={tn}
+                  onClick={() => setAiTone(tn)}
+                  aria-pressed={aiTone === tn}
+                  className={clsx(
+                    'text-sm px-3 py-1 rounded-full border transition-colors capitalize',
+                    aiTone === tn
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  )}
+                >{tn}</button>
               ))}
             </div>
           </div>
         </div>
       </Section>
 
+      {/* ── Stellensuche ── */}
       <Section title="🔍 Stellensuche">
         <div className="space-y-3">
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
-              <input value={defaultLocation} onChange={e => setDefaultLocation(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" placeholder="z.B. Bremen" aria-label="Standard-Ort" />
+              <input
+                value={defaultLocation}
+                onChange={e => setDefaultLocation(e.target.value)}
+                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+                placeholder="z.B. Bremen"
+                aria-label="Standard-Ort"
+                autoComplete="off"
+              />
             </div>
             <div className="w-32">
               <label className="text-sm text-gray-500 block mb-1">Radius (km)</label>
-              <select value={defaultRadius} onChange={e => setDefaultRadius(Number(e.target.value))}
-                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="Radius">
-                {[10,25,50,100].map(r => <option key={r} value={r}>{r} km</option>)}
+              <select
+                value={defaultRadius}
+                onChange={e => setDefaultRadius(Number(e.target.value))}
+                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+                aria-label="Radius"
+              >
+                {[10, 25, 50, 100].map(r => <option key={r} value={r}>{r} km</option>)}
               </select>
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={hideAusbildung} onChange={e => setHideAusbildung(e.target.checked)} className="rounded" />
+            <input
+              type="checkbox"
+              checked={hideAusbildung}
+              onChange={e => setHideAusbildung(e.target.checked)}
+              className="rounded"
+            />
             Ausbildungsstellen ausblenden
           </label>
         </div>
       </Section>
 
+      {/* ── Erinnerungen ── */}
       <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
-          <input type="number" min={1} max={30} value={reminderDays} onChange={e => setReminderDays(Number(e.target.value))}
-            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="Vorlaufzeit" />
+          <input
+            type="number" min={1} max={30}
+            value={reminderDays}
+            onChange={e => setReminderDays(Number(e.target.value))}
+            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+            aria-label="Vorlaufzeit"
+          />
         </div>
       </Section>
 
+      {/* ── API Keys ── */}
       <Section title="🔑 API Keys">
         <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
         {([
-          { key: 'adzuna_app_id', label: 'Adzuna App ID', portal: 'adzuna', hasKey: remote?.has_adzuna_key },
-          { key: 'adzuna_api_key', label: 'Adzuna API Key', portal: 'adzuna', hasKey: remote?.has_adzuna_key },
-          { key: 'arbeitsagentur_client_id', label: 'Arbeitsagentur Client ID', portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'arbeitsagentur_client_secret', label: 'Arbeitsagentur Secret', portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'linkedin_api_key', label: 'LinkedIn API Key', portal: 'linkedin', hasKey: remote?.has_linkedin_key },
+          { key: 'adzuna_app_id',               label: 'Adzuna App ID',           portal: 'adzuna',          hasKey: remote?.has_adzuna_key },
+          { key: 'adzuna_api_key',              label: 'Adzuna API Key',          portal: 'adzuna',          hasKey: remote?.has_adzuna_key },
+          { key: 'arbeitsagentur_client_id',    label: 'Arbeitsagentur Client ID', portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
+          { key: 'arbeitsagentur_client_secret',label: 'Arbeitsagentur Secret',   portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
+          { key: 'linkedin_api_key',            label: 'LinkedIn API Key',        portal: 'linkedin',        hasKey: remote?.has_linkedin_key },
         ] as const).map(({ key, label, portal, hasKey }) => (
           <div key={key} className="mb-3">
             <div className="flex items-center gap-2 mb-1">
               <label className="text-sm text-gray-500">{label}</label>
               {hasKey && <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">✓ gesetzt</span>}
-              <a href={API_LINKS[portal]} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-0.5 ml-auto">
+              <a href={API_LINKS[portal]} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-blue-500 hover:underline flex items-center gap-0.5 ml-auto">
                 Registrieren <ExternalLink size={10} aria-hidden />
               </a>
             </div>
             <div className="relative">
-              <input type={showKeys[key] ? 'text' : 'password'} value={keys[key]}
+              <input
+                type={showKeys[key] ? 'text' : 'password'}
+                value={keys[key]}
                 onChange={e => setKeys(k => ({ ...k, [key]: e.target.value }))}
                 placeholder={hasKey ? '•••••••• (zum Überschreiben eingeben)' : 'Leer'}
                 className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                aria-label={label} />
-              <button type="button" onClick={() => setShowKeys(s => ({ ...s, [key]: !s[key] }))}
+                aria-label={label}
+              />
+              <button
+                type="button"
+                onClick={() => setShowKeys(s => ({ ...s, [key]: !s[key] }))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label={showKeys[key] ? 'Verbergen' : 'Anzeigen'}>
+                aria-label={showKeys[key] ? 'Verbergen' : 'Anzeigen'}
+                style={{ minHeight: 'unset', minWidth: 'unset' }}
+              >
                 {showKeys[key] ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
               </button>
             </div>
@@ -288,19 +422,24 @@ export default function Settings() {
         ))}
       </Section>
 
+      {/* ── Export / Import ── */}
       <Section title="📦 Daten Export / Import">
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">Alle Daten als JSON exportieren (DSGVO Art. 20)</p>
-            <button onClick={handleExport}
-              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
               <Download size={15} aria-hidden /> Daten exportieren
             </button>
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-2">Backup importieren (.json)</p>
-            <label className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-fit',
-              importing ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600')}>
+            <label className={clsx(
+              'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-fit',
+              importing ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+            )}>
               {importing ? <>⏳ Importiere...</> : <><Upload size={15} aria-hidden /> Backup importieren</>}
               <input type="file" accept=".json" onChange={handleImport} disabled={importing} className="hidden" aria-label="JSON-Backup importieren" />
             </label>

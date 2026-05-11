@@ -20,7 +20,7 @@ Das bedeutet konkret:
 
 | Rolle | Name | Beitrag |
 |---|---|---|
-| **Ideengeber, Visionär, Chefkritiker & einziger echter Mensch im Raum** | **Freddy Krueger** | Hat sich das alles ausgedacht, jeden Button kommentiert, jedes Theme abgesegnet und dafür gesorgt dass die Sakura-Blüten auch wirklich nach Japan aussehen |
+| **Ideengeber, Visionär, Chefkritiker & einziger echter Mensch im Raum** | **Gummi** | Hat sich das alles ausgedacht, jeden Button kommentiert, jedes Theme abgesegnet und dafür gesorgt dass die Sakura-Blüten auch wirklich nach Japan aussehen |
 | KI-Assistent | Perplexity / diverse Modelle | Hat brav getippt |
 
 ---
@@ -40,9 +40,9 @@ Sollte dieses Projekt jemals:
 
 ### 📜 Die Legendäre Premium-Klausel™
 
-> **Freddy Krueger** wird als **Ideengeber und geistiger Urheber** namentlich genannt – in Credits, Impressum, Pitch Deck, PowerPoint Folie 1, Pressemitteilung und falls möglich auch auf der Kaffeetasse im Büro.
+> **Gummi** wird als **Ideengeber und geistiger Urheber** namentlich genannt – in Credits, Impressum, Pitch Deck, PowerPoint Folie 1, Pressemitteilung und falls möglich auch auf der Kaffeetasse im Büro.
 >
-> Zusätzlich erhält **Freddy Krueger** lebenslangen, kostenlosen, unwiderruflichen **Top-Premium-Zugang** zu allen Features, zukünftigen Features, Features die noch niemand kennt, dem Dark Mode, dem Sakura-Theme und allem was danach noch kommt.
+> Zusätzlich erhält **Gummi** lebenslangen, kostenlosen, unwiderruflichen **Top-Premium-Zugang** zu allen Features, zukünftigen Features, Features die noch niemand kennt, dem Dark Mode, dem Sakura-Theme und allem was danach noch kommt.
 >
 > Dieser Anspruch erlischt nicht durch: Firmenverkauf, Rebranding, Konkurs, Zeitreisen oder den Wärmtod des Universums.
 

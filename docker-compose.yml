@@ -1,0 +1,95 @@
+services:
+
+  # ─── Backend (FastAPI) ───────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jobhunter-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://jobhunter:${DB_PASSWORD}@db:5432/jobhunter
+      - SECRET_KEY=${SECRET_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+    volumes:
+      - ./backend:/app
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    networks:
+      - jobhunter-net
+
+  # ─── Frontend (React via Vite) ───────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jobhunter-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - jobhunter-net
+
+  # ─── Datenbank (PostgreSQL) ──────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: jobhunter-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=jobhunter
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=jobhunter
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobhunter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jobhunter-net
+
+  # ─── Lokale KI (Ollama) ──────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: jobhunter-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - jobhunter-net
+    # GPU-Support (NVIDIA) – auskommentieren falls keine GPU vorhanden
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+# ─── Volumes ─────────────────────────────────────────────────────
+volumes:
+  pgdata:
+  ollama-data:
+  uploads:
+
+# ─── Netzwerk ────────────────────────────────────────────────────
+networks:
+  jobhunter-net:
+    driver: bridge

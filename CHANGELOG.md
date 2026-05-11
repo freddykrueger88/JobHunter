@@ -7,7 +7,19 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
-> Ideen für v1.8: Multi-User-Support, Mobile-App (React Native), Bewerbungscoach-Chat
+> Ideen für v1.9: Multi-User-Support, Mobile-App (React Native), Bewerbungscoach-Chat, Browser-Extension
+
+---
+
+## [1.8.0] – 2026-05-11
+
+### ATS-Optimierung & Bewerbungsqualität
+
+- **ATS-Score-Checker** – `ats_scorer.py`: Tokenizer mit Stop-Wörter-Filter (DE+EN), Top-30-Keyword-Frequenzanalyse, gewichteter Match-Score 0–100, Ampel-System (🔴 < 50 / 🟡 50–70 / 🟢 ≥ 70), Formatierungs-Check (Tabellen, SVG-Icons, Mehrspalter); `AtsScorePanel.tsx` mit aufklappbarer Keyword-Liste + KI-Vorschlägen (#57)
+- **Ghost-Job-Erkennung** – `ghost_job_detector.py`: 5 gewichtete Heuristiken (Alter 35% · kein Ansprechpartner 20% · kein Gehalt 15% · Boilerplate 20% · kurze Beschreibung 10%); `GhostJobBadge.tsx` mit ⚠️-Badge und Tooltip der Gründe (#58)
+- **Bewerbungs-Qualitätsscore** – `application_quality.py`: gewichteter Gesamt-Score aus Anschreiben (20%) + Anschreiben-Score (25%) + CV (15%) + ATS-Score (25%) + Skill-Gap (15%); `QualityScoreCard.tsx` mit SVG-Fortschrittsring, Checkliste und „Nächster Schritt“-Banner mit Schnelllink (#59)
+- **Gehaltsnegotiations-Coach** – `salary_negotiation.py`: KI generiert 3 Szenarien (konservativ / realistisch / optimistisch) mit konkreten Beträgen; `SalaryNegotiationModal.tsx` mit Tab-Umschalter E-Mail ↔ Telefonat, 1-Klick-Kopieren, realistisches Szenario hervorgehoben; baut auf `salary_calculator.py` (v1.6) auf (#60)
+- **Marktlage-Analyse** – `market_analyzer.py`: Vorab-Heuristik (Dringlichkeit / Wachstum / Fluktuation) + KI-Analyse: Wettbewerb-Level (niedrig/mittel/hoch), optimaler Bewerbungszeitpunkt, Unternehmenstyp (Startup/KMU/Konzern/Behörde), Strategie-Empfehlung mit Begründung (#61)
 
 ---
 
@@ -143,7 +155,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ---
 
-[Unreleased]: https://github.com/freddykrueger88/JobHunter/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/freddykrueger88/JobHunter/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.4.0...v1.5.0

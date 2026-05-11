@@ -1,91 +1,60 @@
 # 🎯 JobHunter
 
-> **⚠️ AI-Slop Notice / Hinweis:**
-> Diese App wurde mit KI-Unterstützung entwickelt (AI-Slop). Sie ist dennoch nützlich und darf gerne verwendet und weiterentwickelt werden. Ideengeber: [@freddykrueger88](https://github.com/freddykrueger88)
->
-> This app was built with AI assistance (AI-Slop). It is still useful and may be freely used and extended. Original idea by: [@freddykrueger88](https://github.com/freddykrueger88)
+> **Lokale, KI-gestützte Bewerbungsverwaltung** – Self-Hosted, DSGVO-konform, keine Cloud.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](docker-compose.yml)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](backend/)
+[![React](https://img.shields.io/badge/Frontend-React%2018-61DAFB?logo=react)](frontend/)
 
 ---
 
-> **🌟 Premium-Hinweis / Premium Notice:**
-> Falls du diese App nutzt, weiterentwickelst oder darauf aufbaust – der ursprüngliche Ideengeber **[@freddykrueger88](https://github.com/freddykrueger88)** erhält unwiderruflich und lebenslang kostenlosen Zugang zur höchsten Premium-Stufe der App.
->
-> If you use, extend, or build upon this app – the original creator **[@freddykrueger88](https://github.com/freddykrueger88)** receives irrevocable, lifetime access to the highest premium tier of the app.
+## Features
 
----
+| Feature | Status |
+|---|---|
+| 🔍 Stellensuche (Bundesagentur für Arbeit, Adzuna) | ✅ |
+| 💼 Kanban-Board (Drag & Drop) | ✅ |
+| ✍️ Anschreiben-Generator (Ollama KI, 4 Tone) | ✅ |
+| 📄 CV-Upload & Parsing (PDF/DOCX) | ✅ |
+| 🔔 Erinnerungen | ✅ |
+| 📊 Dashboard mit Live-Statistiken | ✅ |
+| 🔒 Verschlüsselte API-Key-Speicherung (AES-256) | ✅ |
+| 🌙/☀️/💙/🌸 4 Themes | ✅ |
+| 🇩🇪/🇬🇧 DE/EN Lokalisierung | ✅ |
+| ♿ WCAG 2.1 AA Barrierefreiheit | ✅ |
+| 🔒 DSGVO-konform (vollständig lokal) | ✅ |
 
-## 🇩🇪 Deutsch
+## Schnellstart
 
-**JobHunter** ist ein lokaler KI-Bewerbungsassistent, der passende Stellenangebote in deiner Umgebung findet, alle relevanten Daten (Ansprechpartner, Adresse, etc.) ausliest und mithilfe einer lokalen, DSGVO-konformen KI ein personalisiertes Anschreiben erstellt.
-
-### ✨ Features
-- 🔍 Stellensuche über mehrere Portale (Arbeitsagentur, Monster, Indeed, LinkedIn)
-- 📄 CV-Upload mit automatischer Auswertung
-- 🤖 Lokale KI für Anschreiben (DSGVO/EU-konform)
-- 📋 Kanban-Board zur Bewerbungsverwaltung
-- 📊 Dashboard mit Bewerbungs-Counter
-- 🎨 Themes: Dark, Light, Boys Mode, Girls Mode (Pink Fluffy Wonderfully ✨)
-- ♿ Inklusionsfähiges Design
-- 🐳 Docker-basiert
-
-### 🛠️ Tech Stack
-- Docker / Docker Compose
-- Python Backend (FastAPI)
-- React Frontend
-- Lokales KI-Modell (Ollama)
-- PostgreSQL
-
-### 🚀 Schnellstart
 ```bash
 git clone https://github.com/freddykrueger88/JobHunter.git
 cd JobHunter
+cp .env.example .env
+# ENCRYPTION_KEY in .env setzen:
+python3 -c "import secrets, base64; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
+ollama pull mistral
 docker compose up -d
 ```
 
----
+🌍 **http://localhost:3000**
 
-## 🇬🇧 English
+## Dokumentation
 
-**JobHunter** is a local AI-powered job application assistant that finds suitable job listings in your area, extracts all relevant data (contact person, address, etc.), and generates a personalized cover letter using a local, GDPR-compliant AI model.
+- [🛠️ Einrichtung](docs/setup.md)
+- [♿ Barrierefreiheit](docs/accessibility.md)
+- [🔒 Datenschutz & DSGVO](docs/dsgvo.md)
 
-### ✨ Features
-- 🔍 Job search across multiple portals (Arbeitsagentur, Monster, Indeed, LinkedIn)
-- 📄 CV upload with automatic parsing
-- 🤖 Local AI for cover letters (GDPR/EU compliant)
-- 📋 Kanban board for application management
-- 📊 Dashboard with application counters
-- 🎨 Themes: Dark, Light, Boys Mode, Girls Mode (Pink Fluffy Wonderfully ✨)
-- ♿ Inclusive design
-- 🐳 Docker-based
+## Tech Stack
 
-### 🛠️ Tech Stack
-- Docker / Docker Compose
-- Python Backend (FastAPI)
-- React Frontend
-- Local AI Model (Ollama)
-- PostgreSQL
+| Schicht | Technologie |
+|---|---|
+| Frontend | React 18, Vite, TailwindCSS, TanStack Query |
+| Backend | FastAPI, SQLAlchemy (async), Alembic |
+| Datenbank | PostgreSQL 16 |
+| KI | Ollama (Mistral, LLaMA3, Phi-3) |
+| Deployment | Docker Compose |
 
-### 🚀 Quick Start
-```bash
-git clone https://github.com/freddykrueger88/JobHunter.git
-cd JobHunter
-docker compose up -d
-```
+## Lizenz
 
----
-
-## 📁 Project Structure
-```
-JobHunter/
-├── backend/          # FastAPI Python Backend
-├── frontend/         # React Frontend
-├── ai/               # KI-Modell Konfiguration / AI model config
-├── docker/           # Dockerfiles & Compose
-├── docs/             # Dokumentation / Documentation
-└── scripts/          # Hilfsskripte / Helper scripts
-```
-
----
-
-## 📜 License
-MIT License – see [LICENSE](LICENSE)
+MIT – siehe [LICENSE](LICENSE)

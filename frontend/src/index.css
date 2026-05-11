@@ -2,18 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Basis-Schriftgröße in rem für Skalierbarkeit (Accessibility) */
 html {
   font-size: 16px;
 }
 
-/* Fokus-Indikator für Tastaturnavigation (WCAG) */
+/* Fokus-Indikator (WCAG 2.1 AA) */
 *:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+
+/* Reduzierte Bewegung (WCAG 2.1 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Scrollbar Dark */
 .dark ::-webkit-scrollbar { width: 6px; }
 .dark ::-webkit-scrollbar-track { background: #161b22; }
 .dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+/* Mindest-Touch-Target (WCAG 2.5.5) */
+button, a, [role="menuitem"], [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ausnahme: reine Icon-Buttons im Inline-Kontext */
+.icon-btn-sm {
+  min-height: 32px;
+  min-width: 32px;
+}

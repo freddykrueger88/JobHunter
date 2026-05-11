@@ -14,7 +14,8 @@ export default function App() {
     <ThemeProvider>
       <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
         <TopNav />
-        <main className="container mx-auto px-4 py-6">
+        {/* main-content Anker für Skip-Link (WCAG 2.4.1) */}
+        <main id="main-content" className="container mx-auto px-4 py-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/jobs" element={<Jobs />} />

@@ -1,38 +1,61 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 
-export type Theme = 'dark' | 'light' | 'boys' | 'girls'
+export type Theme = 'dark' | 'light' | 'boys' | 'girls' | 'dyslexic'
+export type ColorBlindMode = 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'achromatopsia'
+
+const CB_CLASSES: ColorBlindMode[] = ['deuteranopia', 'protanopia', 'tritanopia', 'achromatopsia']
 
 interface ThemeContextType {
   theme: Theme
   setTheme: (t: Theme) => void
+  colorBlindMode: ColorBlindMode
+  setColorBlindMode: (m: ColorBlindMode) => void
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'dark',
-  setTheme: () => {},
+  theme: 'dark', setTheme: () => {},
+  colorBlindMode: 'none', setColorBlindMode: () => {},
 })
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(
-    (localStorage.getItem('theme') as Theme) || 'dark'
+    () => (localStorage.getItem('theme') as Theme) ?? 'dark'
   )
+  const [colorBlindMode, setColorBlindModeState] = useState<ColorBlindMode>(
+    () => (localStorage.getItem('colorBlindMode') as ColorBlindMode) ?? 'none'
+  )
+
+  const applyTheme = (t: Theme) => {
+    const html = document.documentElement
+    // Dark/Light-Klasse
+    html.classList.remove('dark', 'light', 'boys', 'girls', 'dyslexic')
+    html.classList.add(t === 'dark' || t === 'boys' || t === 'dyslexic' ? 'dark' : 'light')
+    html.classList.add(t)
+  }
+
+  const applyColorBlind = (m: ColorBlindMode) => {
+    const html = document.documentElement
+    CB_CLASSES.forEach(c => html.classList.remove(`cb-${c}`))
+    if (m !== 'none') html.classList.add(`cb-${m}`)
+  }
 
   const setTheme = (t: Theme) => {
     setThemeState(t)
     localStorage.setItem('theme', t)
+    applyTheme(t)
   }
 
-  useEffect(() => {
-    const root = document.documentElement
-    // Klassen bereinigen
-    root.classList.remove('dark', 'light', 'theme-boys', 'theme-girls')
-    if (t === 'dark' || t === 'boys') root.classList.add('dark')
-    if (t === 'boys') root.classList.add('theme-boys')
-    if (t === 'girls') root.classList.add('theme-girls')
-  }, [theme])
+  const setColorBlindMode = (m: ColorBlindMode) => {
+    setColorBlindModeState(m)
+    localStorage.setItem('colorBlindMode', m)
+    applyColorBlind(m)
+  }
+
+  useEffect(() => { applyTheme(theme) }, [])
+  useEffect(() => { applyColorBlind(colorBlindMode) }, [])
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, colorBlindMode, setColorBlindMode }}>
       {children}
     </ThemeContext.Provider>
   )

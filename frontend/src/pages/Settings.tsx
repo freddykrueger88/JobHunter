@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { useTheme } from '../context/ThemeContext'
-import type { Theme } from '../context/ThemeContext'
+import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { Save, Eye, EyeOff, ExternalLink, Download, Upload } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -15,11 +14,21 @@ interface SettingsData {
 }
 
 const THEMES: { value: Theme; label: string; desc: string }[] = [
-  { value: 'dark',  label: '🌙 Dark Mode',  desc: 'Dunkel, klassisch' },
-  { value: 'light', label: '☀️ Light Mode', desc: 'Hell, klar' },
-  { value: 'boys',  label: '💙 Boys Mode',  desc: 'Dark Blue' },
-  { value: 'girls', label: '🌸 Girls Mode', desc: 'Pink Fluffy Wonderfully ✨' },
+  { value: 'dark',     label: '🌙 Dark Mode',     desc: 'Dunkel, klassisch' },
+  { value: 'light',    label: '☀️ Light Mode',    desc: 'Hell, klar' },
+  { value: 'boys',     label: '💙 Boys Mode',     desc: 'Dark Blue' },
+  { value: 'girls',    label: '🌸 Girls Mode',    desc: 'Pink Fluffy Wonderfully ✨' },
+  { value: 'dyslexic', label: '📚 Legasthenie',   desc: 'OpenDyslexic – Leseoptimiert' },
 ]
+
+const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
+  { value: 'none',          label: 'Kein Filter',     desc: 'Standard' },
+  { value: 'deuteranopia',  label: 'Deuteranopie',    desc: 'Grün-Schwäche (~6% Männer)' },
+  { value: 'protanopia',    label: 'Protanopie',      desc: 'Rot-Schwäche (~2% Männer)' },
+  { value: 'tritanopia',    label: 'Tritanopie',      desc: 'Blau-Gelb-Schwäche' },
+  { value: 'achromatopsia', label: 'Achromatopsie',   desc: 'Vollständige Farbenblindheit' },
+]
+
 const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
   adzuna: 'https://developer.adzuna.com/',
@@ -29,7 +38,7 @@ const API_LINKS: Record<string, string> = {
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, colorBlindMode, setColorBlindMode } = useTheme()
   const qc = useQueryClient()
 
   const { data: remote } = useQuery<SettingsData>({ queryKey: ['settings'], queryFn: () => axios.get('/api/settings/').then(r => r.data) })
@@ -40,7 +49,10 @@ export default function Settings() {
   const [hideAusbildung, setHideAusbildung] = useState(true)
   const [reminderDays, setReminderDays] = useState(7)
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
-  const [keys, setKeys] = useState<Record<string, string>>({ adzuna_app_id: '', adzuna_api_key: '', linkedin_api_key: '', arbeitsagentur_client_id: '', arbeitsagentur_client_secret: '' })
+  const [keys, setKeys] = useState<Record<string, string>>({
+    adzuna_app_id: '', adzuna_api_key: '', linkedin_api_key: '',
+    arbeitsagentur_client_id: '', arbeitsagentur_client_secret: '',
+  })
   const [saved, setSaved] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState('')
@@ -62,19 +74,21 @@ export default function Settings() {
       theme, language: i18n.language, ai_model: aiModel, ai_tone: aiTone,
       default_location: defaultLocation || null, default_radius_km: defaultRadius,
       hide_ausbildung: hideAusbildung, reminder_default_days: reminderDays,
+      color_blind_mode: colorBlindMode,
       ...Object.fromEntries(Object.entries(keys).filter(([, v]) => v !== '')),
     }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['settings'] }); setSaved(true); setTimeout(() => setSaved(false), 2500); setKeys(k => Object.fromEntries(Object.entries(k).map(([key]) => [key, '']))) },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['settings'] })
+      setSaved(true); setTimeout(() => setSaved(false), 2500)
+      setKeys(k => Object.fromEntries(Object.entries(k).map(([key]) => [key, ''])))
+    },
   })
 
   const handleExport = () => { window.location.href = '/api/export/' }
-
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0]; if (!file) return
     setImporting(true); setImportMsg('')
-    const form = new FormData()
-    form.append('file', file)
+    const form = new FormData(); form.append('file', file)
     try {
       const res = await axios.post('/api/export/import', form)
       const d = res.data.imported
@@ -82,10 +96,7 @@ export default function Settings() {
       qc.invalidateQueries()
     } catch (err: any) {
       setImportMsg(`❌ Fehler: ${err.response?.data?.detail ?? err.message}`)
-    } finally {
-      setImporting(false)
-      e.target.value = ''
-    }
+    } finally { setImporting(false); e.target.value = '' }
   }
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -106,6 +117,7 @@ export default function Settings() {
         </button>
       </div>
 
+      {/* Theme */}
       <Section title={`🎨 ${t('settings.theme')}`}>
         <div className="grid grid-cols-2 gap-3">
           {THEMES.map(opt => (
@@ -120,6 +132,26 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* Farbenblindheit */}
+      <Section title="👁️ Farbenblindheits-Filter">
+        <p className="text-sm text-gray-500 mb-3">
+          Passt die Darstellung an verschiedene Formen der Farbenblindheit an.
+          Der Filter wird zusätzlich zum Theme angewendet.
+        </p>
+        <div className="grid grid-cols-1 gap-2">
+          {COLOR_BLIND_MODES.map(opt => (
+            <button key={opt.value} onClick={() => setColorBlindMode(opt.value)}
+              className={clsx('rounded-xl px-4 py-3 text-left border-2 transition-all flex items-center justify-between',
+                colorBlindMode === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
+              aria-pressed={colorBlindMode === opt.value}>
+              <span className="font-medium text-sm">{opt.label}</span>
+              <span className="text-xs text-gray-400">{opt.desc}</span>
+            </button>
+          ))}
+        </div>
+      </Section>
+
+      {/* Sprache */}
       <Section title={`🌍 ${t('settings.language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
@@ -133,12 +165,13 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* KI */}
       <Section title={`🤖 ${t('settings.ai')}`}>
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
             <select value={aiModel} onChange={e => setAiModel(e.target.value)}
-              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="KI-Modell">
+              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="KI-Modell">
               {(models.length ? models : ['mistral', 'llama3', 'phi3']).map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -156,14 +189,14 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* Stellensuche */}
       <Section title="🔍 Stellensuche">
         <div className="space-y-3">
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
               <input value={defaultLocation} onChange={e => setDefaultLocation(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="z.B. Bremen" aria-label="Standard-Ort" />
+                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" placeholder="z.B. Bremen" aria-label="Standard-Ort" />
             </div>
             <div className="w-32">
               <label className="text-sm text-gray-500 block mb-1">Radius (km)</label>
@@ -180,16 +213,18 @@ export default function Settings() {
         </div>
       </Section>
 
+      {/* Erinnerungen */}
       <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
           <input type="number" min={1} max={30} value={reminderDays} onChange={e => setReminderDays(Number(e.target.value))}
-            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Vorlaufzeit" />
+            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="Vorlaufzeit" />
         </div>
       </Section>
 
+      {/* API Keys */}
       <Section title="🔑 API Keys">
-        <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256). Aktuelle Keys werden nie angezeigt.</p>
+        <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
         {([
           { key: 'adzuna_app_id', label: 'Adzuna App ID', portal: 'adzuna', hasKey: remote?.has_adzuna_key },
           { key: 'adzuna_api_key', label: 'Adzuna API Key', portal: 'adzuna', hasKey: remote?.has_adzuna_key },
@@ -209,7 +244,7 @@ export default function Settings() {
               <input type={showKeys[key] ? 'text' : 'password'} value={keys[key]}
                 onChange={e => setKeys(k => ({ ...k, [key]: e.target.value }))}
                 placeholder={hasKey ? '•••••••• (zum Überschreiben eingeben)' : 'Leer'}
-                className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
                 aria-label={label} />
               <button type="button" onClick={() => setShowKeys(s => ({ ...s, [key]: !s[key] }))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -221,7 +256,7 @@ export default function Settings() {
         ))}
       </Section>
 
-      {/* Export / Import */}
+      {/* Export/Import */}
       <Section title="📦 Daten Export / Import">
         <div className="space-y-4">
           <div>
@@ -235,12 +270,10 @@ export default function Settings() {
             <p className="text-sm text-gray-500 mb-2">Backup importieren (.json)</p>
             <label className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-fit',
               importing ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600')}>
-              {importing
-                ? <>⏳ Importiere...</>
-                : <><Upload size={15} aria-hidden /> Backup importieren</>}
+              {importing ? <>⏳ Importiere...</> : <><Upload size={15} aria-hidden /> Backup importieren</>}
               <input type="file" accept=".json" onChange={handleImport} disabled={importing} className="hidden" aria-label="JSON-Backup importieren" />
             </label>
-            {importMsg && <p className="text-sm mt-2">{importMsg}</p>}
+            {importMsg && <p className="text-sm mt-2" role="status">{importMsg}</p>}
           </div>
         </div>
       </Section>

@@ -2,17 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== OpenDyslexic Font (SIL OFL) ===== */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic/OpenDyslexic-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic/OpenDyslexic-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 html {
   font-size: 16px;
 }
 
-/* Fokus-Indikator (WCAG 2.1 AA) */
+/* ===== Fokus-Indikator (WCAG 2.1 AA) ===== */
 *:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-/* Reduzierte Bewegung (WCAG 2.1 2.3.3) */
+/* ===== Reduzierte Bewegung (WCAG 2.1 2.3.3) ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -20,12 +43,54 @@ html {
   }
 }
 
-/* Scrollbar Dark */
-.dark ::-webkit-scrollbar { width: 6px; }
-.dark ::-webkit-scrollbar-track { background: #161b22; }
-.dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+/* ===== Legasthenie-Theme ===== */
+.dyslexic {
+  font-family: 'OpenDyslexic', 'Arial', sans-serif !important;
+  font-size: 17px;
+  line-height: 1.8 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+  background-color: #fffef5 !important;
+  color: #1a1a1a !important;
+}
+.dyslexic p,
+.dyslexic li,
+.dyslexic td,
+.dyslexic label,
+.dyslexic span {
+  max-width: 65ch;
+}
+/* Kein hartes Weiß, kein hartes Schwarz im Legasthenie-Modus */
+.dyslexic .bg-white { background-color: #fffef0 !important; }
+.dyslexic .dark\:bg-gray-800 { background-color: #2a2a1f !important; }
+.dyslexic .text-gray-900 { color: #1a1a1a !important; }
 
-/* Mindest-Touch-Target (WCAG 2.5.5) */
+/* ===== Farbenblindheits-Filter ===== */
+/* Werden als CSS-Klassen auf <html> angewendet */
+html.cb-deuteranopia  { filter: url(#cb-deuteranopia);  }
+html.cb-protanopia    { filter: url(#cb-protanopia);    }
+html.cb-tritanopia    { filter: url(#cb-tritanopia);    }
+html.cb-achromatopsia { filter: url(#cb-achromatopsia); }
+
+/* ===== Skip-Link (Screenreader) ===== */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: #1d4ed8;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  z-index: 9999;
+  border-radius: 0 0 6px 0;
+  transition: top 0.1s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ===== Mindest-Touch-Target (WCAG 2.5.5) ===== */
 button, a, [role="menuitem"], [role="button"] {
   min-height: 44px;
   min-width: 44px;
@@ -33,9 +98,12 @@ button, a, [role="menuitem"], [role="button"] {
   align-items: center;
   justify-content: center;
 }
-
-/* Ausnahme: reine Icon-Buttons im Inline-Kontext */
 .icon-btn-sm {
   min-height: 32px;
   min-width: 32px;
 }
+
+/* ===== Scrollbar Dark ===== */
+.dark ::-webkit-scrollbar { width: 6px; }
+.dark ::-webkit-scrollbar-track { background: #161b22; }
+.dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }

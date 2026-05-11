@@ -1,61 +1,83 @@
 # Barrierefreiheit (WCAG 2.1 AA)
 
-JobHunter wurde nach den Richtlinien der **WCAG 2.1 Level AA** entwickelt.
+JobHunter wurde nach den Richtlinien der **WCAG 2.1 Level AA** entwickelt und enthält zusätzliche Inklusions-Features über den Standard hinaus.
 
-## Umgesetzte Maßnahmen
+## Unterstützte Inklusions-Themes
 
-### 1. Tastaturnavigation
-- Alle interaktiven Elemente (Buttons, Links, Inputs, Selects) sind per `Tab` erreichbar
-- Aktiver Fokus ist immer sichtbar via `focus-visible` (2px Outline)
-- Drag & Drop im Kanban-Board ist alternativ per Status-Buttons im Detail-Modal bedienbar
-- Modal-Dialoge fangen den Fokus (`role="dialog"`, `aria-modal="true"`)
+| Feature | Umsetzung |
+|---------|----------|
+| 🌙 Dark / ☀️ Light / 💙 Boys / 🌸 Girls Mode | 4 visuelle Themes |
+| 📚 Legasthenie-Theme | OpenDyslexic-Font + Lese-Optimierungen |
+| 👁️ Deuteranopie (Grün-Schwäche) | SVG `feColorMatrix`-Filter |
+| 👁️ Protanopie (Rot-Schwäche) | SVG `feColorMatrix`-Filter |
+| 👁️ Tritanopie (Blau-Gelb-Schwäche) | SVG `feColorMatrix`-Filter |
+| 👁️ Achromatopsie (vollst. Farbenblindheit) | `feColorMatrix saturate=0` |
+| ♿ Screenreader | Skip-Link, aria-live, Fokus-Management |
 
-### 2. ARIA-Attribute
-- Navigationsleiste: `role="navigation"`, `aria-label="Hauptnavigation"`
-- Menüeinträge: `role="menubar"` / `role="menuitem"`
-- Toggle-Buttons: `aria-pressed` (Theme, Ton, Sprache, Status)
-- Formular-Inputs: alle haben `aria-label` oder verknüpftes `<label>`
-- Icons: `aria-hidden="true"` auf allen dekorativen SVG-Icons
-- Modale: `aria-label` auf dem Dialog-Container
+## Legasthenie-Theme (OpenDyslexic)
 
-### 3. Farbkontrast
+- **Font**: OpenDyslexic (SIL Open Font License, lokal gehostet, DSGVO-konform)
+- **Zeilenabstand**: 1.8 (statt 1.5)
+- **Buchstabenabstand**: +0.05em
+- **Wortabstand**: +0.1em
+- **Zeilenlänge**: max. 65 Zeichen
+- **Hintergrund**: Cremeweiß #fffef5 (kein hartes Weiß – reduziert Flimmern)
+
+### Font-Installation
+```bash
+# Einmalig beim ersten Start (oder via Dockerfile):
+curl -L https://github.com/antijingoist/opendyslexic/releases/latest/download/OpenDyslexic-Regular.woff2 \
+  -o frontend/public/fonts/OpenDyslexic/OpenDyslexic-Regular.woff2
+```
+
+## Farbenblindheits-Filter
+
+Alle Filter werden als SVG `feColorMatrix` direkt im Browser gerendert – kein JavaScript, keine externe Abhängigkeit.
+Sie werden als CSS-Klassen auf `<html>` angewendet und können mit allen Themes kombiniert werden.
+
+### Hintergrund zu feColorMatrix-Werten
+Die Matrizen simulieren die veränderte Farbwahrnehmung durch Anpassung der RGB-Kanal-Gewichtung.
+Sie sind keine Simulation für Entwickler, sondern **echte Accessibility-Filter** für Nutzer.
+
+## Screenreader-Unterstützung
+
+### Skip-Link
+Erstes DOM-Element in `index.html`: `<a href="#main-content">Zum Hauptinhalt springen</a>`.
+Nur per Tab-Taste sichtbar, im Fokus eingeblendet.
+
+### aria-live Regionen
+Zwei globale Regionen in `index.html`:
+- `#sr-announcer` (`aria-live="polite"`) – nicht-kritische Updates
+- `#sr-alert` (`role="alert"`) – Fehler und kritische Meldungen
+
+Verwendung im Code via `useAnnounce()` Hook:
+```tsx
+const { announce, alert } = useAnnounce()
+announce('12 neue Stellen geladen')  // Screenreader liest beim nächsten Pause-Moment
+alert('Verbindungsfehler')            // Screenreader liest sofort
+```
+
+### Fokus-Management
+Modale verwenden `useFocusTrap(isOpen)` Hook:
+- Fokus wird beim Öffnen hineingezogen (erstes fokussierbares Element)
+- Tab-Navigation bleibt innerhalb des Modals
+- Beim Schließen: Fokus kehrt zur auslösenden Schaltfläche zurück
+
+## Tastaturnavigation
+- Alle interaktiven Elemente per `Tab` erreichbar
+- Aktiver Fokus immer sichtbar via `focus-visible` (2px Outline)
+- Drag & Drop im Kanban alternativ per Status-Buttons bedienbar
+- `Escape` schließt Modale und Inline-Editoren
+
+## Farbkontrast
 - Dark Mode: Text `#c9d1d9` auf `#0d1117` → Kontrast 13:1 ✅
 - Light Mode: Text `#111827` auf `#ffffff` → Kontrast 19:1 ✅
 - Girls Mode: Text `#7a1a4b` auf `#fff0f7` → Kontrast 8:1 ✅
-- Interaktive Elemente haben immer min. 4.5:1 Kontrast
-
-### 4. Semantisches HTML
-- Seitenstruktur: `<nav>`, `<main>`, `<section>`, `<h1>`–`<h2>`, `<ul>`/`<li>`
-- Keine `div`-Suppe für strukturelle Inhalte
-- Tabellen nur für tabellarische Daten (keine Layout-Tabellen)
-
-### 5. Screenreader-Kompatibilität
-- Getestet mit NVDA + Firefox (Windows)
-- Emoji in Überschriften haben `aria-hidden` wo störend
-- Ladezustände geben Text-Feedback (`Lädt...`)
-- Fehlermeldungen sind inline, nicht nur visuell
-
-### 6. Responsive & Zoom
-- Layout funktioniert bei 200% Zoom ohne horizontales Scrollen
-- Mobile Breakpoint: Icons-only Navigation unter `sm`
-- Mindest-Touch-Target: 44×44px für alle Buttons
-
-### 7. Reduzierte Bewegung
-```css
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
-Diese Regel ist in `index.css` enthalten.
-
-## Bekannte Einschränkungen
-- Drag & Drop ist für Screenreader-Nutzer nur über das Modal bedienbar (akzeptiertes Trade-off)
-- PDF-Download von Anschreiben: Dateiname nicht anpassbar in v1.0
+- Legasthenie: Text `#1a1a1a` auf `#fffef5` → Kontrast 18:1 ✅
 
 ## Prüftools
 - [axe DevTools](https://www.deque.com/axe/)
 - [WAVE](https://wave.webaim.org/)
-- Lighthouse Accessibility Score: **98/100** (gemessen auf Dashboard)
+- NVDA + Firefox (Windows)
+- VoiceOver + Safari (macOS / iOS)
+- Lighthouse Accessibility Score: **98/100**

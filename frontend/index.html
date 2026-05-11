@@ -1,12 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JobHunter 🎯</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content="JobHunter – Lokale, KI-gestützte Bewerbungsverwaltung" />
+    <title>JobHunter</title>
   </head>
   <body>
+    <!-- Skip-Link für Screenreader (WCAG 2.4.1) -->
+    <a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
+
+    <!-- SVG-Filter für Farbenblindheit (unsichtbar, einmalig geladen) -->
+    <svg aria-hidden="true" focusable="false"
+         style="position:absolute;width:0;height:0;overflow:hidden">
+      <defs>
+        <!-- Deuteranopie (Grün-Schwäche) -->
+        <filter id="cb-deuteranopia">
+          <feColorMatrix type="matrix" values="
+            0.625 0.375 0     0 0
+            0.70  0.30  0     0 0
+            0     0.30  0.70  0 0
+            0     0     0     1 0" />
+        </filter>
+        <!-- Protanopie (Rot-Schwäche) -->
+        <filter id="cb-protanopia">
+          <feColorMatrix type="matrix" values="
+            0.567 0.433 0     0 0
+            0.558 0.442 0     0 0
+            0     0.242 0.758 0 0
+            0     0     0     1 0" />
+        </filter>
+        <!-- Tritanopie (Blau-Gelb-Schwäche) -->
+        <filter id="cb-tritanopia">
+          <feColorMatrix type="matrix" values="
+            0.95  0.05  0     0 0
+            0     0.433 0.567 0 0
+            0     0.475 0.525 0 0
+            0     0     0     1 0" />
+        </filter>
+        <!-- Achromatopsie (vollständige Farbenblindheit / Graustufen) -->
+        <filter id="cb-achromatopsia">
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- aria-live Region für dynamische Announcements -->
+    <div id="sr-announcer"
+         role="status"
+         aria-live="polite"
+         aria-atomic="true"
+         style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
+    </div>
+    <div id="sr-alert"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true"
+         style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -7,7 +7,66 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
-> Ideen für v1.3: Mehrsprachige KI-Prompts, Mobile-PWA, Bewerbungs-Templates
+> Ideen für v1.8: Multi-User-Support, Mobile-App (React Native), Bewerbungscoach-Chat
+
+---
+
+## [1.7.0] – 2026-05-11
+
+### Statistiken & Motivation
+
+- **Erweiterte Dashboard-Statistiken** – `StatsChart.tsx` mit Pie-Chart (Status-Verteilung), Bar-Chart (Bewerbungen pro Woche), Funnel-Chart (Beworben → Eingeladen → Gespräch → Zusage) via Recharts (#36)
+- **Browser-Push-Benachrichtigungen** – `goals.py` mit `get_streak()`, `get_weekly_progress()`, `get_stats()` – alle Stats-Endpoints fertig (#37)
+- **Bewerbungs-Ziele + Streak-Tracking** – `WeeklyGoalWidget.tsx`: konfigurierbares Wochenziel, Fortschrittsbalken, 🔥 Streak-Anzeige, ARIA-accessible (#51)
+- **Gamification – Abzeichen** – `badges.py`: 10 Abzeichen (Erste Bewerbung, 10/50 Bewerbungen, Erste Einladung, Erste Zusage, 3/7-Tage-Streak, KI-Anschreiben, Lebenslauf, Foto-Upload); `BadgesPanel.tsx` mit gesperrten/freigeschalteten Abzeichen (#52)
+- **Druckansicht als PDF** – `pdf_overview.py`: HTML→PDF via weasyprint, filterbar nach Zeitraum und Status, Tabelle mit allen Bewerbungen (#53)
+
+---
+
+## [1.6.0] – 2026-05-11
+
+### Kommunikation & Workflow
+
+- **Kalender-Export** – `calendar_export.py`: `.ics`-Export pro Vorstellungsgespräch + abonnierbarer Kalender-Feed `GET /api/calendar/feed.ics` für alle Termine (#47)
+- **E-Mail-Vorlagen** – `email_templates.py`: 6 Templates (Follow-up, Nachfrage, Absage-Antwort, Zusage bestätigen, Termin bestätigen/absagen) mit Platzhaltern `{anrede}`, `{stelle}`, `{firma}`, `{datum}` (#48)
+- **Kontakte-Verwaltung** – `Contact`-Modell: Recruiter und Ansprechpartner mit Firma, Rolle, E-Mail, Telefon, LinkedIn-URL, Notizen, nächstem Kontaktdatum (#49)
+- **Netto-Brutto-Gehaltsrechner** – `salary_calculator.py`: Steuerklassen 1–6, SV-Beiträge 2025 (KV/PV/RV/AV), BBG-konforme Berechnung, 100% lokal (#43)
+
+---
+
+## [1.5.0] – 2026-05-11
+
+### KI-Tiefe
+
+- **Absage-Analyse per KI** – `rejection_analyzer.py`: Absage + Anschreiben + Stellenbeschreibung → Stärken, Schwächen, 3 Verbesserungsvorschläge, Zusammenfassung (#40)
+- **Interview-Vorbereitung per KI** – `interview_prep.py`: 10 Fragen (5 fachlich, 3 persönlich, 2 Gehalt) mit Musterantworten, passend zu CV + Stelle (#41)
+- **Skill-Gap-Analyse** – `skill_gap.py`: Match-Score 0–100, vorhandene/fehlende Skills, Lernempfehlungen; Ergebnis wird in DB gecacht (#42)
+- **Lebenslauf-Optimierung per KI** – `cv_optimizer.py`: Score + Stärken/Schwächen + Abschnitt-für-Abschnitt-Vorschläge, optional mit Zielstelle (#55)
+- **Anschreiben-Bewertung per KI** – `cover_letter_evaluator.py`: Relevanz/Ton/Struktur-Score (0–100), speichert `anschreiben_score` in DB (#56)
+
+---
+
+## [1.4.0] – 2026-05-11
+
+### Smarte Suche & Datenanalyse
+
+- **Foto-Upload von Stellenanzeigen** – `ocr.py` + `jobs_image.py`: `POST /api/jobs/from-image`; easyocr bevorzugt (Fallback: pytesseract), KI extrahiert Titel/Firma/Ort/Frist/Tags; `ImageJobUpload.tsx` mit Drag & Drop + Kamera-Button (#38)
+- **Duplikat-Erkennung** – `duplicate_detection.py`: Fuzzy-Matching via rapidfuzz, Gewichtung Titel 50% + Firma 35% + Ort 15%, Schwellenwert 75%, Warnung vor dem Speichern (#39)
+- **Bewerbungsfristen-Tracker** – `DeadlineBadge.tsx`: Ampel-Badge 🟢 >7T · 🟡 3–7T · 🔴 <3T · ⚫ abgelaufen, vollständig ARIA-beschriftet (#44)
+- **Stellenbeschreibung-Analyse** – `job_analyzer.py`: KI extrahiert Must-haves, Nice-to-haves, Gehalt, Remote/Hybrid, Tags; schreibt Ergebnisse zurück in DB (#45)
+- **Firmen-Schwarze-Liste** – `blocklist.py`: `GET/POST/DELETE /api/blocklist/`, `is_blocked()`-Hilfsfunktion für alle Such-Endpoints (#46)
+
+---
+
+## [1.3.0] – 2026-05-11
+
+### Mobil & Basis-Produktivität
+
+- **PWA Install-Support** – `vite.config.ts` mit `vite-plugin-pwa`: autoUpdate, Workbox Offline-Cache (NetworkFirst für `/api/`), `manifest.webmanifest` mit Icons; `PwaInstallBanner.tsx` via `beforeinstallprompt`, 7-Tage-Snooze (#33)
+- **Bewerbungs-Templates** – `CoverLetterTemplate`-Modell + `default_templates.py`: 5 vorgefertigte Templates (IT allgemein, IT-Support, Büro, Logistik, IT EN), Platzhalter `{stelle}`, `{firma}`, `{ort}`, `{datum}`, `{anrede}` (#34)
+- **Mehrsprachige KI-Prompts** – `ai_prompts.py`: vollständige DE/EN-Prompt-Bibliothek (Anschreiben, Job-Analyse, Skill-Gap, Interview-Prep, Absage-Analyse), `detect_language()` via Häufigkeitswörter (#35)
+- **Onboarding-Flow** – `Onboarding.tsx`: 5-Schritt-Wizard (Sprache → Ort → Ollama-Check → Theme → Fertig), Fortschrittsbalken, Live-Verbindungstest (#50)
+- **Automatisches Backup** – `backup.py`: komprimiertes `.json.gz`-Backup täglich, 7-Tage-Rotation, API-Keys werden nicht gesichert, `BackupLog`-Modell (#54)
 
 ---
 
@@ -84,7 +143,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ---
 
-[Unreleased]: https://github.com/freddykrueger88/JobHunter/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/freddykrueger88/JobHunter/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/freddykrueger88/JobHunter/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/freddykrueger88/JobHunter/compare/v0.1.0...v1.0.0

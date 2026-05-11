@@ -12,7 +12,8 @@
 | v1.5 | KI-Tiefe | ✅ Fertig |
 | v1.6 | Kommunikation & Workflow | ✅ Fertig |
 | v1.7 | Statistiken & Motivation | ✅ Fertig |
-| v1.8 | ATS-Optimierung & Bewerbungsqualität | 📌 Geplant |
+| v1.8 | ATS-Optimierung & Bewerbungsqualität | 🚧 In Arbeit |
+| v1.9 | Bewerbungscoach & Automatisierung | 📌 Geplant |
 
 ---
 
@@ -72,6 +73,53 @@
 - Gibt Einschätzung: Wettbewerb (niedrig/mittel/hoch), optimaler Zeitpunkt (sofort vs. 1 Woche warten)
 - Bewerbungsstrategie-Empfehlung ("Direkt bewerben" vs. "Erst LinkedIn-Kontakt suchen")
 - Dateien: `backend/services/market_analyzer.py`
+
+---
+
+## v1.9 – Bewerbungscoach & Automatisierung
+
+> Fokus: Den Bewerber aktiv begleiten – nicht nur tracken, sondern coachen und automatisieren.
+
+### #62 – Bewerbungscoach-Chat
+
+**Problem:** Bewerber wissen oft nicht wie sie bestimmte Situationen formulieren sollen.
+
+**Lösung:**
+- KI-Chatbot direkt in der App (lokal via Ollama)
+- Kontextbewusst: Kennt die aktuelle Bewerbung (Stelle, Status, Dokumente)
+- Beispiel-Fragen: "Wie formuliere ich eine Absage höflich?", "Wann sollte ich nachfassen?", "Wie erkläre ich meine Karrierelücke?"
+- Chat-Verlauf wird gespeichert (pro Bewerbung)
+- Dateien: `backend/services/coach_chat.py`, `frontend/src/components/CoachChatDrawer.tsx`
+
+### #63 – Auto-Apply-Vorbereitung (1-Klick-Paket)
+
+**Problem:** Bewerber müssen Anschreiben, CV und Formulardaten jedes Mal manuell zusammensuchen.
+
+**Lösung:**
+- 1-Klick-Export: Anschreiben (PDF) + CV (PDF) + Metadaten (JSON) als ZIP
+- Dateiname automatisch generiert: `Bewerbung_Firma_Stelle_Datum.zip`
+- Vorschau-Modal zeigt Dateiliste vor Download
+- Dateien: `backend/services/auto_apply.py`, `frontend/src/components/AutoApplyButton.tsx`
+
+### #64 – Wiedervorlagen-System mit Erinnerungen
+
+**Problem:** Bewerber vergessen nachzufassen – eine der häufigsten Ursachen für verpasste Chancen.
+
+**Lösung:**
+- "Nachfassen in X Tagen" direkt bei jeder Bewerbung setzbar (1 / 3 / 7 / 14 Tage)
+- Dashboard zeigt fällige Wiedervorlagen mit Ampel-Farbe (heute 🔴, morgen 🟡, später 🟢)
+- Vorgefertigte E-Mail-Vorlage für Nachfass-Mail (per Klick in Clipboard kopieren)
+- Dateien: `backend/services/followup_scheduler.py`, `frontend/src/components/FollowUpWidget.tsx`
+
+---
+
+## Zukunft (v2.0+)
+
+| Feature | Beschreibung |
+|---------|-------------|
+| Browser-Extension | Stellenanzeige per Klick direkt aus Browser in JobHunter importieren |
+| Multi-User-Support | Mehrere Profile lokal verwalten |
+| Mobile App (React Native) | Native App für Android/iOS |
 
 ---
 

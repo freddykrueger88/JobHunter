@@ -1,0 +1,47 @@
+# CITATION.cff
+# This file allows others to cite JobHunter in academic work or projects.
+# Format: Citation File Format (CFF) v1.2.0 – https://citation-file-format.github.io
+
+cff-version: 1.2.0
+title: JobHunter
+message: >-
+  If you use JobHunter in your work or project, please cite it using
+  the metadata from this file. / Wenn du JobHunter in deiner Arbeit
+  oder deinem Projekt verwendest, zitiere es bitte mit den Metadaten
+  aus dieser Datei.
+type: software
+authors:
+  - given-names: Freddy
+    family-names: Krueger
+    alias: freddykrueger88
+    url: https://github.com/freddykrueger88
+repository-code: https://github.com/freddykrueger88/JobHunter
+url: https://github.com/freddykrueger88/JobHunter
+abstract: >-
+  JobHunter is a fully local, AI-powered job application manager.
+  Self-hosted via Docker, GDPR-compliant, no cloud required.
+  Features include job search across multiple portals, AI-generated
+  cover letters, ATS score checker, Kanban board, and more.
+  All AI runs locally via Ollama (Mistral, LLaMA3, Phi-3).
+  / JobHunter ist ein vollständig lokaler, KI-gestützter
+  Bewerbungsassistent. Self-Hosted via Docker, DSGVO-konform,
+  keine Cloud erforderlich.
+keywords:
+  - job-search
+  - job-application
+  - ai-assistant
+  - local-ai
+  - ollama
+  - self-hosted
+  - privacy
+  - gdpr
+  - open-source
+  - python
+  - fastapi
+  - react
+license: MIT
+version: 1.8.0
+date-released: '2026-05-10'
+languages:
+  - de
+  - en

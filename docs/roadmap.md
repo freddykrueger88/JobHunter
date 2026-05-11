@@ -7,70 +7,71 @@
 | v1.0 | Kern-Features (Backend, Frontend, KI, DSGVO, WCAG) | ✅ Fertig |
 | v1.1 | Export, PDF, Cron, Portale, JWT, Alembic | ✅ Fertig |
 | v1.2 | Inklusion & Barrierefreiheit | ✅ Fertig |
-| v1.3 | Mobil & Basis-Produktivität | 🔄 In Arbeit |
-| v1.4 | Smarte Suche & Datenanalyse | 📌 Geplant |
-| v1.5 | KI-Tiefe | 📌 Geplant |
-| v1.6 | Kommunikation & Workflow | 📌 Geplant |
-| v1.7 | Statistiken & Motivation | 📌 Geplant |
+| v1.3 | Mobil & Basis-Produktivität | ✅ Fertig |
+| v1.4 | Smarte Suche & Datenanalyse | ✅ Fertig |
+| v1.5 | KI-Tiefe | ✅ Fertig |
+| v1.6 | Kommunikation & Workflow | ✅ Fertig |
+| v1.7 | Statistiken & Motivation | ✅ Fertig |
+| v1.8 | ATS-Optimierung & Bewerbungsqualität | 📌 Geplant |
 
 ---
 
-## v1.3 – Mobil & Basis-Produktivität
+## v1.8 – ATS-Optimierung & Bewerbungsqualität
 
-Fundament für alle weiteren Versionen.
+> Hintergrund: 75% aller Bewerbungen werden von ATS-Systemen gefiltert, bevor ein Mensch sie liest.
+> JobHunter hilft, genau das zu überwinden – lokal, ohne Cloud-Dienst.
 
-- #33 PWA: Install-Support + Offline-Caching
-- #34 Bewerbungs-Templates mit Platzhaltern
-- #35 Mehrsprachige KI-Prompts (DE/EN)
-- #50 Onboarding-Flow beim ersten Start
-- #54 Automatisches Backup mit Rotation
+### #57 – ATS-Score-Checker
 
----
+**Problem:** Bewerber wissen nicht, ob ihr Lebenslauf ein ATS-System passiert.
 
-## v1.4 – Smarte Suche & Datenanalyse
+**Lösung:**
+- KI vergleicht CV vs. Stellenbeschreibung auf Keyword-Übereinstimmung
+- Score 0–100 mit Ampel-Anzeige (< 50 🔴, 50–70 🟡, > 70 🟢)
+- Listet fehlende Keywords mit Kontext: _"Erwähne Linux in deinem Erfahrungsabschnitt"
+- ATS-Parser-Check: Erkennt problematische Formatierungen (Tabellen, SVG-Icons, Mehrspalter)
+- Dateien: `backend/services/ats_scorer.py`, `frontend/src/components/AtsScorePanel.tsx`
 
-Stellen besser finden, verstehen und verwalten.
+### #58 – Ghost-Job-Erkennung
 
-- #38 Foto-Upload von Stellenanzeigen (OCR + KI)
-- #39 Duplikat-Erkennung
-- #44 Bewerbungsfristen-Tracker mit Ampel
-- #45 Stellenbeschreibung-Analyse (KI)
-- #46 Firmen-Schwarze-Liste
+**Problem:** Viele Stellenanzeigen sind veraltet ("Ghost Jobs") – Zeitverschwendung.
 
----
+**Lösung:**
+- Analysiert Verhaltenssignale: Veraltetes Datum, generische Beschreibung, fehlende Ansprechperson
+- Heuristik-Score: Datum (>30 Tage), kein konkreter Name, keine Gehaltsspanne, Boilerplate-Text
+- Badge ⚠️ "Möglicherweise Ghost Job" in der Stellenliste
+- Dateien: `backend/services/ghost_job_detector.py`, `frontend/src/components/GhostJobBadge.tsx`
 
-## v1.5 – KI-Tiefe
+### #59 – Bewerbungs-Qualitätsscore
 
-KI wirklich nützlich machen – jenseits des Anschreibens.
+**Problem:** Nutzer wissen nicht, wie vollständig ihre Bewerbungsunterlagen sind.
 
-- #40 Absage-Analyse per KI
-- #41 Interview-Vorbereitung per KI
-- #42 Skill-Gap-Analyse (CV vs. Stelle)
-- #55 Lebenslauf-Optimierung per KI
-- #56 Anschreiben-Bewertung per KI
+**Lösung:**
+- Checkliste pro Bewerbung: Anschreiben, CV, Anschreiben-Score, Skill-Gap, ATS-Check
+- Gesamt-Score 0–100 aus gewichteten Einzelscores
+- "Verbessern"-Schnelllink direkt zum fehlenden Element
+- Dateien: `backend/services/application_quality.py`, `frontend/src/components/QualityScoreCard.tsx`
 
----
+### #60 – Gehaltsnegotiations-Coach
 
-## v1.6 – Kommunikation & Workflow
+**Problem:** Die meisten Bewerber kennen ihren Marktwert nicht und verhandeln nicht.
 
-Kontakte, Termine und E-Mails effizient verwalten.
+**Lösung:**
+- KI generiert Verhandlungsstrategie basierend auf: Stelle, Region, eigene Erfahrung, Gehaltsband der Anzeige
+- 3 Szenarien: konservativ / realistisch / optimistisch
+- Konkrete Formulierungen für E-Mail und Telefonat
+- Kombination mit dem vorhandenen Gehaltsrechner (v1.6)
+- Dateien: `backend/services/salary_negotiation.py`, `frontend/src/components/SalaryNegotiationModal.tsx`
 
-- #47 Kalender-Export (iCal / Google / Outlook)
-- #48 E-Mail-Vorlagen (Follow-up, Nachfrage, Absage)
-- #49 Kontakte-Verwaltung (Recruiter & Ansprechpartner)
-- #43 Netto-Brutto-Gehaltsrechner
+### #61 – Marktlage-Analyse pro Stelle
 
----
+**Problem:** Wie umkämpft ist eine Stelle wirklich? Wann sollte man sich bewerben?
 
-## v1.7 – Statistiken & Motivation
-
-Dashboard ausbauen und Nutzer langfristig motivieren.
-
-- #36 Erweiterte Dashboard-Statistiken
-- #37 Browser-Push-Benachrichtigungen
-- #51 Bewerbungs-Ziele + Streak-Tracking
-- #52 Gamification – Abzeichen für Meilensteine
-- #53 Druckansicht als PDF
+**Lösung:**
+- KI analysiert Beschreibung auf Signale: Dringlichkeit, Team-Wachstum, Fluktuation, Startup vs. Konzern
+- Gibt Einschätzung: Wettbewerb (niedrig/mittel/hoch), optimaler Zeitpunkt (sofort vs. 1 Woche warten)
+- Bewerbungsstrategie-Empfehlung ("Direkt bewerben" vs. "Erst LinkedIn-Kontakt suchen")
+- Dateien: `backend/services/market_analyzer.py`
 
 ---
 

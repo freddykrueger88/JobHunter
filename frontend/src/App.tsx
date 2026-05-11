@@ -6,6 +6,7 @@ import Jobs from './pages/Jobs'
 import Kanban from './pages/Kanban'
 import History from './pages/History'
 import Settings from './pages/Settings'
+import Reminders from './pages/Reminders'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/history" element={<History />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/reminders" element={<Reminders />} />
           </Routes>
         </main>
       </div>

@@ -5,19 +5,12 @@ const resources = {
   de: {
     translation: {
       nav: {
-        dashboard: 'Dashboard',
-        jobs: 'Stellensuche',
-        kanban: 'Bewerbungen',
-        history: 'Verlauf',
-        settings: 'Einstellungen',
+        dashboard: 'Dashboard', jobs: 'Stellensuche', kanban: 'Bewerbungen',
+        reminders: 'Erinnerungen', history: 'Verlauf', settings: 'Einstellungen',
       },
       dashboard: {
-        title: 'Dashboard',
-        applied: 'Beworben',
-        rejected: 'Absagen',
-        accepted: 'Angenommen',
-        interview: 'Interview',
-        open: 'Interessant',
+        title: 'Dashboard', applied: 'Beworben', rejected: 'Absagen',
+        accepted: 'Angenommen', interview: 'Interview', open: 'Interessant',
       },
       jobs: { title: 'Stellensuche', search: 'Suchen', hide: 'Ausblenden' },
       settings: { title: 'Einstellungen', theme: 'Design', language: 'Sprache', ai: 'KI-Einstellungen' },
@@ -27,19 +20,12 @@ const resources = {
   en: {
     translation: {
       nav: {
-        dashboard: 'Dashboard',
-        jobs: 'Job Search',
-        kanban: 'Applications',
-        history: 'History',
-        settings: 'Settings',
+        dashboard: 'Dashboard', jobs: 'Job Search', kanban: 'Applications',
+        reminders: 'Reminders', history: 'History', settings: 'Settings',
       },
       dashboard: {
-        title: 'Dashboard',
-        applied: 'Applied',
-        rejected: 'Rejected',
-        accepted: 'Accepted',
-        interview: 'Interview',
-        open: 'Interesting',
+        title: 'Dashboard', applied: 'Applied', rejected: 'Rejected',
+        accepted: 'Accepted', interview: 'Interview', open: 'Interesting',
       },
       jobs: { title: 'Job Search', search: 'Search', hide: 'Hide' },
       settings: { title: 'Settings', theme: 'Theme', language: 'Language', ai: 'AI Settings' },

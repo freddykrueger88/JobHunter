@@ -4,6 +4,7 @@ import axios from 'axios'
 import { GripVertical, X, Clock, Plus, Calendar, ChevronRight } from 'lucide-react'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
+import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
 
 interface Application {
   id: number
@@ -73,7 +74,6 @@ export default function Kanban() {
 
   // Quick-Add state per column
   const [quickAddCol, setQuickAddCol] = useState<string | null>(null)
-  const [quickAddJobId, setQuickAddJobId] = useState('')
 
   // Interview date edit
   const [editingInterview, setEditingInterview] = useState(false)
@@ -85,11 +85,22 @@ export default function Kanban() {
     queryFn: () => axios.get('/api/applications/').then(r => r.data),
   })
 
-  const { data: jobs = [] } = useQuery<Job[]>({
+  const { data: jobs = [], isLoading: jobsLoading } = useQuery<Job[]>({
     queryKey: ['jobs-all'],
     queryFn: () => axios.get('/api/jobs/?hide_hidden=false').then(r => r.data),
   })
   const jobMap = Object.fromEntries(jobs.map(j => [j.id, j]))
+
+  // IDs aller Jobs mit bestehender Bewerbung
+  const appliedJobIds = new Set(applications.map(a => a.job_id))
+
+  // Jobs als JobOption Array für Dropdown
+  const jobOptions: JobOption[] = jobs.map(j => ({
+    id: j.id,
+    title: j.title,
+    company: j.company,
+    city: j.city,
+  }))
 
   const { data: timeline = [], refetch: fetchTimeline } = useQuery<TimelineEntry[]>({
     queryKey: ['timeline', detailApp?.id],
@@ -132,7 +143,6 @@ export default function Kanban() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['applications'] })
       setQuickAddCol(null)
-      setQuickAddJobId('')
     },
   })
 
@@ -162,24 +172,18 @@ export default function Kanban() {
 
     let newPosition: number
     if (targetCardId === null) {
-      // Drop at end of column
       newPosition = colApps.length > 0 ? colApps[colApps.length - 1].kanban_position + 1 : 0
     } else {
       const targetIndex = colApps.findIndex(a => a.id === targetCardId)
       const before = colApps[targetIndex - 1]?.kanban_position ?? -1
       const after = colApps[targetIndex]?.kanban_position ?? colApps.length
       newPosition = Math.floor((before + after) / 2)
-      // Fallback: use index if positions are equal (avoid collisions)
       if (newPosition === before || newPosition === after) {
         newPosition = targetIndex
       }
     }
 
-    moveMutation.mutate({
-      id: draggingId,
-      status: targetColKey,
-      kanban_position: newPosition,
-    })
+    moveMutation.mutate({ id: draggingId, status: targetColKey, kanban_position: newPosition })
     setDraggingId(null)
     setDragOverCol(null)
     setDragOverCardId(null)
@@ -203,9 +207,7 @@ export default function Kanban() {
         moveMutation.mutate({ id: app.id, status: COLUMNS[colIdx - 1].key })
         setKbSelected(null)
       }
-      if (e.key === 'Escape') {
-        setKbSelected(null)
-      }
+      if (e.key === 'Escape') setKbSelected(null)
     }
   }
 
@@ -220,11 +222,9 @@ export default function Kanban() {
     notesMutation.mutate({ id, notes: notesValue })
   }
 
-  // ───── Quick-Add ─────
-  const submitQuickAdd = (colKey: string) => {
-    const jobId = parseInt(quickAddJobId)
-    if (!jobId || isNaN(jobId)) return
-    createMutation.mutate({ job_id: jobId, status: colKey })
+  // ───── Quick-Add via Dropdown ─────
+  const handleJobSelect = (job: JobOption, colKey: string) => {
+    createMutation.mutate({ job_id: job.id, status: colKey })
   }
 
   // ───── Render ─────
@@ -241,8 +241,10 @@ export default function Kanban() {
       {/* Keyboard hint */}
       {kbSelected && (
         <div className="mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg text-xs text-blue-700 dark:text-blue-300">
-          Karte ausgewählt – <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">←</kbd>{' '}
-          <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">→</kbd> zum Verschieben,{' '}
+          Karte ausgewählt –{' '}
+          <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">←</kbd>{' '}
+          <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">→</kbd>{' '}
+          zum Verschieben,{' '}
           <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">Esc</kbd> zum Abbrechen
         </div>
       )}
@@ -252,39 +254,23 @@ export default function Kanban() {
         {COLUMNS.map(col => {
           const cards = getColApps(col.key)
           const isDropTarget = dragOverCol === col.key
+          const isQuickAdd = quickAddCol === col.key
 
           return (
             <div
               key={col.key}
               className={clsx(
                 'flex-shrink-0 w-64 rounded-xl transition-all duration-150',
-                isDropTarget && dragOverCardId === null
-                  ? 'ring-2 ring-blue-400 ring-offset-1'
-                  : ''
+                isDropTarget && dragOverCardId === null ? 'ring-2 ring-blue-400 ring-offset-1' : ''
               )}
-              onDragOver={e => {
-                e.preventDefault()
-                setDragOverCol(col.key)
-              }}
-              onDragLeave={() => {
-                setDragOverCol(null)
-                setDragOverCardId(null)
-              }}
-              onDrop={e => {
-                e.preventDefault()
-                handleDrop(col.key, dragOverCardId)
-              }}
+              onDragOver={e => { e.preventDefault(); setDragOverCol(col.key) }}
+              onDragLeave={() => { setDragOverCol(null); setDragOverCardId(null) }}
+              onDrop={e => { e.preventDefault(); handleDrop(col.key, dragOverCardId) }}
               role="region"
               aria-label={`Spalte: ${col.label}`}
             >
               {/* Column header */}
-              <div
-                className={clsx(
-                  'border-t-4 rounded-t-xl px-3 py-2 flex items-center justify-between',
-                  col.borderClass,
-                  col.bgClass
-                )}
-              >
+              <div className={clsx('border-t-4 rounded-t-xl px-3 py-2 flex items-center justify-between', col.borderClass, col.bgClass)}>
                 <span className={clsx('font-semibold text-sm', col.colorClass)}>
                   {STATUS_ICONS[col.key]} {col.label}
                 </span>
@@ -310,40 +296,21 @@ export default function Kanban() {
 
                   return (
                     <div key={app.id}>
-                      {/* Drop indicator above card */}
                       {isDropAbove && (
                         <div className="h-1 bg-blue-400 rounded-full mx-1 mb-1 transition-all" aria-hidden />
                       )}
                       <div
                         draggable
-                        onDragStart={() => {
-                          setDraggingId(app.id)
-                          setKbSelected(null)
-                        }}
-                        onDragEnd={() => {
-                          setDraggingId(null)
-                          setDragOverCol(null)
-                          setDragOverCardId(null)
-                        }}
-                        onDragOver={e => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          setDragOverCardId(app.id)
-                          setDragOverCol(col.key)
-                        }}
-                        onDrop={e => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleDrop(col.key, app.id)
-                        }}
+                        onDragStart={() => { setDraggingId(app.id); setKbSelected(null) }}
+                        onDragEnd={() => { setDraggingId(null); setDragOverCol(null); setDragOverCardId(null) }}
+                        onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOverCardId(app.id); setDragOverCol(col.key) }}
+                        onDrop={e => { e.preventDefault(); e.stopPropagation(); handleDrop(col.key, app.id) }}
                         tabIndex={0}
                         onKeyDown={e => handleCardKeyDown(e, app)}
                         aria-label={`${job?.title ?? 'Stelle'} bei ${job?.company ?? '?'} – Status: ${col.label}. Enter zum Auswählen und mit Pfeiltasten verschieben.`}
                         className={clsx(
                           'bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border transition-all cursor-grab active:cursor-grabbing select-none',
-                          isKbSelected
-                            ? 'border-blue-500 ring-2 ring-blue-400'
-                            : 'border-transparent hover:border-gray-200 dark:hover:border-gray-600',
+                          isKbSelected ? 'border-blue-500 ring-2 ring-blue-400' : 'border-transparent hover:border-gray-200 dark:hover:border-gray-600',
                           isDraggingThis && 'opacity-40 scale-95',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400'
                         )}
@@ -386,10 +353,7 @@ export default function Kanban() {
                             onChange={e => setNotesValue(e.target.value)}
                             onBlur={() => saveNotes(app.id)}
                             onKeyDown={e => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault()
-                                saveNotes(app.id)
-                              }
+                              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveNotes(app.id) }
                               if (e.key === 'Escape') setEditingNotes(null)
                             }}
                             onClick={e => e.stopPropagation()}
@@ -400,10 +364,7 @@ export default function Kanban() {
                         ) : (
                           <p
                             className="mt-1.5 text-xs text-gray-400 italic cursor-text hover:text-gray-600 dark:hover:text-gray-300 transition-colors line-clamp-2"
-                            onDoubleClick={e => {
-                              e.stopPropagation()
-                              startEditNotes(app)
-                            }}
+                            onDoubleClick={e => { e.stopPropagation(); startEditNotes(app) }}
                             title="Doppelklick zum Bearbeiten"
                           >
                             {app.notes || '+ Notiz hinzufügen…'}
@@ -415,46 +376,28 @@ export default function Kanban() {
                 })}
 
                 {/* Empty state */}
-                {cards.length === 0 && !quickAddCol && (
+                {cards.length === 0 && !isQuickAdd && (
                   <p className="text-xs text-gray-400 text-center py-4 select-none">Leer – hierher ziehen</p>
                 )}
 
-                {/* Quick-Add form */}
-                {quickAddCol === col.key ? (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-2 border border-blue-400 shadow-sm">
-                    <p className="text-xs text-gray-500 mb-1">Job-ID eingeben:</p>
-                    <input
-                      type="number"
-                      autoFocus
-                      value={quickAddJobId}
-                      onChange={e => setQuickAddJobId(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') submitQuickAdd(col.key)
-                        if (e.key === 'Escape') { setQuickAddCol(null); setQuickAddJobId('') }
-                      }}
-                      placeholder="z.B. 42"
-                      className="w-full text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400 mb-1"
-                      aria-label="Job-ID für neue Bewerbung"
+                {/* Quick-Add – Dropdown */}
+                {isQuickAdd ? (
+                  <div className="pt-1">
+                    <JobSearchDropdown
+                      jobs={jobOptions}
+                      appliedJobIds={appliedJobIds}
+                      loading={jobsLoading}
+                      onSelect={job => handleJobSelect(job, col.key)}
+                      onCancel={() => setQuickAddCol(null)}
+                      placeholder={`Stelle für "${col.label}" suchen…`}
                     />
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => submitQuickAdd(col.key)}
-                        disabled={createMutation.isPending}
-                        className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded px-2 py-1 transition-colors disabled:opacity-50"
-                      >
-                        {createMutation.isPending ? '…' : 'Hinzufügen'}
-                      </button>
-                      <button
-                        onClick={() => { setQuickAddCol(null); setQuickAddJobId('') }}
-                        className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 px-2 py-1 rounded"
-                      >
-                        Abbrechen
-                      </button>
-                    </div>
+                    {createMutation.isPending && (
+                      <p className="text-xs text-gray-400 text-center pt-1">Wird hinzugefügt…</p>
+                    )}
                   </div>
                 ) : (
                   <button
-                    onClick={() => { setQuickAddCol(col.key); setQuickAddJobId('') }}
+                    onClick={() => setQuickAddCol(col.key)}
                     className="w-full flex items-center justify-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg py-2 transition-colors"
                     aria-label={`Bewerbung in Spalte ${col.label} hinzufügen`}
                   >
@@ -490,8 +433,7 @@ export default function Kanban() {
                       {job?.title ?? `Stelle #${detailApp.job_id}`}
                     </h2>
                     <p className="text-sm text-gray-500">
-                      {job?.company}
-                      {job?.city && ` • ${job.city}`}
+                      {job?.company}{job?.city && ` • ${job.city}`}
                     </p>
                   </div>
                   <button
@@ -563,12 +505,7 @@ export default function Kanban() {
                         aria-label="Gesprächstermin Datum und Uhrzeit"
                       />
                       <button
-                        onClick={() => {
-                          interviewMutation.mutate({
-                            id: detailApp.id,
-                            interview_at: interviewValue || null,
-                          })
-                        }}
+                        onClick={() => interviewMutation.mutate({ id: detailApp.id, interview_at: interviewValue || null })}
                         className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                       >
                         Speichern
@@ -585,20 +522,16 @@ export default function Kanban() {
                       onClick={() => setEditingInterview(true)}
                       className="text-xs text-left text-gray-600 dark:text-gray-300 hover:underline"
                     >
-                      {detailApp.interview_at
-                        ? formatDate(detailApp.interview_at)
-                        : '+ Termin setzen'}
+                      {detailApp.interview_at ? formatDate(detailApp.interview_at) : '+ Termin setzen'}
                     </button>
                   )}
                 </div>
 
                 {/* Applied date */}
                 {detailApp.applied_at && (
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      Beworben am: <span className="text-gray-700 dark:text-gray-300">{formatDate(detailApp.applied_at)}</span>
-                    </p>
-                  </div>
+                  <p className="text-xs text-gray-500">
+                    Beworben am: <span className="text-gray-700 dark:text-gray-300">{formatDate(detailApp.applied_at)}</span>
+                  </p>
                 )}
 
                 {/* Timeline */}
@@ -610,13 +543,8 @@ export default function Kanban() {
                     <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-2 space-y-3">
                       {timeline.map((entry, i) => (
                         <li key={i} className="ml-4">
-                          <span
-                            className="absolute -left-1.5 w-3 h-3 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800"
-                            aria-hidden
-                          />
-                          <p className="text-xs font-medium">
-                            {STATUS_ICONS[entry.status] ?? '🟡'} {entry.status}
-                          </p>
+                          <span className="absolute -left-1.5 w-3 h-3 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800" aria-hidden />
+                          <p className="text-xs font-medium">{STATUS_ICONS[entry.status] ?? '🟡'} {entry.status}</p>
                           <p className="text-xs text-gray-400">{formatDateTime(entry.changed_at)}</p>
                         </li>
                       ))}
@@ -627,9 +555,7 @@ export default function Kanban() {
                 {/* Delete */}
                 <button
                   onClick={() => {
-                    if (window.confirm('Bewerbung wirklich entfernen?')) {
-                      deleteMutation.mutate(detailApp.id)
-                    }
+                    if (window.confirm('Bewerbung wirklich entfernen?')) deleteMutation.mutate(detailApp.id)
                   }}
                   disabled={deleteMutation.isPending}
                   className="flex items-center gap-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"

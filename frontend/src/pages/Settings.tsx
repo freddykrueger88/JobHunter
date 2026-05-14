@@ -14,18 +14,17 @@ interface SettingsData {
   has_adzuna_key: boolean; has_linkedin_key: boolean; has_arbeitsagentur_key: boolean
 }
 
-// Jedes Theme hat einen Mini-Mockup: nav-Farbe, body-Farbe, text-Farbe, accent-Farbe
 const THEMES: {
   value: Theme
   emoji: string
   label: string
   sublabel: string
-  nav: string      // Hintergrund Nav-Balken
-  navText: string  // Textfarbe im Nav
-  body: string     // Hintergrund Inhaltsbereich
-  card: string     // Karten-Hintergrund
-  cardText: string // Text auf Karten
-  accent: string   // Akzentfarbe (Button-Simulation)
+  nav: string
+  navText: string
+  body: string
+  card: string
+  cardText: string
+  accent: string
   accentText: string
 }[] = [
   {
@@ -91,7 +90,6 @@ const API_LINKS: Record<string, string> = {
   linkedin: 'https://developer.linkedin.com/',
 }
 
-/** Mini-Mockup: zeigt wie das Theme aussieht – Nav-Balken + Inhaltsbereich + Karte + Button */
 function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boolean }) {
   return (
     <button
@@ -105,71 +103,31 @@ function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boo
       }}
       className="relative w-full rounded-2xl border-2 overflow-hidden transition-all hover:scale-[1.02] focus-visible:outline-none text-left"
     >
-      {/* Aktiv-Badge */}
       {active && (
-        <span
-          className="absolute top-2 right-2 z-10 flex items-center justify-center w-5 h-5 rounded-full bg-blue-500"
-          aria-hidden
-        >
+        <span className="absolute top-2 right-2 z-10 flex items-center justify-center w-5 h-5 rounded-full bg-blue-500" aria-hidden>
           <Check size={12} strokeWidth={3} color="#fff" />
         </span>
       )}
-
-      {/* Nav-Simulation */}
-      <div
-        style={{ background: opt.nav, borderBottom: `1px solid ${opt.navText}22` }}
-        className="flex items-center gap-1.5 px-3 py-2"
-      >
-        {/* 3 dot-Flächen als Nav-Links-Simulation */}
+      <div style={{ background: opt.nav, borderBottom: `1px solid ${opt.navText}22` }} className="flex items-center gap-1.5 px-3 py-2">
         {[40, 28, 34].map((w, i) => (
-          <span
-            key={i}
-            style={{ width: w, height: 6, background: opt.navText, opacity: i === 0 ? 0.9 : 0.4, borderRadius: 3 }}
-          />
+          <span key={i} style={{ width: w, height: 6, background: opt.navText, opacity: i === 0 ? 0.9 : 0.4, borderRadius: 3 }} />
         ))}
-        {/* Rechts: Avatar-Kreis */}
-        <span
-          style={{ width: 16, height: 16, background: opt.accent, borderRadius: '50%', marginLeft: 'auto' }}
-        />
+        <span style={{ width: 16, height: 16, background: opt.accent, borderRadius: '50%', marginLeft: 'auto' }} />
       </div>
-
-      {/* Body-Simulation */}
       <div style={{ background: opt.body }} className="px-3 py-3 space-y-2">
-        {/* Karte */}
-        <div
-          style={{ background: opt.card, borderRadius: 6, padding: '6px 8px' }}
-          className="space-y-1.5"
-        >
-          {/* Titelzeile */}
+        <div style={{ background: opt.card, borderRadius: 6, padding: '6px 8px' }} className="space-y-1.5">
           <span style={{ display: 'block', width: '70%', height: 7, background: opt.cardText, opacity: 0.85, borderRadius: 3 }} />
-          {/* Subzeile */}
           <span style={{ display: 'block', width: '50%', height: 5, background: opt.cardText, opacity: 0.35, borderRadius: 3 }} />
-          {/* Button-Simulation */}
-          <span
-            style={{ display: 'inline-block', background: opt.accent, color: opt.accentText, borderRadius: 4, fontSize: 8, padding: '2px 7px', marginTop: 2, fontWeight: 600 }}
-          >
-            Öffnen
-          </span>
+          <span style={{ display: 'inline-block', background: opt.accent, color: opt.accentText, borderRadius: 4, fontSize: 8, padding: '2px 7px', marginTop: 2, fontWeight: 600 }}>Öffnen</span>
         </div>
-        {/* zweite schmale Karte */}
-        <div
-          style={{ background: opt.card, borderRadius: 6, padding: '5px 8px', display: 'flex', alignItems: 'center', gap: 5 }}
-        >
+        <div style={{ background: opt.card, borderRadius: 6, padding: '5px 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
           <span style={{ width: 10, height: 10, background: opt.accent, borderRadius: '50%', flexShrink: 0 }} />
           <span style={{ flex: 1, height: 5, background: opt.cardText, opacity: 0.5, borderRadius: 3 }} />
         </div>
       </div>
-
-      {/* Label unterhalb des Mockups */}
-      <div
-        style={{ background: opt.nav, borderTop: `1px solid ${opt.navText}18`, padding: '8px 12px' }}
-      >
-        <span style={{ color: opt.navText, fontWeight: 700, fontSize: 13 }}>
-          {opt.emoji} {opt.label}
-        </span>
-        <span style={{ color: opt.navText, opacity: 0.6, fontSize: 11, display: 'block', marginTop: 1 }}>
-          {opt.sublabel}
-        </span>
+      <div style={{ background: opt.nav, borderTop: `1px solid ${opt.navText}18`, padding: '8px 12px' }}>
+        <span style={{ color: opt.navText, fontWeight: 700, fontSize: 13 }}>{opt.emoji} {opt.label}</span>
+        <span style={{ color: opt.navText, opacity: 0.6, fontSize: 11, display: 'block', marginTop: 1 }}>{opt.sublabel}</span>
       </div>
     </button>
   )
@@ -186,10 +144,7 @@ function ToggleSwitch({ value, onChange, id }: { value: boolean; onChange: (v: b
         value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
       )}
     >
-      <span className={clsx(
-        'absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform',
-        value ? 'translate-x-5' : 'translate-x-0'
-      )} />
+      <span className={clsx('absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform', value ? 'translate-x-5' : 'translate-x-0')} />
     </button>
   )
 }
@@ -216,42 +171,45 @@ export default function Settings() {
   const { data: remote } = useQuery<SettingsData>({
     queryKey: ['settings'],
     queryFn: () => axios.get('/api/settings/').then(r => r.data),
+    // Kein Hintergrund-Refetch während der User tippt
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
   })
 
-  const [aiModel, setAiModel]       = useState('mistral')
-  const [aiTone, setAiTone]         = useState('formell')
-  const locationInitialized         = useRef(false)
+  const [aiModel, setAiModel]             = useState('mistral')
+  const [aiTone, setAiTone]               = useState('formell')
   const [defaultLocation, setDefaultLocation] = useState('')
   const [defaultRadius, setDefaultRadius]     = useState(25)
   const [hideAusbildung, setHideAusbildung]   = useState(true)
   const [reminderDays, setReminderDays]       = useState(7)
-  const [showKeys, setShowKeys]     = useState<Record<string, boolean>>({})
-  const [keys, setKeys]             = useState<Record<string, string>>({
+  const [showKeys, setShowKeys]   = useState<Record<string, boolean>>({})
+  const [keys, setKeys]           = useState<Record<string, string>>({
     adzuna_app_id: '', adzuna_api_key: '', linkedin_api_key: '',
     arbeitsagentur_client_id: '', arbeitsagentur_client_secret: '',
   })
-  const [saved, setSaved]           = useState(false)
-  const [importing, setImporting]   = useState(false)
-  const [importMsg, setImportMsg]   = useState('')
+  const [saved, setSaved]         = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
 
-  const { data: models = [] } = useQuery<string[]>({
-    queryKey: ['ai-models'],
-    queryFn: () => axios.get('/api/ai/models').then(r => r.data.models),
-  })
-
+  // ─── FIX: einmalige Initialisierung aus remote, danach nie wieder überschreiben ───
+  const initialized = useRef(false)
   useEffect(() => {
-    if (remote) {
+    if (remote && !initialized.current) {
+      initialized.current = true
       setAiModel(remote.ai_model)
       setAiTone(remote.ai_tone)
-      if (!locationInitialized.current) {
-        setDefaultLocation(remote.default_location ?? '')
-        setDefaultRadius(remote.default_radius_km)
-        locationInitialized.current = true
-      }
+      setDefaultLocation(remote.default_location ?? '')
+      setDefaultRadius(remote.default_radius_km)
       setHideAusbildung(remote.hide_ausbildung)
       setReminderDays(remote.reminder_default_days)
     }
   }, [remote])
+
+  const { data: models = [] } = useQuery<string[]>({
+    queryKey: ['ai-models'],
+    queryFn: () => axios.get('/api/ai/models').then(r => r.data.models),
+    staleTime: 300_000,
+  })
 
   const saveMutation = useMutation({
     mutationFn: () => axios.patch('/api/settings/', {
@@ -262,6 +220,8 @@ export default function Settings() {
       ...Object.fromEntries(Object.entries(keys).filter(([, v]) => v !== '')),
     }),
     onSuccess: () => {
+      // Nach dem Speichern remote neu laden, aber initialized bleibt true
+      // → kein State-Überschreiben, nur has_*_key Badges aktualisieren
       qc.invalidateQueries({ queryKey: ['settings'] })
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
@@ -309,10 +269,8 @@ export default function Settings() {
 
       {/* ── Erscheinungsbild ── */}
       <Section title="🎨 Erscheinungsbild">
-        {/* 3-spaltig auf breiten Screens, 2-spaltig auf mobil */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {THEMES.map(opt => (
-            // Wrapper-div fängt onClick ab und delegiert an setTheme
             <div key={opt.value} onClick={() => setTheme(opt.value)} className="cursor-pointer">
               <ThemeMockup t={opt} active={theme === opt.value} />
             </div>
@@ -415,9 +373,14 @@ export default function Settings() {
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
-              <input value={defaultLocation} onChange={e => setDefaultLocation(e.target.value)}
+              <input
+                value={defaultLocation}
+                onChange={e => setDefaultLocation(e.target.value)}
                 className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                placeholder="z.B. Bremen" aria-label="Standard-Ort" autoComplete="off" />
+                placeholder="z.B. Bremen"
+                aria-label="Standard-Ort"
+                autoComplete="off"
+              />
             </div>
             <div className="w-32">
               <label className="text-sm text-gray-500 block mb-1">Radius (km)</label>
@@ -438,8 +401,13 @@ export default function Settings() {
       <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
-          <input type="number" min={1} max={30} value={reminderDays} onChange={e => setReminderDays(Number(e.target.value))}
-            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="Vorlaufzeit" />
+          <input
+            type="number" min={1} max={30}
+            value={reminderDays}
+            onChange={e => setReminderDays(Number(e.target.value))}
+            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+            aria-label="Vorlaufzeit"
+          />
         </div>
       </Section>
 
@@ -463,11 +431,14 @@ export default function Settings() {
               </a>
             </div>
             <div className="relative">
-              <input type={showKeys[key] ? 'text' : 'password'} value={keys[key]}
+              <input
+                type={showKeys[key] ? 'text' : 'password'}
+                value={keys[key]}
                 onChange={e => setKeys(k => ({ ...k, [key]: e.target.value }))}
                 placeholder={hasKey ? '•••••••• (zum Überschreiben eingeben)' : 'Leer'}
                 className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                aria-label={label} />
+                aria-label={label}
+              />
               <button type="button" onClick={() => setShowKeys(s => ({ ...s, [key]: !s[key] }))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 aria-label={showKeys[key] ? 'Verbergen' : 'Anzeigen'}

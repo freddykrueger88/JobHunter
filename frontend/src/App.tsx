@@ -14,6 +14,8 @@ import History from './pages/History'
 import Settings from './pages/Settings'
 import Reminders from './pages/Reminders'
 import SearchProfiles from './pages/SearchProfiles'
+import InterviewSimulator from './pages/InterviewSimulator'
+import CompanyDossier from './pages/CompanyDossier'
 import { useUndoToast } from './hooks/useUndoToast'
 
 function AppInner() {
@@ -30,7 +32,6 @@ function AppInner() {
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       <TopNav focusMode={focusMode} />
 
-      {/* main-content Anker für Skip-Link (WCAG 2.4.1) */}
       <main id="main-content" className="container mx-auto px-4 py-6">
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -40,14 +41,13 @@ function AppInner() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/reminders" element={<Reminders />} />
           <Route path="/search-profiles" element={<SearchProfiles />} />
+          <Route path="/interview-simulator" element={<InterviewSimulator />} />
+          <Route path="/company-dossier" element={<CompanyDossier />} />
         </Routes>
       </main>
 
-      {/* Globale Overlays */}
       <ShortcutOverlay isOpen={shortcutOpen} onClose={() => setShortcutOpen(false)} />
       <UndoToast state={undoState} onUndo={undo} onDismiss={dismiss} />
-
-      {/* Sakura Blütenblätter – nur aktiv wenn theme === 'sakura' */}
       <SakuraPetals />
     </div>
   )

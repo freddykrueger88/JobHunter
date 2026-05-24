@@ -43,6 +43,7 @@ class Application(Base):
     erstellt_am = Column(DateTime, default=datetime.utcnow)
     job = relationship('Job', back_populates='applications')
     status_logs = relationship('ApplicationStatusLog', back_populates='application')
+    followups = relationship('FollowUp', back_populates='application', cascade='all, delete-orphan')
 
 class ApplicationStatusLog(Base):
     __tablename__ = 'application_status_logs'
@@ -51,6 +52,27 @@ class ApplicationStatusLog(Base):
     status = Column(String)
     erstellt_am = Column(DateTime, default=datetime.utcnow)
     application = relationship('Application', back_populates='status_logs')
+
+class FollowUp(Base):
+    """Wiedervorlage fuer eine Bewerbung (Issue #64).
+
+    ampel_status wird dynamisch vom FollowUpScheduler berechnet
+    und kann fuer Caching hier persistiert werden:
+      'urgent' = heute oder ueberfaellig
+      'soon'   = morgen faellig
+      'later'  = innerhalb der naechsten 7 Tage
+      'done'   = erledigt
+    """
+    __tablename__ = 'followups'
+    id = Column(Integer, primary_key=True)
+    application_id = Column(Integer, ForeignKey('applications.id'), nullable=False)
+    faellig_am = Column(DateTime, nullable=False)
+    notiz = Column(Text)
+    erledigt = Column(Boolean, default=False, nullable=False)
+    erledigt_am = Column(DateTime, nullable=True)
+    erstellt_am = Column(DateTime, default=datetime.utcnow)
+    aktualisiert_am = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    application = relationship('Application', back_populates='followups')
 
 class Reminder(Base):
     __tablename__ = 'reminders'

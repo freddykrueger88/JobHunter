@@ -2,11 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api import jobs, applications, settings, cv, ai, dashboard, history, reminders
 from backend.api import export, interview, company, eures
+from backend.routers import followups
 
 app = FastAPI(
     title="JobHunter API",
     description="🎯 Lokaler KI-Bewerbungsassistent – DSGVO-konform, vollständig lokal",
-    version="0.4.0",
+    version="1.9.0",
 )
 
 app.add_middleware(
@@ -29,8 +30,9 @@ app.include_router(export.router)
 app.include_router(interview.router)
 app.include_router(company.router)
 app.include_router(eures.router)
+app.include_router(followups.router)
 
 
 @app.get("/health", tags=["System"])
 async def health_check():
-    return {"status": "ok", "version": "0.4.0"}
+    return {"status": "ok", "version": "1.9.0"}

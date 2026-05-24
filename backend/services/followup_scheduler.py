@@ -8,16 +8,20 @@ Verantwortlich fuer:
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
-from typing import Literal, Optional
+from datetime import date, datetime, timedelta, timezone
+from typing import Any, Literal, Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from backend.models import Application, FollowUp
 
 AmpelStatus = Literal["urgent", "soon", "later", "done"]
+
+# Sentinel: unterscheidet "nicht uebergeben" von explizitem None
+_UNSET: Any = object()
+
 
 # ---------------------------------------------------------------------------
 # Ampel-Logik
@@ -27,10 +31,10 @@ def berechne_ampel(followup: FollowUp) -> AmpelStatus:
     """Berechnet den Ampel-Status eines FollowUp-Eintrags.
 
     Returns:
-        'done'   – bereits erledigt
-        'urgent' – heute oder ueberfaellig  (diff <= 0)
-        'soon'   – morgen faellig            (diff == 1)
-        'later'  – innerhalb der naechsten 7 Tage
+        'done'   - bereits erledigt
+        'urgent' - heute oder ueberfaellig  (diff <= 0)
+        'soon'   - morgen faellig            (diff == 1)
+        'later'  - ab uebermorgen (kein Limit nach oben)
     """
     if followup.erledigt:
         return "done"
@@ -74,7 +78,7 @@ async def erstelle_followup(
     Returns:
         Das persistierte FollowUp-Objekt
     """
-    faellig_am = datetime.utcnow() + timedelta(days=tage)
+    faellig_am = datetime.now(timezone.utc) + timedelta(days=tage)
     followup = FollowUp(
         application_id=application_id,
         faellig_am=faellig_am,
@@ -135,7 +139,7 @@ async def markiere_erledigt(
     if not followup:
         return None
     followup.erledigt = True
-    followup.erledigt_am = datetime.utcnow()
+    followup.erledigt_am = datetime.now(timezone.utc)
     await db.commit()
     await db.refresh(followup)
     return followup
@@ -145,17 +149,23 @@ async def aktualisiere_followup(
     db: AsyncSession,
     followup_id: int,
     tage: Optional[int] = None,
-    notiz: Optional[str] = None,
+    notiz: Any = _UNSET,
 ) -> Optional[FollowUp]:
-    """Aktualisiert Faelligkeit und/oder Notiz einer Wiedervorlage."""
+    """Aktualisiert Faelligkeit und/oder Notiz einer Wiedervorlage.
+
+    Args:
+        tage:  Neues Faelligkeitsdatum als Offset ab heute (None = unveraendert)
+        notiz: Neuer Notiztext. Explizit None uebergeben um die Notiz zu loeschen.
+               Nicht uebergeben (_UNSET) bedeutet unveraendert.
+    """
     result = await db.execute(select(FollowUp).where(FollowUp.id == followup_id))
     followup = result.scalar_one_or_none()
     if not followup:
         return None
     if tage is not None:
-        followup.faellig_am = datetime.utcnow() + timedelta(days=tage)
-    if notiz is not None:
-        followup.notiz = notiz
+        followup.faellig_am = datetime.now(timezone.utc) + timedelta(days=tage)
+    if notiz is not _UNSET:
+        followup.notiz = notiz  # None loescht die Notiz, String setzt sie
     await db.commit()
     await db.refresh(followup)
     return followup
@@ -173,11 +183,14 @@ async def loesche_followup(db: AsyncSession, followup_id: int) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Dashboard-Stats
+# Dashboard-Stats  (einzelner SQL GROUP-BY-Query statt N+1)
 # ---------------------------------------------------------------------------
 
 async def berechne_dashboard_stats(db: AsyncSession) -> dict:
     """Berechnet die Ampel-Statistik fuer das Dashboard-Widget.
+
+    Verwendet einen einzigen GROUP-BY-Query statt alle Objekte in Python
+    zu laden. Skaliert damit auch bei vielen Eintraegen.
 
     Returns ein Dict mit den Zaehlen pro Ampel-Status sowie Gesamt.
 
@@ -191,18 +204,28 @@ async def berechne_dashboard_stats(db: AsyncSession) -> dict:
             'gesamt_offen': 7,
         }
     """
-    alle_offenen = await hole_alle_offenen_followups(db)
+    today = func.current_date()
+    tomorrow = func.current_date() + 1  # SQLite + Postgres kompatibel
+
+    bucket = case(
+        (FollowUp.erledigt.is_(True), "done"),
+        (func.date(FollowUp.faellig_am) <= today, "urgent"),
+        (func.date(FollowUp.faellig_am) == tomorrow, "soon"),
+        else_="later",
+    ).label("bucket")
+
+    stmt = (
+        select(bucket, func.count().label("n"))
+        .select_from(FollowUp)
+        .group_by("bucket")
+    )
+    rows = (await db.execute(stmt)).all()
 
     stats: dict[str, int] = {"urgent": 0, "soon": 0, "later": 0, "done": 0}
-    for fw in alle_offenen:
-        status = berechne_ampel(fw)
-        stats[status] += 1
+    for row in rows:
+        if row.bucket in stats:
+            stats[row.bucket] = row.n
 
-    # Erledigte separat zaehlen
-    result = await db.execute(
-        select(func.count()).select_from(FollowUp).where(FollowUp.erledigt.is_(True))
-    )
-    stats["done"] = result.scalar_one() or 0
     stats["gesamt_offen"] = stats["urgent"] + stats["soon"] + stats["later"]
     return stats
 

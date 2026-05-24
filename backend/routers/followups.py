@@ -2,25 +2,28 @@
 
 Endpunkte::
 
-    GET    /api/followups/              – alle offenen Wiedervorlagen (mit Ampel)
-    GET    /api/followups/stats         – Dashboard-Zaehler
-    GET    /api/followups/{id}/vorlage  – Nachfass-E-Mail-Vorlage als Text
-    POST   /api/followups/              – neue Wiedervorlage anlegen
-    PATCH  /api/followups/{id}/erledigt – als erledigt markieren
-    PATCH  /api/followups/{id}          – Datum/Notiz aendern
-    DELETE /api/followups/{id}          – loeschen
+    GET    /api/followups/              - alle offenen Wiedervorlagen (mit Ampel)
+    GET    /api/followups/stats         - Dashboard-Zaehler
+    GET    /api/followups/{id}/vorlage  - Nachfass-E-Mail-Vorlage als Text
+    POST   /api/followups/              - neue Wiedervorlage anlegen
+    PATCH  /api/followups/{id}/erledigt - als erledigt markieren
+    PATCH  /api/followups/{id}          - Datum/Notiz aendern
+    DELETE /api/followups/{id}          - loeschen
 """
 from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from backend.database import get_db
-from backend.models import FollowUp
+from backend.models import Application, FollowUp
 from backend.services.followup_scheduler import (
     AmpelStatus,
+    _UNSET,
     aktualisiere_followup,
     berechne_ampel,
     berechne_dashboard_stats,
@@ -47,7 +50,14 @@ class FollowUpCreate(BaseModel):
 
 class FollowUpUpdate(BaseModel):
     tage: Optional[int] = Field(None, ge=1, le=365)
-    notiz: Optional[str] = None
+    notiz: Optional[str] = None  # explizit None = Notiz loeschen
+
+    @model_validator(mode="after")
+    def mindestens_ein_feld(self) -> "FollowUpUpdate":
+        """Verhindert leere PATCH-Requests ohne Aenderung."""
+        if self.tage is None and self.notiz is None:
+            raise ValueError("Mindestens 'tage' oder 'notiz' muss angegeben werden.")
+        return self
 
 
 class FollowUpResponse(BaseModel):
@@ -153,12 +163,20 @@ async def update_followup(
     data: FollowUpUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    """Faelligkeit und/oder Notiz einer Wiedervorlage aendern."""
+    """Faelligkeit und/oder Notiz einer Wiedervorlage aendern.
+
+    Notiz auf null setzen loescht die Notiz explizit.
+    Leerer Request-Body ohne 'tage' und 'notiz' wird mit 422 abgelehnt.
+    """
+    # Sentinel-Weiterleitung: nur uebergeben was wirklich im Body stand
+    notiz_value = data.notiz if data.notiz is not None else (
+        None if "notiz" in data.model_fields_set else _UNSET
+    )
     fw = await aktualisiere_followup(
         db,
         followup_id=followup_id,
         tage=data.tage,
-        notiz=data.notiz,
+        notiz=notiz_value,
     )
     if not fw:
         raise HTTPException(404, "Wiedervorlage nicht gefunden")
@@ -182,14 +200,10 @@ async def get_vorlage(
     db: AsyncSession = Depends(get_db),
 ):
     """Gibt die Nachfass-E-Mail-Vorlage als reinen Text zurueck."""
-    from sqlalchemy import select
-    from sqlalchemy.orm import selectinload
-    from backend.models import FollowUp as FUModel
-
     result = await db.execute(
-        select(FUModel)
-        .where(FUModel.id == followup_id)
-        .options(selectinload(FUModel.application).selectinload(FollowUp.application.property.mapper.class_.job))
+        select(FollowUp)
+        .where(FollowUp.id == followup_id)
+        .options(selectinload(FollowUp.application).selectinload(Application.job))
     )
     fw = result.scalar_one_or_none()
     if not fw:

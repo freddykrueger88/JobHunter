@@ -1,0 +1,8 @@
+# Entwicklungs- und Test-Abhaengigkeiten
+# Installieren mit: pip install -r requirements-dev.txt
+-r requirements.txt
+
+pytest==8.2.2
+pytest-asyncio==0.23.7
+aiosqlite==0.20.0          # In-Memory SQLite fuer Tests (kein Postgres noetig)
+httpx==0.27.0              # bereits in requirements.txt, hier explizit fuer TestClient

@@ -1,11 +1,12 @@
 import { useState, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { GripVertical, X, Clock, Plus, Calendar, ChevronRight } from 'lucide-react'
+import { GripVertical, X, Clock, Plus, Calendar, ChevronRight, Bot } from 'lucide-react'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
 import AutoApplyButton from '../components/AutoApplyButton'
+import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
   id: number
@@ -67,6 +68,9 @@ export default function Kanban() {
 
   // Detail modal
   const [detailApp, setDetailApp] = useState<Application | null>(null)
+
+  // Coach-Drawer (kontextbewusst aus dem Detail-Modal)
+  const [coachOpen, setCoachOpen] = useState(false)
 
   // Inline note editing
   const [editingNotes, setEditingNotes] = useState<number | null>(null)
@@ -472,6 +476,14 @@ export default function Kanban() {
                     hasCoverLetter={detailApp.status !== 'interessant'}
                     hasCV
                   />
+                  {/* #62 – Bewerbungscoach (kontextbewusst) */}
+                  <button
+                    onClick={() => setCoachOpen(true)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
+                    aria-label="Bewerbungscoach für diese Stelle öffnen"
+                  >
+                    <Bot size={13} aria-hidden /> Coach
+                  </button>
                 </div>
 
                 {/* Status buttons */}
@@ -575,6 +587,17 @@ export default function Kanban() {
             </div>
           )
         })()}
+
+      {/* Bewerbungscoach-Drawer – mit Bewerbungskontext aus dem Detail-Modal */}
+      {detailApp && (
+        <CoachChatDrawer
+          open={coachOpen}
+          onClose={() => setCoachOpen(false)}
+          jobTitle={jobMap[detailApp.job_id]?.title}
+          company={jobMap[detailApp.job_id]?.company}
+          status={detailApp.status}
+        />
+      )}
     </div>
   )
 }

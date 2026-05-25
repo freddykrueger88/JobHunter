@@ -1,7 +1,10 @@
 """Bundesagentur für Arbeit – Jobsuche API (kostenlos, kein Key nötig)."""
 import httpx
+import logging
 from backend.services.job_search.base import BaseJobSource, RawJob
 from datetime import datetime
+
+log = logging.getLogger(__name__)
 
 BASE_URL = "https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs"
 TOKEN_URL = "https://rest.arbeitsagentur.de/oauth/token"
@@ -9,7 +12,6 @@ TOKEN_URL = "https://rest.arbeitsagentur.de/oauth/token"
 
 class ArbeitsagenturSource(BaseJobSource):
     def __init__(self, client_id: str = "", client_secret: str = ""):
-        # Ohne Keys: öffentlicher Zugriff mit eingeschränktem Rate-Limit
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -39,9 +41,23 @@ class ArbeitsagenturSource(BaseJobSource):
         try:
             async with httpx.AsyncClient() as client:
                 r = await client.get(BASE_URL, params=params, headers=headers, timeout=15)
+                if r.status_code == 401:
+                    log.warning(
+                        "ArbeitsagenturSource: 401 Unauthorized – "
+                        "kein OAuth-Token konfiguriert oder Token abgelaufen. "
+                        "Bitte client_id + client_secret in den Einstellungen hinterlegen."
+                    )
+                    return []
                 r.raise_for_status()
                 data = r.json()
-        except Exception:
+        except httpx.TimeoutException:
+            log.error("ArbeitsagenturSource: Timeout beim Abrufen der Jobs")
+            return []
+        except httpx.HTTPStatusError as e:
+            log.error("ArbeitsagenturSource: HTTP %s – %s", e.response.status_code, e.response.text[:200])
+            return []
+        except Exception as e:
+            log.exception("ArbeitsagenturSource: Unerwarteter Fehler: %s", e)
             return []
 
         results = []
@@ -63,6 +79,7 @@ class ArbeitsagenturSource(BaseJobSource):
                 latitude=arbeitsort.get("koordinaten", {}).get("lat"),
                 longitude=arbeitsort.get("koordinaten", {}).get("lon"),
             ))
+        log.info("ArbeitsagenturSource: %d Jobs gefunden für '%s' in '%s'", len(results), keywords, location)
         return results
 
     def _map_arbeitszeitmodell(self, models: list) -> str | None:

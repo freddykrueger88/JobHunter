@@ -1,11 +1,14 @@
 """Aggregiert Ergebnisse aus allen aktivierten Job-Quellen."""
+import asyncio
+import logging
 from backend.services.job_search.base import RawJob
 from backend.services.job_search.arbeitsagentur import ArbeitsagenturSource
 from backend.services.job_search.adzuna import AdzunaSource
 from backend.services.job_search.stepstone import StepStoneSource
 from backend.services.job_search.linkedin import LinkedInSource
 from backend.core.crypto import decrypt
-import asyncio
+
+log = logging.getLogger(__name__)
 
 
 async def search_all_sources(
@@ -38,6 +41,11 @@ async def search_all_sources(
     if getattr(settings_row, "linkedin_api_key_enc", None):
         sources.append(LinkedInSource(decrypt(settings_row.linkedin_api_key_enc)))
 
+    log.info(
+        "Aggregator: Suche '%s' in '%s' (%d km) über %d Quelle(n)",
+        keywords, location, radius_km, len(sources)
+    )
+
     # Parallel suchen
     results_nested = await asyncio.gather(
         *[src.search(keywords, location, radius_km) for src in sources],
@@ -47,12 +55,16 @@ async def search_all_sources(
     # Flatten + Duplikate herausfiltern
     seen: set[str] = set()
     all_jobs: list[RawJob] = []
-    for batch in results_nested:
+    for i, batch in enumerate(results_nested):
+        source_name = type(sources[i]).__name__
         if isinstance(batch, Exception):
+            log.error("Aggregator: Quelle '%s' hat eine Exception geworfen: %s", source_name, batch)
             continue
         for job in batch:
-            key = f"{job.source_portal}:{job.external_id or job.title+job.company}"
+            key = f"{job.source_portal}:{job.external_id or job.title + job.company}"
             if key not in seen:
                 seen.add(key)
                 all_jobs.append(job)
+
+    log.info("Aggregator: %d eindeutige Jobs gesamt", len(all_jobs))
     return all_jobs

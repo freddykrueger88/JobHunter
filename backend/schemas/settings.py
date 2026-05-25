@@ -27,6 +27,7 @@ class SettingsUpdate(BaseModel):
     default_radius_km: int | None = None
     hide_ausbildung: bool | None = None
     reminder_default_days: int | None = None
+    color_blind_mode: str | None = None
     # API-Keys im Klartext – werden beim Speichern verschlüsselt
     adzuna_app_id: str | None = None
     adzuna_api_key: str | None = None

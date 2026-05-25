@@ -1,6 +1,7 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+# Arbeitsverzeichnis innerhalb des Containers
+WORKDIR /app/backend
 
 # System-Abhängigkeiten
 RUN apt-get update && apt-get install -y \
@@ -12,11 +13,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Projektdateien in das backend-Verzeichnis kopieren
 COPY . .
 
-# Projekt-Root zum Python-Path hinzufügen damit 'from backend.x import y' funktioniert
+# Monorepo-Root (/app) zum Python-Path hinzufügen,
+# damit "import backend.*" funktioniert
 ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Start-Skript: führt Alembic-Migrationen aus und startet dann Uvicorn
+CMD ["./entrypoint.sh"]

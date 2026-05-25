@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Save, Eye, EyeOff, ExternalLink, Download, Upload, Check } from 'lucide-react'
+import { Eye, EyeOff, ExternalLink, Download, Upload, Check, Save } from 'lucide-react'
 import clsx from 'clsx'
 
 interface SettingsData {
@@ -13,6 +13,10 @@ interface SettingsData {
   hide_ausbildung: boolean; reminder_default_days: number
   has_adzuna_key: boolean; has_linkedin_key: boolean
 }
+
+type SaveStatus = 'idle' | 'pending' | 'saved' | 'error'
+
+const AUTOSAVE_DELAY = 1200 // ms
 
 const THEMES: {
   value: Theme
@@ -170,6 +174,26 @@ function ToggleRow({ label, desc, value, onChange }: { label: string; desc?: str
   )
 }
 
+// ─── Auto-Save Toast ────────────────────────────────────────────────────────
+function SaveToast({ status }: { status: SaveStatus }) {
+  if (status === 'idle') return null
+  return (
+    <div
+      aria-live="polite"
+      className={clsx(
+        'fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300',
+        status === 'pending' && 'bg-yellow-50 dark:bg-yellow-900/80 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700',
+        status === 'saved'   && 'bg-green-50 dark:bg-green-900/80 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700',
+        status === 'error'   && 'bg-red-50 dark:bg-red-900/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700',
+      )}
+    >
+      {status === 'pending' && <><span className="w-3.5 h-3.5 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />Speichern…</>}
+      {status === 'saved'   && <><Check size={14} aria-hidden />Gespeichert</>}
+      {status === 'error'   && <>❌ Fehler beim Speichern</>}
+    </div>
+  )
+}
+
 export default function Settings() {
   const { t, i18n } = useTranslation()
   const { theme, setTheme, colorBlindMode, setColorBlindMode } = useTheme()
@@ -183,21 +207,25 @@ export default function Settings() {
     staleTime: 60_000,
   })
 
-  const [aiModel, setAiModel]             = useState('mistral')
-  const [aiTone, setAiTone]               = useState('formell')
+  const [aiModel, setAiModel]                 = useState('mistral')
+  const [aiTone, setAiTone]                   = useState('formell')
   const [defaultLocation, setDefaultLocation] = useState('')
   const [defaultRadius, setDefaultRadius]     = useState(25)
   const [hideAusbildung, setHideAusbildung]   = useState(true)
   const [reminderDays, setReminderDays]       = useState(7)
-  const [showKeys, setShowKeys]   = useState<Record<string, boolean>>({})
-  const [keys, setKeys]           = useState<Record<string, string>>({
+  const [showKeys, setShowKeys]               = useState<Record<string, boolean>>({})
+  const [keys, setKeys]                       = useState<Record<string, string>>({
     adzuna_app_id: '', adzuna_api_key: '',
   })
-  const [saved, setSaved]         = useState(false)
-  const [importing, setImporting] = useState(false)
-  const [importMsg, setImportMsg] = useState('')
+  const [saveStatus, setSaveStatus]           = useState<SaveStatus>('idle')
+  const [keysSaved, setKeysSaved]             = useState(false)
+  const [importing, setImporting]             = useState(false)
+  const [importMsg, setImportMsg]             = useState('')
 
-  const initialized = useRef(false)
+  const initialized   = useRef(false)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isFirstRender = useRef(true)
+
   useEffect(() => {
     if (remote && !initialized.current) {
       initialized.current = true
@@ -216,18 +244,54 @@ export default function Settings() {
     staleTime: 300_000,
   })
 
-  const saveMutation = useMutation({
+  // ─── Core save function (ohne API-Keys) ─────────────────────────────────
+  const doSave = useCallback(async (payload: object) => {
+    setSaveStatus('pending')
+    try {
+      await axios.patch('/api/settings/', payload)
+      qc.invalidateQueries({ queryKey: ['settings'] })
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    } catch {
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    }
+  }, [qc])
+
+  // ─── Auto-Save Trigger ──────────────────────────────────────────────────
+  // Läuft bei jeder Änderung der Einstellungen (außer API-Keys)
+  useEffect(() => {
+    if (!initialized.current) return
+    // Ersten Render nach Initialisierung überspringen
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => {
+      doSave({
+        theme,
+        language: i18n.language,
+        ai_model: aiModel,
+        ai_tone: aiTone,
+        default_location: defaultLocation || null,
+        default_radius_km: defaultRadius,
+        hide_ausbildung: hideAusbildung,
+        reminder_default_days: reminderDays,
+        color_blind_mode: colorBlindMode,
+      })
+    }, AUTOSAVE_DELAY)
+
+    return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current) }
+  }, [theme, colorBlindMode, aiModel, aiTone, defaultLocation, defaultRadius, hideAusbildung, reminderDays, i18n.language])
+
+  // ─── API-Keys: manuell speichern ────────────────────────────────────────
+  const saveKeysMutation = useMutation({
     mutationFn: () => axios.patch('/api/settings/', {
-      theme, language: i18n.language, ai_model: aiModel, ai_tone: aiTone,
-      default_location: defaultLocation || null, default_radius_km: defaultRadius,
-      hide_ausbildung: hideAusbildung, reminder_default_days: reminderDays,
-      color_blind_mode: colorBlindMode,
       ...Object.fromEntries(Object.entries(keys).filter(([, v]) => v !== '')),
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['settings'] })
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2500)
+      setKeysSaved(true)
+      setTimeout(() => setKeysSaved(false), 2500)
       setKeys({ adzuna_app_id: '', adzuna_api_key: '' })
     },
   })
@@ -247,10 +311,10 @@ export default function Settings() {
     } finally { setImporting(false); e.target.value = '' }
   }
 
-  // ─── API-Key Input Helper ───────────────────────────────────────────────────
+  // ─── API-Key Input Helper ───────────────────────────────────────────────
   function ApiKeyInput({
-    id, label, placeholder, link, hint,
-  }: { id: string; label: string; placeholder: string; link?: string; hint?: string }) {
+    id, label, placeholder, link,
+  }: { id: string; label: string; placeholder: string; link?: string }) {
     return (
       <div>
         <div className="flex items-center justify-between mb-1">
@@ -280,25 +344,20 @@ export default function Settings() {
             {showKeys[id] ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
           </button>
         </div>
-        {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
       </div>
     )
   }
 
+  const hasKeyInput = keys.adzuna_app_id !== '' || keys.adzuna_api_key !== ''
+
   return (
     <div className="max-w-2xl">
+      {/* Auto-Save Toast */}
+      <SaveToast status={saveStatus} />
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
-        <button
-          onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending}
-          className={clsx(
-            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-            saved ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
-          )}
-        >
-          <Save size={15} aria-hidden />{saved ? 'Gespeichert ✅' : t('common.save')}
-        </button>
+        <span className="text-xs text-gray-400 italic">Änderungen werden automatisch gespeichert</span>
       </div>
 
       {/* ── Erscheinungsbild ── */}
@@ -446,19 +505,25 @@ export default function Settings() {
           {/* Adzuna */}
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Adzuna (optional, kostenlos)</p>
-            <ApiKeyInput
-              id="adzuna_app_id"
-              label="App ID"
-              placeholder="Deine Adzuna App ID"
-              link={API_LINKS.adzuna}
-            />
-            <ApiKeyInput
-              id="adzuna_api_key"
-              label="API Key"
-              placeholder="Dein Adzuna API Key"
-            />
-            {remote?.has_adzuna_key && (
+            <ApiKeyInput id="adzuna_app_id" label="App ID" placeholder="Deine Adzuna App ID" link={API_LINKS.adzuna} />
+            <ApiKeyInput id="adzuna_api_key" label="API Key" placeholder="Dein Adzuna API Key" />
+            {remote?.has_adzuna_key && !hasKeyInput && (
               <p className="text-xs text-green-600 dark:text-green-400">✅ Adzuna-Key hinterlegt</p>
+            )}
+            {hasKeyInput && (
+              <button
+                onClick={() => saveKeysMutation.mutate()}
+                disabled={saveKeysMutation.isPending}
+                className={clsx(
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors mt-1',
+                  keysSaved
+                    ? 'bg-green-600 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
+                )}
+              >
+                <Save size={12} aria-hidden />
+                {keysSaved ? 'Keys gespeichert ✅' : 'Keys speichern'}
+              </button>
             )}
           </div>
 

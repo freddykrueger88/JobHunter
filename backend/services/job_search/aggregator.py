@@ -19,13 +19,9 @@ async def search_all_sources(
 ) -> list[RawJob]:
     sources = []
 
-    # 1. Bundesagentur für Arbeit (immer aktiv)
-    aa_id, aa_secret = "", ""
-    if getattr(settings_row, "arbeitsagentur_client_id_enc", None):
-        aa_id = decrypt(settings_row.arbeitsagentur_client_id_enc)
-    if getattr(settings_row, "arbeitsagentur_client_secret_enc", None):
-        aa_secret = decrypt(settings_row.arbeitsagentur_client_secret_enc)
-    sources.append(ArbeitsagenturSource(aa_id, aa_secret))
+    # 1. Bundesagentur für Arbeit (immer aktiv, benötigt keinen Nutzer-Key)
+    #    Die API nutzt einen öffentlichen API-Key, der im Adapter fest hinterlegt ist.
+    sources.append(ArbeitsagenturSource())
 
     # 2. StepStone (immer aktiv, kein Key nötig)
     sources.append(StepStoneSource())
@@ -45,6 +41,10 @@ async def search_all_sources(
         "Aggregator: Suche '%s' in '%s' (%d km) über %d Quelle(n)",
         keywords, location, radius_km, len(sources)
     )
+
+    if not sources:
+        log.warning("Aggregator: Keine aktiven Job-Quellen konfiguriert")
+        return []
 
     # Parallel suchen
     results_nested = await asyncio.gather(

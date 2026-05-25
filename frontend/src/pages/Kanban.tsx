@@ -5,6 +5,7 @@ import { GripVertical, X, Clock, Plus, Calendar, ChevronRight } from 'lucide-rea
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
+import AutoApplyButton from '../components/AutoApplyButton'
 
 interface Application {
   id: number
@@ -446,7 +447,7 @@ export default function Kanban() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {job?.url && (
                     <a
                       href={job.url}
@@ -463,6 +464,14 @@ export default function Kanban() {
                   >
                     📋 Zur Stelle
                   </button>
+                  {/* #63 – 1-Klick-Bewerbungspaket */}
+                  <AutoApplyButton
+                    applicationId={detailApp.id}
+                    jobTitle={job?.title}
+                    company={job?.company}
+                    hasCoverLetter={detailApp.status !== 'interessant'}
+                    hasCV
+                  />
                 </div>
 
                 {/* Status buttons */}

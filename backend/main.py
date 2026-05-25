@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api import jobs, applications, settings, cv, ai, dashboard, history, reminders
 from backend.api import export, interview, company, eures
-from backend.api import calendar
+from backend.api import calendar, company_dossier
 from backend.routers import followups
 
 app = FastAPI(
@@ -33,6 +33,7 @@ app.include_router(company.router)
 app.include_router(eures.router)
 app.include_router(followups.router)
 app.include_router(calendar.router)
+app.include_router(company_dossier.router)
 
 
 @app.get("/health", tags=["System"])

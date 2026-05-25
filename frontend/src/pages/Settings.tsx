@@ -29,42 +29,42 @@ const THEMES: {
 }[] = [
   {
     value: 'dark',
-    emoji: '\ud83c\udf19', label: 'Dark', sublabel: 'Dunkel & klassisch',
+    emoji: '🌙', label: 'Dark', sublabel: 'Dunkel & klassisch',
     nav: '#0d1117', navText: '#c9d1d9',
     body: '#161b22', card: '#21262d', cardText: '#e6edf3',
     accent: '#2563eb', accentText: '#fff',
   },
   {
     value: 'light',
-    emoji: '\u2600\ufe0f', label: 'Hell', sublabel: 'Sauber & klar',
+    emoji: '☀️', label: 'Hell', sublabel: 'Sauber & klar',
     nav: '#ffffff', navText: '#111827',
     body: '#f9fafb', card: '#ffffff', cardText: '#111827',
     accent: '#2563eb', accentText: '#fff',
   },
   {
     value: 'boys',
-    emoji: '\ud83c\udf0a', label: 'Ocean', sublabel: 'Tiefes Marineblau',
+    emoji: '🌊', label: 'Ocean', sublabel: 'Tiefes Marineblau',
     nav: '#0a1628', navText: '#cfe0f4',
     body: '#0d1b2e', card: '#112240', cardText: '#e2eaf4',
     accent: '#1d4ed8', accentText: '#fff',
   },
   {
     value: 'girls',
-    emoji: '\ud83c\udf3a', label: 'Rose', sublabel: 'Warmes Rosa',
+    emoji: '🌺', label: 'Rose', sublabel: 'Warmes Rosa',
     nav: '#fce4ef', navText: '#3b0f24',
     body: '#fdf0f5', card: '#fff4f8', cardText: '#3b0f24',
     accent: '#be185d', accentText: '#fff',
   },
   {
     value: 'sakura',
-    emoji: '\ud83c\udf38', label: 'Sakura', sublabel: 'Kirschbl\u00fcte & Japan',
+    emoji: '🌸', label: 'Sakura', sublabel: 'Kirschblüte & Japan',
     nav: '#f3e8dc', navText: '#1c0a10',
     body: '#fef6f8', card: '#fdeef2', cardText: '#1c0a10',
     accent: '#c0392b', accentText: '#fff',
   },
   {
     value: 'dyslexic',
-    emoji: '\ud83d\udcd6', label: 'Lese-Modus', sublabel: 'Legasthenie-optimiert',
+    emoji: '📖', label: 'Lese-Modus', sublabel: 'Legasthenie-optimiert',
     nav: '#f7f6e7', navText: '#1a1a1a',
     body: '#fffef5', card: '#fffef0', cardText: '#1a1a1a',
     accent: '#7c6f1e', accentText: '#fff',
@@ -73,10 +73,10 @@ const THEMES: {
 
 const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
   { value: 'none',          label: 'Kein Filter',   desc: 'Standard' },
-  { value: 'deuteranopia',  label: 'Deuteranopie',  desc: 'Gr\u00fcn-Schw\u00e4che (~6% M\u00e4nner)' },
-  { value: 'protanopia',    label: 'Protanopie',    desc: 'Rot-Schw\u00e4che (~2% M\u00e4nner)' },
-  { value: 'tritanopia',    label: 'Tritanopie',    desc: 'Blau-Gelb-Schw\u00e4che' },
-  { value: 'achromatopsia', label: 'Achromatopsie', desc: 'Vollst\u00e4ndige Farbenblindheit' },
+  { value: 'deuteranopia',  label: 'Deuteranopie',  desc: 'Grün-Schwäche (~6% Männer)' },
+  { value: 'protanopia',    label: 'Protanopie',    desc: 'Rot-Schwäche (~2% Männer)' },
+  { value: 'tritanopia',    label: 'Tritanopie',    desc: 'Blau-Gelb-Schwäche' },
+  { value: 'achromatopsia', label: 'Achromatopsie', desc: 'Vollständige Farbenblindheit' },
 ]
 const DENSITY_OPTIONS: { value: Density; label: string; desc: string }[] = [
   { value: 'normal',  label: 'Normal',   desc: 'Komfortabler Abstand' },
@@ -106,7 +106,7 @@ function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boo
     <button
       onClick={() => {}}
       aria-pressed={active}
-      aria-label={`Theme ${opt.label} ausw\u00e4hlen`}
+      aria-label={`Theme ${opt.label} auswählen`}
       style={{
         background: opt.body,
         borderColor: active ? '#3b82f6' : 'transparent',
@@ -244,10 +244,10 @@ export default function Settings() {
     try {
       const res = await axios.post('/api/export/import', form)
       const d = res.data.imported
-      setImportMsg(`\u2705 Importiert: ${d.jobs} Stellen, ${d.reminders} Erinnerungen, ${d.history} Verlaufseintr\u00e4ge`)
+      setImportMsg(`✅ Importiert: ${d.jobs} Stellen, ${d.reminders} Erinnerungen, ${d.history} Verlaufseinträge`)
       qc.invalidateQueries()
     } catch (err: any) {
-      setImportMsg(`\u274c Fehler: ${err.response?.data?.detail ?? err.message}`)
+      setImportMsg(`❌ Fehler: ${err.response?.data?.detail ?? err.message}`)
     } finally { setImporting(false); e.target.value = '' }
   }
 
@@ -263,11 +263,12 @@ export default function Settings() {
             saved ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
           )}
         >
-          <Save size={15} aria-hidden />{saved ? 'Gespeichert \u2705' : t('common.save')}
+          <Save size={15} aria-hidden />{saved ? 'Gespeichert ✅' : t('common.save')}
         </button>
       </div>
 
-      <Section title="\ud83c\udfa8 Erscheinungsbild">
+      {/* ── Erscheinungsbild ── */}
+      <Section title="🎨 Erscheinungsbild">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {THEMES.map(opt => (
             <div key={opt.value} onClick={() => setTheme(opt.value)} className="cursor-pointer">
@@ -277,7 +278,8 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title="\ud83d\udc41\ufe0f Farbenblindheits-Filter">
+      {/* ── Farbenblindheits-Filter ── */}
+      <Section title="👁️ Farbenblindheits-Filter">
         <div className="grid grid-cols-1 gap-2">
           {COLOR_BLIND_MODES.map(opt => (
             <button
@@ -298,7 +300,8 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title="\ud83e\udde0 ADHS & Kognition">
+      {/* ── ADHS & Kognition ── */}
+      <Section title="🧠 ADHS & Kognition">
         <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-5">
           <ToggleRow label="ADHS-Modus" desc="Aktiviert Fokus-Modus + reduzierte Bewegung" value={adhdMode} onChange={setAdhdMode} />
           <ToggleRow label="Fokus-Modus" desc="Navigation wird ausgeblendet, nur aktiver Bereich sichtbar" value={focusMode} onChange={setFocusMode} />
@@ -327,19 +330,21 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title={`\ud83c\udf0d ${t('settings.language')}`}>
+      {/* ── Sprache ── */}
+      <Section title={`🌍 ${t('settings.language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
             <button key={lang} onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
               aria-pressed={i18n.language === lang}
               className={clsx('px-6 py-2 rounded-lg font-medium border-2 transition-all',
                 i18n.language === lang ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-            >{lang === 'de' ? '\ud83c\udde9\ud83c\uddea Deutsch' : '\ud83c\uddec\ud83c\udde7 English'}</button>
+            >{lang === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}</button>
           ))}
         </div>
       </Section>
 
-      <Section title={`\ud83e\udd16 ${t('settings.ai')}`}>
+      {/* ── KI ── */}
+      <Section title={`🤖 ${t('settings.ai')}`}>
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
@@ -362,7 +367,8 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title="\ud83d\udd0d Stellensuche">
+      {/* ── Stellensuche ── */}
+      <Section title="🔍 Stellensuche">
         <div className="space-y-3">
           <div className="flex gap-3">
             <div className="flex-1">
@@ -391,7 +397,8 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title="\ud83d\udd14 Erinnerungen">
+      {/* ── Erinnerungen ── */}
+      <Section title="🔔 Erinnerungen">
         <div>
           <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
           <input
@@ -404,8 +411,9 @@ export default function Settings() {
         </div>
       </Section>
 
-      <Section title="\ud83d\udd11 API Keys">
-        <p className="text-sm text-gray-500 mb-4">Keys werden verschl\u00fcsselt gespeichert (AES-256).</p>
+      {/* ── API Keys ── */}
+      <Section title="🔑 API Keys">
+        <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
         {([
           { key: 'adzuna_app_id',                label: 'Adzuna App ID',            portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
           { key: 'adzuna_api_key',               label: 'Adzuna API Key',           portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
@@ -416,7 +424,7 @@ export default function Settings() {
           <div key={key} className="mb-3">
             <div className="flex items-center gap-2 mb-1">
               <label className="text-sm text-gray-500">{label}</label>
-              {hasKey && <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">\u2713 gesetzt</span>}
+              {hasKey && <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">✓ gesetzt</span>}
               <a href={API_LINKS[portal]} target="_blank" rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:underline flex items-center gap-0.5 ml-auto">
                 Registrieren <ExternalLink size={10} aria-hidden />
@@ -427,7 +435,7 @@ export default function Settings() {
                 type={showKeys[key] ? 'text' : 'password'}
                 value={keys[key]}
                 onChange={e => setKeys(k => ({ ...k, [key]: e.target.value }))}
-                placeholder={hasKey ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (zum \u00dcberschreiben eingeben)' : 'Leer'}
+                placeholder={hasKey ? '•••••••• (zum Überschreiben eingeben)' : 'Leer'}
                 className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
                 aria-label={label}
               />
@@ -442,7 +450,8 @@ export default function Settings() {
         ))}
       </Section>
 
-      <Section title="\ud83d\udce6 Daten Export / Import">
+      {/* ── Export / Import ── */}
+      <Section title="📦 Daten Export / Import">
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">Alle Daten als JSON exportieren (DSGVO Art. 20)</p>
@@ -455,7 +464,7 @@ export default function Settings() {
             <p className="text-sm text-gray-500 mb-2">Backup importieren (.json)</p>
             <label className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-fit',
               importing ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600')}>
-              {importing ? <>\u23f3 Importiere...</> : <><Upload size={15} aria-hidden /> Backup importieren</>}
+              {importing ? <>⏳ Importiere...</> : <><Upload size={15} aria-hidden /> Backup importieren</>}
               <input type="file" accept=".json" onChange={handleImport} disabled={importing} className="hidden" aria-label="JSON-Backup importieren" />
             </label>
             {importMsg && <p className="text-sm mt-2" role="status">{importMsg}</p>}

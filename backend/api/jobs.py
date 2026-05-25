@@ -7,8 +7,16 @@ from backend.models.settings import UserSettings
 from backend.models.history import HistoryEntry
 from backend.schemas.job import JobCreate, JobRead
 from backend.services.job_search.aggregator import search_all_sources
+import re
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
+PLZ_RE = re.compile(r"^\d{5}$")
+
+
+def _normalize_location(location: str) -> str:
+    """Gibt den Ort unveraendert zurueck. PLZ wird akzeptiert und direkt weitergegeben."""
+    return location.strip()
 
 
 @router.get("/", response_model=list[JobRead])
@@ -16,6 +24,7 @@ async def list_jobs(
     hide_hidden: bool = True,
     hide_ausbildung: bool = Query(default=None),
     city: str | None = None,
+    postal_code: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     q = select(Job)
@@ -25,6 +34,8 @@ async def list_jobs(
         q = q.where(Job.job_type != "ausbildung")
     if city:
         q = q.where(Job.city.ilike(f"%{city}%"))
+    if postal_code:
+        q = q.where(Job.postal_code.ilike(f"%{postal_code}%"))
     q = q.order_by(Job.created_at.desc())
     result = await db.execute(q)
     return result.scalars().all()
@@ -33,12 +44,19 @@ async def list_jobs(
 @router.get("/search")
 async def search_jobs(
     keywords: str = Query(..., description="Suchbegriff, z.B. 'IT-Support'"),
-    location: str = Query(..., description="Ort, z.B. 'Bremen'"),
-    radius_km: int = Query(default=25),
+    location: str = Query(
+        ...,
+        description="Ort oder PLZ, z.B. 'Bremen' oder '28195'",
+        min_length=2,
+    ),
+    radius_km: int = Query(default=25, ge=0, le=200),
     save: bool = Query(default=True, description="Ergebnisse in DB speichern"),
     db: AsyncSession = Depends(get_db),
 ):
-    """Sucht Stellen über alle konfigurierten Portale und speichert sie optional."""
+    """Sucht Stellen ueber alle konfigurierten Portale und speichert sie optional."""
+    location = _normalize_location(location)
+    is_plz = bool(PLZ_RE.match(location))
+
     result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
     settings_row = result.scalar_one_or_none()
     if not settings_row:
@@ -46,10 +64,9 @@ async def search_jobs(
 
     raw_jobs = await search_all_sources(keywords, location, radius_km, settings_row)
 
+    new_count = 0
     if save:
-        new_count = 0
         for rj in raw_jobs:
-            # Duplikatcheck per external_id
             if rj.external_id:
                 exists = await db.execute(
                     select(Job).where(Job.external_id == rj.external_id, Job.source_portal == rj.source_portal)
@@ -67,17 +84,24 @@ async def search_jobs(
             db.add(job)
             new_count += 1
         if new_count:
+            label = f"PLZ {location}" if is_plz else f"'{location}'"
             db.add(HistoryEntry(
                 event_type="job_search",
-                description=f"Suche '{keywords}' in '{location}': {new_count} neue Stellen gefunden",
-                meta={"keywords": keywords, "location": location, "new": new_count},
+                description=f"Suche '{keywords}' in {label}: {new_count} neue Stellen gefunden",
+                meta={"keywords": keywords, "location": location, "is_plz": is_plz, "new": new_count},
             ))
         await db.commit()
 
-    return {"found": len(raw_jobs), "saved_new": new_count if save else 0, "jobs": [
-        {"title": j.title, "company": j.company, "city": j.city,
-         "portal": j.source_portal, "url": j.url} for j in raw_jobs
-    ]}
+    return {
+        "found": len(raw_jobs),
+        "saved_new": new_count if save else 0,
+        "location_type": "plz" if is_plz else "city",
+        "jobs": [
+            {"title": j.title, "company": j.company, "city": j.city,
+             "postal_code": j.postal_code, "portal": j.source_portal, "url": j.url}
+            for j in raw_jobs
+        ],
+    }
 
 
 @router.get("/{job_id}", response_model=JobRead)
@@ -94,7 +118,7 @@ async def create_job(data: JobCreate, db: AsyncSession = Depends(get_db)):
     db.add(job)
     await db.commit()
     await db.refresh(job)
-    db.add(HistoryEntry(event_type="job_created", description=f"Stelle '{job.title}' manuell hinzugefügt"))
+    db.add(HistoryEntry(event_type="job_created", description=f"Stelle '{job.title}' manuell hinzugef\u00fcgt"))
     await db.commit()
     return job
 

@@ -1,10 +1,10 @@
 # 🎯 JobHunter
 
-> **Lokale, KI-gestützte Bewerbungsverwaltung** – Self-Hosted, DSGVO-konform, keine Cloud.
+> **Lokale, KI-gestützte Bewerbungsverwaltung** – Self-hosted, DSGVO-konform, keine Cloud erforderlich.
 
-🇬🇧 [English version](README.md)
+🇬🇧 [English Version](README.md)
 
-[![Version](https://img.shields.io/badge/Version-1.8.0-brightgreen)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.9.0-brightgreen)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](docker-compose.yml)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](backend/)
@@ -16,55 +16,69 @@
 
 ## Was ist JobHunter?
 
-JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung. Alle Daten bleiben auf deinem Rechner – kein Account, kein Abo, keine Cloud. Die KI läuft lokal über [Ollama](https://ollama.com) direkt in Docker.
+JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung. Alle Daten bleiben auf deinem Rechner – kein Account, kein Abo, keine Cloud. Die KI läuft lokal via [Ollama](https://ollama.com) in Docker.
 
 ---
 
 ## ✨ Features
 
 ### 🔍 Stellensuche & Import
-- Stellensuche über Bundesagentur für Arbeit, Adzuna, StepStone, LinkedIn
+- Stellensuche via Bundesagentur für Arbeit, Adzuna, StepStone, LinkedIn
 - Foto-Upload von Stellenanzeigen (OCR + KI-Extraktion)
-- Duplikat-Erkennung (Fuzzy-Matching)
+- Duplikat-Erkennung (Fuzzy Matching)
 - Ghost-Job-Erkennung ⚠️
-- Bewerbungsfristen-Tracker mit Ampel-Badges
+- Deadline-Tracker mit Ampel-Badges
 
-### 🤖 KI-Features (100% lokal via Ollama)
-- Anschreiben-Generator (4 Tone: formell / direkt / modern / kreativ)
-- Lebenslauf-Optimierung & Anschreiben-Bewertung
+### 🤖 KI-Funktionen (100 % lokal via Ollama)
+- Anschreiben-Generator (4 Töne: formal / direkt / modern / kreativ)
+- CV-Optimierer & Anschreiben-Evaluator
 - Skill-Gap-Analyse
 - Interview-Vorbereitung (10 Fragen + Musterantworten)
 - Absage-Analyse
-- ATS-Score-Checker (Keyword-Abgleich CV ↔ Stellenbeschreibung, 0–100)
-- Bewerbungs-Qualitätsscore
-- Gehaltsnegotiations-Coach (3 Szenarien)
-- Marktlage-Analyse pro Stelle (Wettbewerb, optimales Timing, Strategie)
+- ATS-Score (Keyword-Abgleich CV ↔ Stellenbeschreibung, 0–100)
+- Bewerbungsqualitäts-Score
+- Gehaltsverhandlungs-Coach (3 Szenarien)
+- Marktanalyse pro Stelle
+- **AI Application Coach** – kontextueller Chat-Assistent pro Bewerbung (#62) 🆕
 - Mehrsprachige Prompts (DE / EN automatisch erkannt)
 
-### 📊 Dashboard & Analyse
+### ✉️ Anschreiben-Vorlage *(geplant – #89)*
+- Eigene DOCX-Vorlage einmalig hochladen
+- KI füllt Vorlage stellenspezifisch aus (Firmenadresse aus Stellendaten, Datum automatisch)
+- Fertiges DOCX herunterladen
+
+### 📊 Dashboard & Auswertungen
 - Kanban-Board (Drag & Drop)
-- Live-Statistiken: Pie-Chart, Bar-Chart, Funnel-Chart
-- Wöchentliches Ziel & Streak-Tracking
-- Gamification: 10 Abzeichen
-- PDF-Druckansicht & Export
+- Live-Statistiken: Kreisdiagramm, Balkendiagramm, Funnel-Chart
+- Wochenziel & Streak-Tracking
+- Gamification-Badges (10 Achievements)
+- PDF-Übersichtsexport
 
 ### 📧 Kommunikation & Workflow
 - E-Mail-Vorlagen (6 Templates mit Platzhaltern)
-- Kalender-Export (`.ics` + abonnierbarer Feed)
-- Kontakte-Verwaltung (Recruiter, Ansprechpartner)
-- Netto-Brutto-Gehaltsrechner (Steuerklassen 1–6, SV-Beiträge 2025)
+- **E-Mail-Parser via IMAP** – erkennt automatisch Absagen, Einladungen & Follow-ups (#68) 🆕
+- Kalender-Export (`.ics` + abonnierbarer Feed) (#77) 🆕
+- Kontakte-Manager (Recruiter, Ansprechpartner)
+- Brutto-/Netto-Rechner (Steuerklassen 1–6, Sozialabgaben 2025)
 - Automatisches lokales Backup (täglich, 7-Tage-Rotation)
+
+### 🏢 Firmenrecherche
+- **Firmen-Dossier** – Wikipedia-basiertes Info-Panel (Beschreibung, Gründung, Mitarbeiter, HQ, Logo) pro Bewerbung (#71) 🆕
+
+### 📤 Import / Export
+- **JSON / CSV / XLSX Export & Import** aller Bewerbungen (#65) 🆕
+- PDF-Übersichtsexport
 
 ### ♿ Barrierefreiheit (WCAG 2.1 AA)
 - Legasthenie-Theme (OpenDyslexic)
 - Farbenblindheits-Filter (4 Typen)
 - ADHS-Modus (Fokus-Modus, reduzierte Informationsdichte)
 - Tastaturkürzel-System
-- Screenreader-optimiert (ARIA, Skip-Links, Live-Regionen)
-- Undo-Toast & Bestätigungs-Dialog
+- Screenreader-optimiert (ARIA, Skip-Links, Live-Regions)
+- Undo-Toast & Bestätigungsdialoge
 
 ### 🔒 Datenschutz & Sicherheit
-- 100% lokal – keine externen Datenübertragungen
+- 100 % lokal – keine externe Datenübertragung
 - DSGVO-konform (Art. 20 Datenexport)
 - AES-256-verschlüsselte API-Key-Speicherung
 - Optionale JWT-Authentifizierung (`AUTH_ENABLED=true`)
@@ -72,9 +86,9 @@ JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung.
 
 ---
 
-## 🚀 Schnellstart
+## 🚀 Quickstart
 
-**Voraussetzungen:** Docker, Docker Compose, Python 3 (für die Schlüssel-Generierung)
+**Voraussetzungen:** Docker, Docker Compose, Python 3
 
 ```bash
 # 1. Repository klonen
@@ -85,10 +99,10 @@ cd JobHunter
 cp .env.example .env
 ```
 
-Jetzt `.env` öffnen und die drei Pflichtfelder befüllen:
+Die drei Pflichtfelder in der `.env` mit sicheren Werten befüllen:
 
 ```bash
-# DB_PASSWORD generieren (beliebiger sicherer String):
+# DB_PASSWORD generieren:
 python3 -c "import secrets; print(secrets.token_hex(16))"
 
 # SECRET_KEY generieren:
@@ -99,34 +113,34 @@ python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().
 ```
 
 ```bash
-# 3. Alle Dienste starten (Backend, Frontend, Datenbank, Ollama)
+# 3. Alle Dienste starten
 docker compose up -d
 
-# 4. KI-Modell in den Ollama-Container laden (Mistral empfohlen)
+# 4. KI-Modell laden (Mistral empfohlen)
 docker exec jobhunter-ollama ollama pull mistral
 ```
 
-🌍 **http://localhost:3000** öffnen
+🌍 App öffnen: **http://localhost:3000**
 
-> **GPU-Unterstützung (NVIDIA):** Den `deploy`-Block in der `docker-compose.yml` unter dem `ollama`-Service auskommentieren.
+> **GPU-Unterstützung (NVIDIA):** Den `deploy`-Block im `docker-compose.yml` unter dem `ollama`-Service auskommentieren.
 
 ---
 
 > ### 📋 Ausführliche Installationsanleitung
-> Neu hier oder Probleme beim Einrichten? Die **[INSTALL.md](INSTALL.md)** erklärt alles Schritt für Schritt:
+> Neu hier oder Probleme beim Start? **[INSTALL.md](INSTALL.md)** deckt alles ab:
 > - ✅ Alle Voraussetzungen mit Prüfbefehlen
 > - ✅ Sichere Schlüssel für `.env` generieren
-> - ✅ Docker-Setup & manuelle Installation (ohne Docker)
-> - ✅ KI-Modell (Mistral) installieren & prüfen
-> - ✅ Checkliste für den ersten Start
-> - ✅ Updates einspielen
-> - ✅ Troubleshooting (8 häufige Probleme mit Lösung)
+> - ✅ Docker-Setup & manuelles Setup (ohne Docker)
+> - ✅ Mistral-Modell installieren & prüfen
+> - ✅ Erste-Schritte-Checkliste
+> - ✅ App aktualisieren
+> - ✅ Troubleshooting (8 häufige Probleme mit Lösungen)
 >
-> **→ [Vollständige Installationsanleitung öffnen](INSTALL.md)**
+> **→ [Zur vollständigen Installationsanleitung](INSTALL.md)**
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech-Stack
 
 | Schicht | Technologie |
 |---|---|
@@ -141,11 +155,12 @@ docker exec jobhunter-ollama ollama pull mistral
 ## 📖 Dokumentation
 
 - [📋 Installationsanleitung](INSTALL.md)
-- [🛠️ Einrichtung](docs/setup.md)
+- [🛠️ Setup-Guide](docs/setup.md)
 - [♿ Barrierefreiheit](docs/accessibility.md)
 - [🔒 Datenschutz & DSGVO](docs/dsgvo.md)
 - [📍 Roadmap](docs/roadmap.md)
 - [📝 Changelog](CHANGELOG.md)
+- [📚 Wiki](wiki/Home.md)
 
 ---
 
@@ -153,9 +168,10 @@ docker exec jobhunter-ollama ollama pull mistral
 
 | Version | Thema | Status |
 |---|---|---|
-| v1.0 – v1.8 | Kern, KI, Barrierefreiheit, Analyse, ATS | ✅ Fertig |
-| v1.9 | Bewerbungscoach & Automatisierung (#62–#64) | 📌 Geplant |
-| v2.0+ | EU-Portale, Browser-Extension, Multi-User | 💡 Backlog |
+| v1.0 – v1.8 | Grundgerüst, KI, Barrierefreiheit, Analytics, ATS | ✅ Fertig |
+| v1.9 | Coach, IMAP, Kalender, Dossier, Import/Export (#62 #65 #68 #71 #77) | ✅ Fertig |
+| v1.9.x | Anschreiben-Vorlage & KI-Befüllung (#89), Auto-Apply (#63) | 🚧 In Arbeit |
+| v2.0+ | EU-Jobportale, Browser-Extension, Multi-User | 💡 Backlog |
 
 → Vollständige Roadmap: [docs/roadmap.md](docs/roadmap.md)
 

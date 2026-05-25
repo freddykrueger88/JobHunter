@@ -1,77 +1,121 @@
-# Installation
+# 🚀 Installation
 
-Diese Anleitung beschreibt die lokale Einrichtung von JobHunter mit Docker.
+JobHunter wird per Docker Compose gestartet. Alle Dienste (Backend, Frontend, Datenbank, Ollama) laufen in Containern.
 
 ## Voraussetzungen
 
-- Docker
-- Docker Compose
-- Optional: Ollama lokal installiert, wenn KI-Funktionen genutzt werden sollen
+| Tool | Mindestversion | Prüfen mit |
+|---|---|---|
+| Docker | 24.x | `docker --version` |
+| Docker Compose | 2.x | `docker compose version` |
+| Python 3 | 3.10+ | `python3 --version` |
+| Git | beliebig | `git --version` |
 
-## Repository klonen
+> **GPU-Beschleunigung (NVIDIA):** Im `docker-compose.yml` den `deploy`-Block unter dem `ollama`-Service auskommentieren.
+
+## Schritt-für-Schritt
+
+### 1. Repository klonen
 
 ```bash
 git clone https://github.com/freddykrueger88/JobHunter.git
 cd JobHunter
 ```
 
-## Umgebungsdatei anlegen
-
-Falls noch nicht vorhanden:
+### 2. `.env`-Datei erstellen
 
 ```bash
 cp .env.example .env
 ```
 
-Typische Variablen:
+Die drei Pflichtfelder mit eigenen sicheren Werten befüllen:
+
+```bash
+# DB_PASSWORD – beliebiger sicherer String:
+python3 -c "import secrets; print(secrets.token_hex(16))"
+
+# SECRET_KEY – für JWT-Signaturen:
+python3 -c "import secrets; print(secrets.token_hex(32))"
+
+# ENCRYPTION_KEY – muss ein gültiger Fernet-Key sein:
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Die generierten Werte in der `.env` eintragen:
 
 ```env
-DATABASE_URL=sqlite+aiosqlite:///./jobhunter.db
+DB_PASSWORD=<generierter Wert>
+SECRET_KEY=<generierter Wert>
+ENCRYPTION_KEY=<generierter Fernet-Key>
+
+# Optional:
 AUTH_ENABLED=false
-JWT_SECRET=change-me
-OLLAMA_BASE_URL=http://host.docker.internal:11434
+OLLAMA_BASE_URL=http://ollama:11434
 ```
 
-## Start mit Docker
+### 3. Container starten
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
-Danach erreichbar:
+Beim ersten Start werden alle Images gebaut und die Datenbank migriert (Alembic läuft automatisch).
 
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8000`
-- API-Doku: `http://localhost:8000/docs`
-
-## OpenDyslexic Font
-
-Für das Legasthenie-Theme müssen die Font-Dateien lokal im Frontend liegen.
-
-Pfad:
+### 4. KI-Modell laden
 
 ```bash
+# Mistral (empfohlen, ~4 GB):
+docker exec jobhunter-ollama ollama pull mistral
+
+# Alternativen:
+docker exec jobhunter-ollama ollama pull llama3
+docker exec jobhunter-ollama ollama pull phi3
+```
+
+### 5. App öffnen
+
+| Dienst | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8000 |
+| API-Docs (Swagger) | http://localhost:8000/docs |
+
+## Erster Start – Checkliste
+
+- [ ] App öffnt sich unter `http://localhost:3000`
+- [ ] Einstellungen → KI-Modell auswählen
+- [ ] Test-Stellensuche starten
+- [ ] Bewerbung ins Kanban übernehmen
+- [ ] Anschreiben generieren
+
+## Legasthenie-Theme (OpenDyslexic)
+
+Die Font-Dateien müssen manuell abgelegt werden:
+
+```
 frontend/public/fonts/OpenDyslexic/
+├── OpenDyslexic-Regular.woff2
+├── OpenDyslexic-Bold.woff2
+└── OpenDyslexic-Italic.woff2
 ```
 
-Beispiel-Dateien:
-
-- `OpenDyslexic-Regular.woff2`
-- `OpenDyslexic-Bold.woff2`
-- `OpenDyslexic-Italic.woff2`
-
-## Migrationen
-
-Alembic wird beim Start automatisch ausgeführt:
+## Update
 
 ```bash
-alembic upgrade head
+git pull
+docker compose up -d --build
 ```
 
-## Erster Test
+Alembic-Migrationen laufen beim Start automatisch.
 
-1. App öffnen
-2. Einstellungen prüfen
-3. Test-Stellensuche starten
-4. Bewerbung ins Kanban übernehmen
-5. Anschreiben generieren
+## Häufige Probleme
+
+| Problem | Lösung |
+|---|---|
+| Port 3000 / 8000 belegt | Ports in `docker-compose.yml` anpassen |
+| Ollama antwortet nicht | `docker exec jobhunter-ollama ollama list` prüfen |
+| `ENCRYPTION_KEY` ungültig | Muss ein Fernet-Key sein (44 Zeichen, Base64) |
+| Datenbank-Fehler beim Start | `docker compose down -v` → neu starten (löscht alle Daten!) |
+| Anschreiben-Generierung schlägt fehl | KI-Modell in den Einstellungen auswählen |
+
+> Ausführliche Anleitung: [INSTALL.md](https://github.com/freddykrueger88/JobHunter/blob/main/INSTALL.md)

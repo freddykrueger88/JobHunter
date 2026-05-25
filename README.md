@@ -42,6 +42,11 @@ JobHunter is a fully local job application tracker with AI assistance. All data 
 - **AI Application Coach** – contextual chat assistant per application (#62) 🆕
 - Multilingual prompts (DE / EN auto-detected)
 
+### ✉️ Cover Letter Template *(planned – #89)*
+- Upload your own DOCX template once
+- AI fills it with job-specific content (company address from job data, current date auto-set)
+- Download ready-to-send DOCX
+
 ### 📊 Dashboard & Analytics
 - Kanban board (Drag & Drop)
 - Live statistics: pie chart, bar chart, funnel chart
@@ -97,7 +102,7 @@ cp .env.example .env
 Now edit `.env` and fill in the three required values:
 
 ```bash
-# Generate DB_PASSWORD (any secure string, e.g.):
+# Generate DB_PASSWORD:
 python3 -c "import secrets; print(secrets.token_hex(16))"
 
 # Generate SECRET_KEY:
@@ -108,10 +113,10 @@ python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().
 ```
 
 ```bash
-# 3. Start all services (backend, frontend, database, ollama)
+# 3. Start all services
 docker compose up -d
 
-# 4. Pull an AI model into the Ollama container (Mistral recommended)
+# 4. Pull an AI model (Mistral recommended)
 docker exec jobhunter-ollama ollama pull mistral
 ```
 
@@ -155,6 +160,7 @@ docker exec jobhunter-ollama ollama pull mistral
 - [🔒 Privacy & GDPR](docs/dsgvo.md)
 - [📍 Roadmap](docs/roadmap.md)
 - [📝 Changelog](CHANGELOG.md)
+- [📚 Wiki](wiki/Home.md)
 
 ---
 
@@ -164,6 +170,7 @@ docker exec jobhunter-ollama ollama pull mistral
 |---|---|---|
 | v1.0 – v1.8 | Core, AI, Accessibility, Analytics, ATS | ✅ Done |
 | v1.9 | Coach, IMAP, Calendar, Dossier, Import/Export (#62 #65 #68 #71 #77) | ✅ Done |
+| v1.9.x | Cover letter template upload & AI fill (#89), Auto-Apply (#63) | 🚧 In Progress |
 | v2.0+ | EU portals, browser extension, multi-user | 💡 Backlog |
 
 → Full roadmap: [docs/roadmap.md](docs/roadmap.md)

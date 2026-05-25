@@ -1,89 +1,84 @@
-# Konfiguration
+# ⚙️ Konfiguration
 
-Hier sind die wichtigsten Konfigurationsoptionen von JobHunter zusammengefasst.
+JobHunter wird über zwei Wege konfiguriert: die `.env`-Datei für systemweite Einstellungen und die In-App-Einstellungen für nutzerspezifische Optionen.
 
-## Einstellungen in der App
+## `.env`-Variablen (systemweit)
 
-### Erscheinungsbild
+| Variable | Pflicht | Beschreibung |
+|---|---|---|
+| `DB_PASSWORD` | ✅ | PostgreSQL-Passwort |
+| `SECRET_KEY` | ✅ | JWT-Signaturschlüssel (token_hex 32) |
+| `ENCRYPTION_KEY` | ✅ | Fernet-Key für API-Key-Verschlüsselung |
+| `AUTH_ENABLED` | – | `true` aktiviert JWT-Login (Standard: `false`) |
+| `OLLAMA_BASE_URL` | – | Ollama-Endpunkt (Standard: `http://ollama:11434`) |
+| `SMTP_HOST` | – | SMTP-Server für E-Mail-Erinnerungen |
+| `SMTP_PORT` | – | SMTP-Port (Standard: `587`) |
+| `SMTP_USER` | – | SMTP-Benutzername |
+| `SMTP_PASSWORD` | – | SMTP-Passwort |
 
-Verfügbare Themes:
+## In-App-Einstellungen
 
-- Dark Mode
-- Light Mode
-- Boys Mode
-- Girls Mode
-- Legasthenie-Modus
+### 🎨 Erscheinungsbild
 
-### Farbenblindheits-Filter
+- **Theme:** Dark Mode · Light Mode · Boys Mode · Girls Mode
+- **Legasthenie-Modus:** OpenDyslexic-Font, erhöhter Zeilen- & Buchstabenabstand, cremefarbener Hintergrund
+- **Farbenblindheits-Filter:** Deuteranopie · Protanopie · Tritanopie · Achromatopsie
+- **Sprache:** Deutsch / Englisch
 
-Zusätzliche Darstellungsfilter:
+### 🧠 ADHS & Kognition
 
-- Kein Filter
-- Deuteranopie
-- Protanopie
-- Tritanopie
-- Achromatopsie
+- **ADHS-Modus:** reduzierte visuelle Ablenkung
+- **Fokus-Modus:** blendet Nebenspalten aus
+- **Animationen deaktivieren:** für `prefers-reduced-motion`-Präferenz
+- **Informationsdichte:** normal · kompakt · minimal
 
-### ADHS & Kognition
+### 🤖 KI (Ollama)
 
-- ADHS-Modus
-- Fokus-Modus
-- Animationen deaktivieren
-- Informationsdichte: normal / kompakt / minimal
+- **Modell-Auswahl:** Mistral (empfohlen) · LLaMA 3 · Phi-3
+- **Schreibstil:** formal · direkt · modern · kreativ
+- **Sprache:** automatisch erkannt (DE / EN)
 
-### Sprache
+### 🔍 Stellensuche
 
-- Deutsch
-- Englisch
+- **Standard-Ort:** wird für alle Suchanfragen vorbelegt
+- **Suchradius:** in km
+- **Ausbildungsstellen ausblenden:** filtert Ausbildungsangebote heraus
 
-### KI
+### 🔔 Erinnerungen
 
-- Modell-Auswahl
-- Schreibstil / Ton
+- **Standard-Vorlaufzeit:** Tage vor Deadline für automatische Erinnerung
+- **E-Mail-Versand bei Fälligkeit:** benötigt SMTP-Konfiguration
+- **Cron-Intervall:** prüft alle 15 Minuten auf fällige Einträge
 
-### Stellensuche
+### 📧 IMAP (E-Mail-Parser)
 
-- Standard-Ort
-- Suchradius
-- Ausbildungsstellen ausblenden
+Automatische Erkennung von Absagen, Einladungen und Follow-ups aus dem Postfach:
 
-### Erinnerungen
+- **IMAP-Host / Port**
+- **Benutzername / Passwort**
+- **Zu überwachender Ordner** (Standard: `INBOX`)
+- **Intervall** (Standard: alle 10 Minuten)
 
-- Standard-Vorlaufzeit in Tagen
-- E-Mail-Versand bei Fälligkeit
+### 🔑 API-Keys
 
-## API-Keys
+Alle API-Keys werden AES-256-verschlüsselt in der Datenbank gespeichert:
 
-Unterstützte Integrationen:
+| Integration | Verwendung |
+|---|---|
+| Adzuna | Stellensuche (internationale Jobs) |
+| Bundesagentur für Arbeit | Stellensuche (DE) |
+| LinkedIn | Stellensuche |
 
-- Adzuna
-- Arbeitsagentur
-- LinkedIn
+### 🔒 Authentifizierung (optional)
 
-API-Keys werden verschlüsselt gespeichert.
-
-## Authentifizierung
-
-Optional aktivierbar über `.env`:
+JWT-Login aktivieren:
 
 ```env
 AUTH_ENABLED=true
 ```
 
-Dann stehen JWT-Endpunkte zur Verfügung:
+Verfügbare Endpunkte:
 
-- `/auth/register`
-- `/auth/token`
-- `/auth/change-password`
-
-## Mail-Versand
-
-SMTP-Felder in den Einstellungen:
-
-- Host
-- Port
-- Benutzer
-- Passwort
-- Empfängeradresse
-
-Der Reminder-Cron prüft standardmäßig alle 15 Minuten fällige Einträge.
+- `POST /auth/register` – Benutzer anlegen
+- `POST /auth/token` – Login / Token holen
+- `POST /auth/change-password` – Passwort ändern

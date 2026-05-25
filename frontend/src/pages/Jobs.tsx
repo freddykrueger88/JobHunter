@@ -69,7 +69,7 @@ export default function Jobs() {
             />
             <input
               className="w-44 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ort oder PLZ, z.B. 28195"
+              placeholder="Ort, PLZ"
               value={location}
               onChange={e => setLocation(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && searchMutation.mutate()}

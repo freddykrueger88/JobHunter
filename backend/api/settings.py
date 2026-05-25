@@ -41,8 +41,11 @@ async def get_settings(db: AsyncSession = Depends(get_db)):
 @router.patch("/", response_model=SettingsRead)
 async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_db)):
     s = await get_or_create_settings(db)
-    simple_fields = ["theme", "language", "ai_model", "ai_tone", "default_location",
-                     "default_radius_km", "hide_ausbildung", "reminder_default_days"]
+    simple_fields = [
+        "theme", "language", "ai_model", "ai_tone", "default_location",
+        "default_radius_km", "hide_ausbildung", "reminder_default_days",
+        "color_blind_mode",
+    ]
     for field in simple_fields:
         value = getattr(data, field)
         if value is not None:

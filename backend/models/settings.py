@@ -10,6 +10,8 @@ class UserSettings(Base):
     # Theme: dark, light, boys, girls
     theme: Mapped[str] = mapped_column(String(20), default="dark")
     language: Mapped[str] = mapped_column(String(5), default="de")
+    # Barrierefreiheit: none, protanopia, deuteranopia, tritanopia
+    color_blind_mode: Mapped[str] = mapped_column(String(20), default="none")
     # KI
     ai_model: Mapped[str] = mapped_column(String(100), default="mistral")
     # KI-Laune: formell, direkt, modern, kreativ

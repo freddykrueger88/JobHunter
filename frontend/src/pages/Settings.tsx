@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Eye, EyeOff, ExternalLink, Download, Upload, Check, Save } from 'lucide-react'
+import { Eye, EyeOff, ExternalLink, Download, Upload, Check, Save, AlertCircle } from 'lucide-react'
 import clsx from 'clsx'
 
 interface SettingsData {
@@ -15,6 +15,7 @@ interface SettingsData {
 }
 
 type SaveStatus = 'idle' | 'pending' | 'saved' | 'error'
+type KeysSaveStatus = 'idle' | 'pending' | 'saved' | 'error'
 
 const AUTOSAVE_DELAY = 1200 // ms
 
@@ -218,7 +219,9 @@ export default function Settings() {
     adzuna_app_id: '', adzuna_api_key: '',
   })
   const [saveStatus, setSaveStatus]           = useState<SaveStatus>('idle')
-  const [keysSaved, setKeysSaved]             = useState(false)
+  // keysSaveStatus: 'idle' = Button normal, 'pending' = lädt,
+  // 'saved' = grün (Keys noch sichtbar), 'error' = rot
+  const [keysSaveStatus, setKeysSaveStatus]   = useState<KeysSaveStatus>('idle')
   const [importing, setImporting]             = useState(false)
   const [importMsg, setImportMsg]             = useState('')
 
@@ -259,10 +262,8 @@ export default function Settings() {
   }, [qc])
 
   // ─── Auto-Save Trigger ──────────────────────────────────────────────────
-  // Läuft bei jeder Änderung der Einstellungen (außer API-Keys)
   useEffect(() => {
     if (!initialized.current) return
-    // Ersten Render nach Initialisierung überspringen
     if (isFirstRender.current) { isFirstRender.current = false; return }
 
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
@@ -288,11 +289,21 @@ export default function Settings() {
     mutationFn: () => axios.patch('/api/settings/', {
       ...Object.fromEntries(Object.entries(keys).filter(([, v]) => v !== '')),
     }),
+    onMutate: () => {
+      setKeysSaveStatus('pending')
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['settings'] })
-      setKeysSaved(true)
-      setTimeout(() => setKeysSaved(false), 2500)
-      setKeys({ adzuna_app_id: '', adzuna_api_key: '' })
+      setKeysSaveStatus('saved')
+      // Zuerst Feedback zeigen, DANN Felder leeren
+      setTimeout(() => {
+        setKeys({ adzuna_app_id: '', adzuna_api_key: '' })
+        setKeysSaveStatus('idle')
+      }, 1500)
+    },
+    onError: () => {
+      setKeysSaveStatus('error')
+      setTimeout(() => setKeysSaveStatus('idle'), 3000)
     },
   })
 
@@ -348,7 +359,8 @@ export default function Settings() {
     )
   }
 
-  const hasKeyInput = keys.adzuna_app_id !== '' || keys.adzuna_api_key !== ''
+  // Button ist sichtbar solange Keys eingegeben ODER Feedback läuft
+  const showKeysButton = keys.adzuna_app_id !== '' || keys.adzuna_api_key !== '' || keysSaveStatus !== 'idle'
 
   return (
     <div className="max-w-2xl">
@@ -507,22 +519,29 @@ export default function Settings() {
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Adzuna (optional, kostenlos)</p>
             <ApiKeyInput id="adzuna_app_id" label="App ID" placeholder="Deine Adzuna App ID" link={API_LINKS.adzuna} />
             <ApiKeyInput id="adzuna_api_key" label="API Key" placeholder="Dein Adzuna API Key" />
-            {remote?.has_adzuna_key && !hasKeyInput && (
+            {remote?.has_adzuna_key && keys.adzuna_app_id === '' && keys.adzuna_api_key === '' && keysSaveStatus === 'idle' && (
               <p className="text-xs text-green-600 dark:text-green-400">✅ Adzuna-Key hinterlegt</p>
             )}
-            {hasKeyInput && (
+            {showKeysButton && (
               <button
                 onClick={() => saveKeysMutation.mutate()}
-                disabled={saveKeysMutation.isPending}
+                disabled={keysSaveStatus === 'pending' || keysSaveStatus === 'saved'}
                 className={clsx(
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors mt-1',
-                  keysSaved
-                    ? 'bg-green-600 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all mt-1',
+                  keysSaveStatus === 'saved'   && 'bg-green-600 text-white cursor-default',
+                  keysSaveStatus === 'error'   && 'bg-red-600 hover:bg-red-700 text-white',
+                  keysSaveStatus === 'pending' && 'bg-blue-400 text-white cursor-wait',
+                  keysSaveStatus === 'idle'    && 'bg-blue-600 hover:bg-blue-700 text-white',
                 )}
               >
-                <Save size={12} aria-hidden />
-                {keysSaved ? 'Keys gespeichert ✅' : 'Keys speichern'}
+                {keysSaveStatus === 'pending' && <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />}
+                {keysSaveStatus === 'saved'   && <Check size={12} aria-hidden />}
+                {keysSaveStatus === 'error'   && <AlertCircle size={12} aria-hidden />}
+                {keysSaveStatus === 'idle'    && <Save size={12} aria-hidden />}
+                {keysSaveStatus === 'pending' && 'Speichern…'}
+                {keysSaveStatus === 'saved'   && 'Keys gespeichert ✅'}
+                {keysSaveStatus === 'error'   && 'Fehler – erneut versuchen'}
+                {keysSaveStatus === 'idle'    && 'Keys speichern'}
               </button>
             )}
           </div>

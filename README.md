@@ -4,7 +4,7 @@
 
 🇩🇪 [Deutsche Version](README.de.md)
 
-[![Version](https://img.shields.io/badge/Version-1.8.0-brightgreen)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.9.0-brightgreen)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](docker-compose.yml)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](backend/)
@@ -39,6 +39,7 @@ JobHunter is a fully local job application tracker with AI assistance. All data 
 - Application quality score
 - Salary negotiation coach (3 scenarios)
 - Market analysis per job (competition, optimal timing, strategy)
+- **AI Application Coach** – contextual chat assistant per application (#62) 🆕
 - Multilingual prompts (DE / EN auto-detected)
 
 ### 📊 Dashboard & Analytics
@@ -50,10 +51,18 @@ JobHunter is a fully local job application tracker with AI assistance. All data 
 
 ### 📧 Communication & Workflow
 - E-mail templates (6 templates with placeholders)
-- Calendar export (`.ics` + subscribable feed)
+- **E-mail parsing via IMAP** – auto-detects rejections, invitations & follow-ups (#68) 🆕
+- Calendar export (`.ics` + subscribable feed) (#77) 🆕
 - Contacts manager (recruiters, contact persons)
 - Gross/net salary calculator (tax classes 1–6, 2025 social contributions)
 - Automated local backup (daily, 7-day rotation)
+
+### 🏢 Company Research
+- **Company dossier** – Wikipedia-powered info panel (description, founded, employees, HQ, logo) per application (#71) 🆕
+
+### 📤 Import / Export
+- **JSON / CSV / XLSX export & import** of all applications (#65) 🆕
+- PDF overview export
 
 ### ♿ Accessibility (WCAG 2.1 AA)
 - Dyslexia theme (OpenDyslexic)
@@ -154,7 +163,7 @@ docker exec jobhunter-ollama ollama pull mistral
 | Version | Theme | Status |
 |---|---|---|
 | v1.0 – v1.8 | Core, AI, Accessibility, Analytics, ATS | ✅ Done |
-| v1.9 | Application coach & automation (#62–#64) | 📌 Planned |
+| v1.9 | Coach, IMAP, Calendar, Dossier, Import/Export (#62 #65 #68 #71 #77) | ✅ Done |
 | v2.0+ | EU portals, browser extension, multi-user | 💡 Backlog |
 
 → Full roadmap: [docs/roadmap.md](docs/roadmap.md)

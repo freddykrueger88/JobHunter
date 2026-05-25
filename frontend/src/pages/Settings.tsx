@@ -11,7 +11,7 @@ interface SettingsData {
   theme: string; language: string; ai_model: string; ai_tone: string
   default_location: string | null; default_radius_km: number
   hide_ausbildung: boolean; reminder_default_days: number
-  has_adzuna_key: boolean; has_linkedin_key: boolean; has_arbeitsagentur_key: boolean
+  has_adzuna_key: boolean; has_linkedin_key: boolean
 }
 
 const THEMES: {
@@ -86,12 +86,9 @@ const DENSITY_OPTIONS: { value: Density; label: string; desc: string }[] = [
 const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
   adzuna: 'https://developer.adzuna.com/',
-  arbeitsagentur: 'https://jobsuche.api.bund.dev/',
-  linkedin: 'https://developer.linkedin.com/',
+  linkedin: 'https://www.linkedin.com/jobs/search/',
 }
 
-// ─── Section außerhalb von Settings definiert, sonst wird sie bei jedem
-// ─── Render neu erstellt → React unmountet/remountet Kinder → Fokus-Verlust
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-8">
@@ -194,8 +191,7 @@ export default function Settings() {
   const [reminderDays, setReminderDays]       = useState(7)
   const [showKeys, setShowKeys]   = useState<Record<string, boolean>>({})
   const [keys, setKeys]           = useState<Record<string, string>>({
-    adzuna_app_id: '', adzuna_api_key: '', linkedin_api_key: '',
-    arbeitsagentur_client_id: '', arbeitsagentur_client_secret: '',
+    adzuna_app_id: '', adzuna_api_key: '',
   })
   const [saved, setSaved]         = useState(false)
   const [importing, setImporting] = useState(false)
@@ -232,7 +228,7 @@ export default function Settings() {
       qc.invalidateQueries({ queryKey: ['settings'] })
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
-      setKeys(k => Object.fromEntries(Object.entries(k).map(([key]) => [key, ''])))
+      setKeys({ adzuna_app_id: '', adzuna_api_key: '' })
     },
   })
 
@@ -249,6 +245,44 @@ export default function Settings() {
     } catch (err: any) {
       setImportMsg(`❌ Fehler: ${err.response?.data?.detail ?? err.message}`)
     } finally { setImporting(false); e.target.value = '' }
+  }
+
+  // ─── API-Key Input Helper ───────────────────────────────────────────────────
+  function ApiKeyInput({
+    id, label, placeholder, link, hint,
+  }: { id: string; label: string; placeholder: string; link?: string; hint?: string }) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label htmlFor={id} className="text-sm text-gray-500">{label}</label>
+          {link && (
+            <a href={link} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-blue-500 hover:underline flex items-center gap-1">
+              Registrieren <ExternalLink size={11} aria-hidden />
+            </a>
+          )}
+        </div>
+        <div className="relative">
+          <input
+            id={id}
+            type={showKeys[id] ? 'text' : 'password'}
+            value={keys[id] ?? ''}
+            onChange={e => setKeys(k => ({ ...k, [id]: e.target.value }))}
+            placeholder={placeholder}
+            className="w-full rounded-lg px-3 py-2 pr-9 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 font-mono"
+          />
+          <button
+            type="button"
+            onClick={() => setShowKeys(s => ({ ...s, [id]: !s[id] }))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            aria-label={showKeys[id] ? 'Key verbergen' : 'Key anzeigen'}
+          >
+            {showKeys[id] ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
+          </button>
+        </div>
+        {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+      </div>
+    )
   }
 
   return (
@@ -350,17 +384,20 @@ export default function Settings() {
             <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
             <select value={aiModel} onChange={e => setAiModel(e.target.value)}
               className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="KI-Modell">
-              {(models.length ? models : ['mistral', 'llama3', 'phi3']).map(m => <option key={m} value={m}>{m}</option>)}
+              {models.length > 0
+                ? models.map(m => <option key={m} value={m}>{m}</option>)
+                : <option value="mistral">mistral (Standard)</option>
+              }
             </select>
           </div>
           <div>
-            <label className="text-sm text-gray-500 block mb-1">KI-Ton</label>
-            <div className="flex gap-2 flex-wrap">
-              {TONES.map(tn => (
-                <button key={tn} onClick={() => setAiTone(tn)} aria-pressed={aiTone === tn}
-                  className={clsx('text-sm px-3 py-1 rounded-full border transition-colors capitalize',
-                    aiTone === tn ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700')}
-                >{tn}</button>
+            <label className="text-sm text-gray-500 block mb-1">Schreibton</label>
+            <div className="flex flex-wrap gap-2">
+              {TONES.map(tone => (
+                <button key={tone} onClick={() => setAiTone(tone)} aria-pressed={aiTone === tone}
+                  className={clsx('px-4 py-1.5 rounded-full text-sm font-medium border-2 transition-all capitalize',
+                    aiTone === tone ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
+                >{tone}</button>
               ))}
             </div>
           </div>
@@ -369,107 +406,114 @@ export default function Settings() {
 
       {/* ── Stellensuche ── */}
       <Section title="🔍 Stellensuche">
-        <div className="space-y-3">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
-              <input
-                value={defaultLocation}
-                onChange={e => setDefaultLocation(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                placeholder="z.B. Bremen"
-                aria-label="Standard-Ort"
-                autoComplete="off"
-              />
-            </div>
-            <div className="w-32">
-              <label className="text-sm text-gray-500 block mb-1">Radius (km)</label>
-              <select value={defaultRadius} onChange={e => setDefaultRadius(Number(e.target.value))}
-                className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="Radius">
-                {[10, 25, 50, 100].map(r => <option key={r} value={r}>{r} km</option>)}
-              </select>
-            </div>
+        <div className="space-y-4 mb-5">
+          <div>
+            <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
+            <input
+              value={defaultLocation}
+              onChange={e => setDefaultLocation(e.target.value)}
+              placeholder="z.B. Bremen, Hamburg …"
+              className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
+              aria-label="Standard-Ort"
+            />
           </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={hideAusbildung} onChange={e => setHideAusbildung(e.target.checked)} className="rounded" />
-            Ausbildungsstellen ausblenden
-          </label>
+          <div>
+            <label className="text-sm text-gray-500 block mb-1">Suchradius: {defaultRadius} km</label>
+            <input type="range" min={5} max={100} step={5} value={defaultRadius}
+              onChange={e => setDefaultRadius(Number(e.target.value))}
+              className="w-full accent-blue-600" aria-label="Suchradius"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>5 km</span><span>100 km</span></div>
+          </div>
+          <ToggleRow
+            label="Ausbildungsplätze ausblenden"
+            desc="Ausbildungsangebote werden in der Suche nicht angezeigt"
+            value={hideAusbildung}
+            onChange={setHideAusbildung}
+          />
+        </div>
+
+        {/* API-Key Bereich */}
+        <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4 space-y-4">
+          <div>
+            <p className="text-sm font-medium mb-0.5">🔑 API-Zugänge</p>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Die Bundesagentur für Arbeit, Stepstone und EURES funktionieren <strong>ohne Registrierung</strong>.
+              Für mehr Ergebnisse kannst du optional einen kostenlosen Adzuna-Key hinzufügen.
+            </p>
+          </div>
+
+          {/* Adzuna */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Adzuna (optional, kostenlos)</p>
+            <ApiKeyInput
+              id="adzuna_app_id"
+              label="App ID"
+              placeholder="Deine Adzuna App ID"
+              link={API_LINKS.adzuna}
+            />
+            <ApiKeyInput
+              id="adzuna_api_key"
+              label="API Key"
+              placeholder="Dein Adzuna API Key"
+            />
+            {remote?.has_adzuna_key && (
+              <p className="text-xs text-green-600 dark:text-green-400">✅ Adzuna-Key hinterlegt</p>
+            )}
+          </div>
+
+          {/* LinkedIn */}
+          <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 px-3 py-2.5">
+            <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 mb-1">⚠️ LinkedIn – kein offizieller API-Key</p>
+            <p className="text-xs text-yellow-600 dark:text-yellow-300 leading-relaxed">
+              LinkedIn hat seine Job-API für Drittanbieter geschlossen. JobHunter sucht LinkedIn-Stellen
+              direkt über die öffentliche Suche – kein Key erforderlich.
+            </p>
+            <a href={API_LINKS.linkedin} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-1.5">
+              LinkedIn Jobs direkt öffnen <ExternalLink size={11} aria-hidden />
+            </a>
+          </div>
+
+          {/* Bundesagentur Info */}
+          <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-2.5">
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">✅ Bundesagentur für Arbeit – automatisch aktiv</p>
+            <p className="text-xs text-green-600 dark:text-green-300 leading-relaxed">
+              Die offizielle Jobbörse der BA ist vollständig kostenlos und ohne Registrierung nutzbar.
+              Keine Eingabe erforderlich.
+            </p>
+          </div>
         </div>
       </Section>
 
       {/* ── Erinnerungen ── */}
-      <Section title="🔔 Erinnerungen">
+      <Section title="⏰ Erinnerungen">
         <div>
-          <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit (Tage)</label>
-          <input
-            type="number" min={1} max={30}
-            value={reminderDays}
+          <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit: {reminderDays} Tage</label>
+          <input type="range" min={1} max={30} step={1} value={reminderDays}
             onChange={e => setReminderDays(Number(e.target.value))}
-            className="w-24 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-            aria-label="Vorlaufzeit"
+            className="w-full accent-blue-600" aria-label="Erinnerungsvorlaufzeit"
           />
+          <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>1 Tag</span><span>30 Tage</span></div>
         </div>
       </Section>
 
-      {/* ── API Keys ── */}
-      <Section title="🔑 API Keys">
-        <p className="text-sm text-gray-500 mb-4">Keys werden verschlüsselt gespeichert (AES-256).</p>
-        {([
-          { key: 'adzuna_app_id',                label: 'Adzuna App ID',            portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
-          { key: 'adzuna_api_key',               label: 'Adzuna API Key',           portal: 'adzuna',         hasKey: remote?.has_adzuna_key },
-          { key: 'arbeitsagentur_client_id',     label: 'Arbeitsagentur Client ID', portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'arbeitsagentur_client_secret', label: 'Arbeitsagentur Secret',    portal: 'arbeitsagentur', hasKey: remote?.has_arbeitsagentur_key },
-          { key: 'linkedin_api_key',             label: 'LinkedIn API Key',         portal: 'linkedin',       hasKey: remote?.has_linkedin_key },
-        ] as const).map(({ key, label, portal, hasKey }) => (
-          <div key={key} className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <label className="text-sm text-gray-500">{label}</label>
-              {hasKey && <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">✓ gesetzt</span>}
-              <a href={API_LINKS[portal]} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-blue-500 hover:underline flex items-center gap-0.5 ml-auto">
-                Registrieren <ExternalLink size={10} aria-hidden />
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showKeys[key] ? 'text' : 'password'}
-                value={keys[key]}
-                onChange={e => setKeys(k => ({ ...k, [key]: e.target.value }))}
-                placeholder={hasKey ? '•••••••• (zum Überschreiben eingeben)' : 'Leer'}
-                className="w-full rounded-lg px-3 py-2 pr-10 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                aria-label={label}
-              />
-              <button type="button" onClick={() => setShowKeys(s => ({ ...s, [key]: !s[key] }))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label={showKeys[key] ? 'Verbergen' : 'Anzeigen'}
-                style={{ minHeight: 'unset', minWidth: 'unset' }}>
-                {showKeys[key] ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
-              </button>
-            </div>
-          </div>
-        ))}
-      </Section>
-
-      {/* ── Export / Import ── */}
-      <Section title="📦 Daten Export / Import">
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm text-gray-500 mb-2">Alle Daten als JSON exportieren (DSGVO Art. 20)</p>
-            <button onClick={handleExport}
-              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-              <Download size={15} aria-hidden /> Daten exportieren
-            </button>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-2">Backup importieren (.json)</p>
-            <label className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-fit',
-              importing ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600')}>
-              {importing ? <>⏳ Importiere...</> : <><Upload size={15} aria-hidden /> Backup importieren</>}
-              <input type="file" accept=".json" onChange={handleImport} disabled={importing} className="hidden" aria-label="JSON-Backup importieren" />
-            </label>
-            {importMsg && <p className="text-sm mt-2" role="status">{importMsg}</p>}
-          </div>
+      {/* ── Daten ── */}
+      <Section title="💾 Daten">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Download size={15} aria-hidden /> Daten exportieren
+          </button>
+          <label className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+            <Upload size={15} aria-hidden /> Daten importieren
+            <input type="file" accept=".zip" onChange={handleImport} className="sr-only" />
+          </label>
         </div>
+        {importing && <p className="text-sm text-gray-500 mt-2">⏳ Importiere…</p>}
+        {importMsg && <p className="text-sm mt-2">{importMsg}</p>}
       </Section>
     </div>
   )

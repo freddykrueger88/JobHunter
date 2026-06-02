@@ -6,7 +6,7 @@ const resources = {
     translation: {
       nav: {
         dashboard: 'Dashboard', jobs: 'Stellensuche', kanban: 'Bewerbungen',
-        reminders: 'Erinnerungen', history: 'Verlauf', settings: 'Einstellungen',
+        reminders: 'Erinnerungen', templates: 'Vorlagen', history: 'Verlauf', settings: 'Einstellungen',
       },
       dashboard: {
         title: 'Dashboard', applied: 'Beworben', rejected: 'Absagen',
@@ -21,7 +21,7 @@ const resources = {
     translation: {
       nav: {
         dashboard: 'Dashboard', jobs: 'Job Search', kanban: 'Applications',
-        reminders: 'Reminders', history: 'History', settings: 'Settings',
+        reminders: 'Reminders', templates: 'Templates', history: 'History', settings: 'Settings',
       },
       dashboard: {
         title: 'Dashboard', applied: 'Applied', rejected: 'Rejected',

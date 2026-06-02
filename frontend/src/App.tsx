@@ -16,6 +16,7 @@ import Reminders from './pages/Reminders'
 import SearchProfiles from './pages/SearchProfiles'
 import InterviewSimulator from './pages/InterviewSimulator'
 import CompanyDossier from './pages/CompanyDossier'
+import Templates from './pages/Templates'
 import { useUndoToast } from './hooks/useUndoToast'
 
 function AppInner() {
@@ -43,6 +44,7 @@ function AppInner() {
           <Route path="/search-profiles" element={<SearchProfiles />} />
           <Route path="/interview-simulator" element={<InterviewSimulator />} />
           <Route path="/company-dossier" element={<CompanyDossier />} />
+          <Route path="/templates" element={<Templates />} />
         </Routes>
       </main>
 

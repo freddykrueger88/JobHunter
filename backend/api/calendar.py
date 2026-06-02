@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.database import get_db
+from backend.core.database import get_db
 from backend.services.calendar_export import get_ical, get_all_ical
 
 router = APIRouter(prefix="/api/calendar", tags=["calendar"])

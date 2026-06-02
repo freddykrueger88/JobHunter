@@ -19,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.database import get_db
+from backend.core.database import get_db
 from backend.models import Application, FollowUp
 from backend.services.followup_scheduler import (
     AmpelStatus,

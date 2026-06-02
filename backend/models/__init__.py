@@ -5,6 +5,9 @@ from backend.models.cv import CVData
 from backend.models.cover_letter import CoverLetter
 from backend.models.reminder import Reminder
 from backend.models.history import HistoryEntry
+from backend.models.followup import FollowUp
+from backend.models.user import User
+from backend.models.search_profile import SearchProfile
 
 __all__ = [
     "Job",
@@ -14,4 +17,7 @@ __all__ = [
     "CoverLetter",
     "Reminder",
     "HistoryEntry",
+    "FollowUp",
+    "User",
+    "SearchProfile",
 ]

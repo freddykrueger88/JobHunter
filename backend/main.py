@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import jobs, applications, settings, cv, ai, dashboard, history, reminders
-from backend.api import export, interview, eures
-from backend.api import calendar, company_dossier, email_parsing
-from backend.routers import followups, blocklist
+from backend.api import calendar
+from backend.routers import (
+    ai, applications, blocklist, company_dossier, cv, dashboard,
+    email_parsing, eures, export, followups, history, interview,
+    jobs, reminders, settings,
+)
 
 app = FastAPI(
     title="JobHunter API",

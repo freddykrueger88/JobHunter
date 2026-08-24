@@ -59,7 +59,7 @@ async def client(db: AsyncSession, tmp_path, monkeypatch):  # type: ignore[overr
     zu "Future attached to a different loop"-Fehlern fuehrt.
     """
     from backend.main import app
-    import backend.api.cv as cv_module
+    import backend.routers.cv as cv_module
 
     async def _override_get_db():
         yield db

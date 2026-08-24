@@ -1,9 +1,11 @@
 # JobHunter – Repository-Audit (Deutsch)
 
-> **Status dieses Dokuments:** Entwurf, wird abschnittsweise befüllt (siehe
+> **Status dieses Dokuments:** Phase 1 (Repository-Inventur) abgeschlossen.
+> Phase 2 (Qualitäts-/Architekturbewertung mit priorisierten Empfehlungen)
+> folgt in einem separaten Arbeitsschritt und wird als eigener Abschnitt
+> „## 2. Qualitäts- und Architekturbewertung" ergänzt (siehe
 > `docs/analysis/BACKLOG.md` für den Fortschritt). Englische Fassung:
-> `docs/analysis/REPOSITORY_AUDIT_EN.md` (wird parallel gepflegt, sobald ein
-> Abschnitt hier final ist).
+> `docs/analysis/REPOSITORY_AUDIT_EN.md` (inhaltsgleich).
 >
 > Stand: 2026-08-24. Alle Aussagen beruhen auf tatsächlicher Sichtung des
 > Checkouts in LXC 142 (`/root/JobHunter`, Branch `main`,
@@ -571,6 +573,61 @@ flowchart TD
 Keine – Diagramme fassen ausschließlich bereits verifizierte Befunde aus
 1.1–1.6 zusammen.
 
+## Zusammenfassung Phase 1
+
+Kurzer, sortierter Überblick über die Kernbefunde aus 1.1–1.7 – Details
+und Begründungen jeweils im referenzierten Abschnitt. Bewertung/Priorisierung
+(kritisch/hoch/mittel/niedrig, Aufwand, Empfehlung) folgt in Phase 2, hier nur
+Bestandsaufnahme.
+
+**Verifiziert kaputt (durch tatsächliche Befehlsausführung, nicht nur gelesen):**
+- Backend-Testsuite: `ImportError` beim Sammeln, 0 % lauffähig (1.5).
+- Frontend-Lint: keine ESLint-Konfiguration vorhanden, Befehl bricht ab (1.5).
+- Frontend-Produktionsbuild: keine `tsconfig.json` im gesamten Repo, `tsc`
+  läuft ins Leere (1.5). Bleibt unbemerkt, weil der „Produktions"-Container
+  tatsächlich den Vite-Dev-Server startet (1.5).
+
+**Sicherheitsrelevant (1.6):**
+- 🔴 Path-Traversal-Risiko beim CV-Upload (`api/cv.py`, ungeprüfter
+  Client-Dateiname).
+- Schwache Default-Secrets als Fallback ohne `.env` (1.3/1.6).
+- Kein funktionierender Auth-Pfad trotz vorhandenem JWT-Code (1.3/1.4/1.6).
+- Kein Rate-Limiting, kein automatisiertes Dependency-Scanning (1.6).
+- Positiv: keine SQLi-/XSS-/Command-Injection-Muster gefunden, CORS
+  restriktiv, `.env` nicht getrackt, API-Keys verschlüsselt, DB ohne
+  Host-Port-Exposure, DSGVO-/Privacy-Dokumentation bereits vorhanden (1.6).
+
+**Struktur/Altlasten (1.1/1.3/1.4):**
+- Zwei parallele Endpunkt-Ordner (`api/` vs. `routers/`) ohne fachlichen Grund.
+- Toter Code: `backend/models.py`, Top-Level-`/alembic/`-Baum – beide vom
+  Projekt selbst (Migrations-Kommentar) bzw. durch Docker-Build-Context
+  nachweislich unbenutzt.
+- `User`-Modell ohne Registrierung, ohne Migration, ohne erreichbaren Router
+  – Auth wirkt wie ein unvollständiges Feature-Fragment.
+- Uneinheitliche Sprachführung über drei verschiedene Muster
+  (Datei-Duplikat, Ein-Datei-DE/EN-Mix, nur-Deutsch) in `docs/`/`wiki/`/README.
+
+**Internationalisierung (1.2, zentral für den Auftrag):**
+- i18n-Infrastruktur (i18next/react-i18next) vorhanden, aber nur in **5 von
+  45** Frontend-Dateien genutzt (~11 %).
+- Übersetzungen inline in einer Datei statt als Namespace-/JSON-Struktur,
+  decken nur Nav/Dashboard/Jobs/Settings/Common ab.
+- Positiv: Deutsch ist bereits korrekt als Standard+Fallback verankert,
+  keine Browser-Locale-Verdrängung.
+
+**Nicht kritisch, aber wartungsrelevant (1.2/1.3):**
+- Kein zentraler Frontend-API-Client (`axios` in 22 Dateien direkt genutzt).
+- Dünne Pydantic-Schema-Schicht (3 Module) im Verhältnis zu 18+3
+  API-Modulen.
+- Namenskollision `pages/CompanyDossier.tsx` / `components/CompanyDossier.tsx`.
+- `pages/CoverLetter.tsx` ohne eigene Route, Einbindungspfad nicht
+  abschließend verifiziert.
+
+Diese Zusammenfassung ist bewusst noch **unbewertet** (keine Priorisierung,
+keine Aufwandsschätzung) – das ist Gegenstand von Kapitel 2
+(„Qualitäts- und Architekturbewertung"), das als eigener Arbeitsschritt
+folgt.
+
 ---
 
-*Fortsetzung folgt (1.8/1.9 Dokument-Fertigstellung DE/EN, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Phase 1 abgeschlossen. Fortsetzung mit Kapitel 2 (Qualitäts-/Architekturbewertung) gemäß `docs/analysis/BACKLOG.md`.*

@@ -41,7 +41,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 1.5 Tests/CI/Linting/Build-Bestandsaufnahme (verifiziert per echter Befehlsausfuehrung)
 - [x] 1.6 Security/OWASP/Datenschutz-Sichtung
 - [x] 1.7 Architekturdiagramm (Mermaid) auf Basis realer Struktur
-- [ ] 1.8 docs/analysis/REPOSITORY_AUDIT_DE.md schreiben
+- [x] 1.8 docs/analysis/REPOSITORY_AUDIT_DE.md fertiggestellt (Phase 1)
 - [ ] 1.9 docs/analysis/REPOSITORY_AUDIT_EN.md schreiben (inhaltsgleich)
 
 ## Phase 2 – Qualitäts-/Architekturbewertung

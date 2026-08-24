@@ -1,0 +1,27 @@
+{
+  "title": "Automated Search",
+  "newProfile": "New Search Profile",
+  "namePlaceholder": "Name, e.g. IT Support Bremen",
+  "nameAriaLabel": "Profile name",
+  "keywordsPlaceholder": "Search term",
+  "keywordsAriaLabel": "Search term",
+  "locationPlaceholder": "Location",
+  "locationAriaLabel": "Location",
+  "radiusAriaLabel": "Radius",
+  "scheduleAriaLabel": "Schedule",
+  "scheduleDaily": "🗓️ Daily",
+  "scheduleWeekly": "🗓️ Weekly",
+  "createProfile": "Create Profile",
+  "scheduleLabels": {
+    "daily": "🗓️ Daily (8:00 AM)",
+    "weekly": "🗓️ Weekly (Mon 8:00 AM)"
+  },
+  "lastRun": "Last run: {{date}}",
+  "newResults_one": "{{count}} new result",
+  "newResults_other": "{{count}} new results",
+  "runNow": "Run now",
+  "deactivate": "Deactivate",
+  "activate": "Activate",
+  "deleteProfile": "Delete profile",
+  "empty": "No search profiles yet – create one above 👆"
+}

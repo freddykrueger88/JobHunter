@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { Plus, Play, Pause, Trash2, RefreshCw, Loader2, Clock } from 'lucide-react'
 import clsx from 'clsx'
+import { formatDateTime } from '../lib/formatDate'
 
 interface SearchProfile {
   id: number
@@ -16,12 +18,8 @@ interface SearchProfile {
   last_result_count: number
 }
 
-const SCHEDULE_LABELS: Record<string, string> = {
-  daily: '🗓️ Täglich (08:00)',
-  weekly: '🗓️ Wöchentlich (Mo 08:00)',
-}
-
 export default function SearchProfiles() {
+  const { t, i18n } = useTranslation(['searchProfiles', 'common'])
   const qc = useQueryClient()
   const [name, setName] = useState('')
   const [keywords, setKeywords] = useState('')
@@ -70,40 +68,40 @@ export default function SearchProfiles() {
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <Clock size={22} aria-hidden /> Automatische Suche
+        <Clock size={22} aria-hidden /> {t('title')}
       </h1>
 
       {/* Neues Profil */}
       <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 mb-6 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500">Neues Suchprofil</h2>
+        <h2 className="text-sm font-semibold text-gray-500">{t('newProfile')}</h2>
         <input className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Name, z.B. IT-Support Bremen" value={name} onChange={e => setName(e.target.value)} aria-label="Profilname" />
+          placeholder={t('namePlaceholder')} value={name} onChange={e => setName(e.target.value)} aria-label={t('nameAriaLabel')} />
         <div className="flex gap-2">
           <input className="flex-1 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Suchbegriff" value={keywords} onChange={e => setKeywords(e.target.value)} aria-label="Suchbegriff" />
+            placeholder={t('keywordsPlaceholder')} value={keywords} onChange={e => setKeywords(e.target.value)} aria-label={t('keywordsAriaLabel')} />
           <input className="w-36 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ort" value={location} onChange={e => setLocation(e.target.value)} aria-label="Ort" />
+            placeholder={t('locationPlaceholder')} value={location} onChange={e => setLocation(e.target.value)} aria-label={t('locationAriaLabel')} />
           <select className="w-24 rounded-lg px-2 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-            value={radius} onChange={e => setRadius(Number(e.target.value))} aria-label="Radius">
+            value={radius} onChange={e => setRadius(Number(e.target.value))} aria-label={t('radiusAriaLabel')}>
             {[10, 25, 50, 100].map(r => <option key={r} value={r}>{r} km</option>)}
           </select>
         </div>
         <div className="flex items-center gap-3">
           <select className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-            value={schedule} onChange={e => setSchedule(e.target.value)} aria-label="Zeitplan">
-            <option value="daily">🗓️ Täglich</option>
-            <option value="weekly">🗓️ Wöchentlich</option>
+            value={schedule} onChange={e => setSchedule(e.target.value)} aria-label={t('scheduleAriaLabel')}>
+            <option value="daily">{t('scheduleDaily')}</option>
+            <option value="weekly">{t('scheduleWeekly')}</option>
           </select>
           <button onClick={() => createMutation.mutate()}
             disabled={!name || !keywords || !location || createMutation.isPending}
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium ml-auto transition-colors">
-            <Plus size={15} aria-hidden /> Profil anlegen
+            <Plus size={15} aria-hidden /> {t('createProfile')}
           </button>
         </div>
       </div>
 
       {/* Profil-Liste */}
-      {isLoading && <p className="text-gray-400 text-sm">Lädt...</p>}
+      {isLoading && <p className="text-gray-400 text-sm">{t('common:loading')}</p>}
       <ul className="space-y-3">
         {profiles.map(p => (
           <li key={p.id} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -117,28 +115,28 @@ export default function SearchProfiles() {
                   „{p.keywords}“ • {p.location} • {p.radius_km} km
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {SCHEDULE_LABELS[p.schedule] ?? p.schedule}
-                  {p.last_run && ` • Letzter Lauf: ${new Date(p.last_run).toLocaleString('de-DE')}`}
-                  {p.last_result_count > 0 && ` • ${p.last_result_count} neue Treffer`}
+                  {t(`scheduleLabels.${p.schedule}`, p.schedule)}
+                  {p.last_run && ` • ${t('lastRun', { date: formatDateTime(p.last_run, i18n.language) })}`}
+                  {p.last_result_count > 0 && ` • ${t('newResults', { count: p.last_result_count })}`}
                 </p>
               </div>
               <div className="flex gap-1 shrink-0">
                 <button onClick={() => runNowMutation.mutate(p.id)}
                   disabled={runningId === p.id}
                   className="text-blue-500 hover:text-blue-700 p-2 rounded transition-colors disabled:opacity-50"
-                  aria-label="Jetzt ausführen">
+                  aria-label={t('runNow')}>
                   {runningId === p.id
                     ? <Loader2 size={15} className="animate-spin" aria-hidden />
                     : <RefreshCw size={15} aria-hidden />}
                 </button>
                 <button onClick={() => toggleMutation.mutate(p.id)}
                   className={clsx('p-2 rounded transition-colors', p.is_active ? 'text-yellow-500 hover:text-yellow-700' : 'text-green-500 hover:text-green-700')}
-                  aria-label={p.is_active ? 'Deaktivieren' : 'Aktivieren'}>
+                  aria-label={p.is_active ? t('deactivate') : t('activate')}>
                   {p.is_active ? <Pause size={15} aria-hidden /> : <Play size={15} aria-hidden />}
                 </button>
                 <button onClick={() => deleteMutation.mutate(p.id)}
                   className="text-red-400 hover:text-red-600 p-2 rounded transition-colors"
-                  aria-label="Profil löschen">
+                  aria-label={t('deleteProfile')}>
                   <Trash2 size={15} aria-hidden />
                 </button>
               </div>
@@ -147,7 +145,7 @@ export default function SearchProfiles() {
         ))}
         {!isLoading && profiles.length === 0 && (
           <li className="text-gray-400 text-sm text-center py-8">
-            Noch keine Suchprofile – lege oben eines an 👆
+            {t('empty')}
           </li>
         )}
       </ul>

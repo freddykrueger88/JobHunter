@@ -1,0 +1,27 @@
+{
+  "title": "Automatische Suche",
+  "newProfile": "Neues Suchprofil",
+  "namePlaceholder": "Name, z.B. IT-Support Bremen",
+  "nameAriaLabel": "Profilname",
+  "keywordsPlaceholder": "Suchbegriff",
+  "keywordsAriaLabel": "Suchbegriff",
+  "locationPlaceholder": "Ort",
+  "locationAriaLabel": "Ort",
+  "radiusAriaLabel": "Radius",
+  "scheduleAriaLabel": "Zeitplan",
+  "scheduleDaily": "🗓️ Täglich",
+  "scheduleWeekly": "🗓️ Wöchentlich",
+  "createProfile": "Profil anlegen",
+  "scheduleLabels": {
+    "daily": "🗓️ Täglich (08:00)",
+    "weekly": "🗓️ Wöchentlich (Mo 08:00)"
+  },
+  "lastRun": "Letzter Lauf: {{date}}",
+  "newResults_one": "{{count}} neuer Treffer",
+  "newResults_other": "{{count}} neue Treffer",
+  "runNow": "Jetzt ausführen",
+  "deactivate": "Deaktivieren",
+  "activate": "Aktivieren",
+  "deleteProfile": "Profil löschen",
+  "empty": "Noch keine Suchprofile – lege oben eines an 👆"
+}

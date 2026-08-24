@@ -29,8 +29,10 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 
 ## Phase 0 – Vorbereitung
 - [x] 0.1 gh CLI installieren (`apt-get install gh`) im LXC 142 — erledigt 2026-08-24 (v2.4.0)
-- [!] 0.2 GitHub-Auth klären — blockiert: kein Token/SSH-Key vorhanden. Wird erst bei
-      Phase 5 (Wiki-Veröffentlichung) aktiv beim Nutzer angefragt, nicht vorher.
+- [x] 0.2 GitHub-Auth geklärt (2026-08-24, nachträglich): `gh` ist auf dem
+      Proxmox-Host (nicht in LXC 142) als freddykrueger88 authentifiziert
+      (Token-Scope `repo`, u.a.). Wiki-Operationen (Phase 5) erfolgen darüber,
+      z. B. Klonen von `JobHunter.wiki.git` in ein Host-Scratchpad-Verzeichnis.
 - [x] 0.3 BACKLOG.md angelegt — erledigt 2026-08-24
 
 ## Phase 1 – Repository-Inventur (Audit)

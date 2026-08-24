@@ -20,6 +20,8 @@ Audit-/Rework-Programm (siehe `docs/analysis/`).
   – Zusammenführung von `api/` und `routers/`.
 - **[adr/0003-i18n-namespace-struktur.md](adr/0003-i18n-namespace-struktur.md)**
   – Übersetzungsstruktur für Phase C (Internationalisierung).
+- **[regeln.md](regeln.md)** – Kurze, verbindliche Architekturregeln für
+  neuen Code (Phase B.7).
 
 **Hinweis zum Pflegezustand:** Diese ADRs sind schriftlich fixierte
 Entscheidungen aus dem Rework-Plan (`docs/analysis/REWORK_PLAN_DE.md`).
@@ -45,6 +47,8 @@ audit/rework program (see `docs/analysis/`).
   – Merging `api/` and `routers/`.
 - **[adr/0003-i18n-namespace-struktur.md](adr/0003-i18n-namespace-struktur.md)**
   – Translation structure for Phase C (internationalization).
+- **[regeln.md](regeln.md)** – Short, binding architecture rules for new
+  code (Phase B.7).
 
 **Maintenance note:** These ADRs are decisions fixed in writing from the
 rework plan (`docs/analysis/REWORK_PLAN_EN.md`). They become binding once

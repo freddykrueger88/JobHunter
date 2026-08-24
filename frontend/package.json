@@ -1,6 +1,6 @@
 {
   "name": "jobhunter-frontend",
-  "version": "0.4.0",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "vite",

@@ -628,6 +628,47 @@ keine Aufwandsschätzung) – das ist Gegenstand von Kapitel 2
 („Qualitäts- und Architekturbewertung"), das als eigener Arbeitsschritt
 folgt.
 
+## 2. Qualitäts- und Architekturbewertung
+
+Bewertet die Befunde aus Kapitel 1 systematisch nach Priorität, Aufwand und
+Risiko. Format je Empfehlung: Beobachtung → Problem/Chance →
+Priorität → Empfehlung → Aufwand (S/M/L/XL) → Risiko der Umsetzung.
+Priorität bezieht sich auf die Dringlichkeit *vor* Beginn der
+i18n-Umsetzung (Phase 4) bzw. eines echten Produktionsbetriebs – nicht
+zwingend auf die Reihenfolge in der Roadmap (die folgt in Kapitel 3).
+
+### 2.1 Codequalität
+
+| # | Beobachtung (Ref.) | Priorität | Empfehlung | Aufwand | Risiko der Umsetzung |
+|---|---|---|---|---|---|
+| 1 | Backend-Tests kaputt: `Base`-Import in `conftest.py` falsch (1.5) | **Kritisch** | Import auf `from backend.core.database import Base` korrigieren | S | Sehr gering – Ein-Zeilen-Fix, durch grünen Testlauf sofort verifizierbar |
+| 2 | Kein ESLint-Config im Frontend (1.5) | **Kritisch** | `eslint.config.js` (Flat Config, passend zu ESLint 8.57) mit TypeScript+React-Regeln anlegen | S | Gering – Config-Erstellung, ggf. viele Erstbefunde beim ersten Lauf abzuarbeiten (separater Folgeaufwand) |
+| 3 | Keine `tsconfig.json`, `npm run build` faktisch nie lauffähig (1.5) | **Kritisch** | `tsconfig.json` passend zu Vite/React/TS 5.4 anlegen (`tsc --init` + Vite-Preset als Basis), danach `npm run build` verifizieren | S–M | Mittel – TypeScript-Strict-Modus kann bestehende, bisher nie typgeprüfte Fehler aufdecken; iteratives Vorgehen empfohlen |
+| 4 | „Produktions"-Container startet Vite-Dev-Server statt Build (1.5) | **Hoch** | Mehrstufiges `frontend/Dockerfile` (Build-Stage mit `npm run build`, Serve-Stage z. B. `nginx`/`vite preview`) | M | Mittel – Deployment-Verhalten ändert sich sichtbar, vor Umstellung lokal gegentesten |
+| 5 | Path Traversal beim CV-Upload (1.6) | **Kritisch** | Serverseitige UUID-Dateinamen statt Client-`filename` übernehmen | S | Gering – lokal isolierter Fix in `api/cv.py`, keine Schema-Änderung |
+| 6 | Schwache Default-Secrets in `core/config.py` (1.3/1.6) | **Hoch** | Bei fehlendem `SECRET_KEY`/`ENCRYPTION_KEY` **hart fehlschlagen** (`raise` statt stillem Fallback) statt unsicherer Defaults | S | Gering – reine Absicherung, betrifft nur den Fehlerfall bei fehlkonfiguriertem `.env` |
+| 7 | Zwei tote Code-Pfade: `backend/models.py`, Top-Level-`/alembic/` (1.1/1.3/1.4) | **Niedrig** | Beide Pfade entfernen (nachweislich unbenutzt) | S | Sehr gering – reine Löschung, durch Tests/Build-Lauf danach absicherbar |
+| 8 | Gespaltene Endpunkt-Schicht `api/` vs. `routers/` (1.3) | **Mittel** | Auf einen Ordnernamen vereinheitlichen (z. B. alles nach `routers/` verschieben, `api/` auflösen) | M | Mittel – reine Verschiebung, aber viele Importpfade betroffen; am besten in Phase 3 zusammen mit anderer Strukturbereinigung |
+| 9 | `User`-Modell ohne Registrierung/Migration/Router (1.3/1.4) | **Mittel** *(Produktentscheidung nötig)* | Erst entscheiden: Auth-Feature vervollständigen (Migration nachziehen, Router einbinden) **oder** vollständig entfernen (Modell, `core/security.py`-Teile, `api/auth.py`) | M–L je nach Entscheidung | Mittel – Entscheidung hat Domänenauswirkung (Mehrbenutzerfähigkeit lt. Auftrag gewünscht) |
+| 10 | Kein zentraler Frontend-API-Client, `axios` 22× direkt genutzt (1.2) | **Mittel** | Zentralen `frontend/src/lib/api.ts` mit `axios.create({baseURL})` + Interceptor für Fehlerbehandlung einführen, Aufrufe schrittweise migrieren | M | Gering – additiv einführbar, alte Aufrufe funktionieren parallel weiter während der Migration |
+| 11 | Dünne Schema-Schicht (3 Pydantic-Module ggü. 18+3 API-Modulen) (1.3) | **Mittel** | Pro Domäne (z. B. `reminders`, `cv`, `interview`) eigenes Schema-Modul ergänzen, wo aktuell inline/ORM-direkt validiert wird | L | Gering – additiv, schrittweise pro Endpunkt möglich |
+| 12 | Kein Rate-Limiting (1.6) | **Niedrig** *(steigt bei Netzwerk-Exposure)* | `slowapi` oder einfache Middleware ergänzen, sobald Auth/Exposure angegangen wird | S | Gering |
+| 13 | Kein Dependency-Scanning (1.6) | **Mittel** | `dependabot.yml` (oder Renovate) für `pip`/`npm` einrichten; einmalig `pip-audit`/`npm audit` laufen lassen | S | Sehr gering – reine Automatisierung |
+| 14 | Namenskollision `pages/CompanyDossier.tsx` / `components/CompanyDossier.tsx` (1.2) | **Niedrig** | Eine der beiden Dateien umbenennen (z. B. `CompanyDossierPage.tsx`) nach Klärung der Rollen | S | Sehr gering |
+| 15 | `pages/CoverLetter.tsx` ohne eigene Route (1.2) | **Niedrig** | Einbindungspfad dokumentieren (Kommentar/ADR), keine Code-Änderung zwingend nötig | S | Keines – informativ |
+
+**Übergreifende Beobachtung:** Die drei kritischen Kaputt-Befunde (#1, #2,
+#3) sind bewusst **vor** jede weitere Empfehlung zu stellen – ohne
+lauffähige Tests/Lint/Build kann keine der übrigen Maßnahmen (erst recht
+nicht die groß angelegte i18n-Migration in Phase 4) verlässlich verifiziert
+werden. Dies bestimmt maßgeblich die Reihenfolge der Roadmap in Kapitel 3.
+
+### Offene Fragen aus diesem Abschnitt
+
+- Produktentscheidung zu Punkt 9 (`User`-Modell/Auth) steht weiterhin aus
+  – siehe bereits in 1.3/1.4 vermerkt, hier nur in die Priorisierung
+  eingeordnet.
+
 ---
 
-*Phase 1 abgeschlossen. Fortsetzung mit Kapitel 2 (Qualitäts-/Architekturbewertung) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (2.2 Stack-Eignung, …) gemäß `docs/analysis/BACKLOG.md`.*

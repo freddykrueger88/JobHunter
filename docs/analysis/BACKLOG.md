@@ -45,7 +45,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 1.9 docs/analysis/REPOSITORY_AUDIT_EN.md geschrieben (inhaltsgleich)
 
 ## Phase 2 – Qualitäts-/Architekturbewertung
-- [ ] 2.1 Codequalität bewerten (Befund/Problem/Impact/Empfehlung/Aufwand/Risiko je Punkt)
+- [x] 2.1 Codequalitaet bewertet (Befund/Prioritaet/Empfehlung/Aufwand/Risiko je Punkt)
 - [ ] 2.2 Stack-Eignung fürs Job-Tool bewerten (Ist vs. Ziel)
 - [ ] 2.3 Ergebnisse in REPOSITORY_AUDIT_{DE,EN}.md einarbeiten
 

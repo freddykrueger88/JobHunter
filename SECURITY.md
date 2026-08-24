@@ -59,7 +59,6 @@ JobHunter is a **fully local** tool. By default there are no external connection
 
 #### Implemented protections
 - **AES-256 encryption** for all stored API keys (Fernet)
-- **Optional JWT authentication** (`AUTH_ENABLED=true` in `.env`)
 - **No telemetry**, no external tracking services
 - **Alembic migrations** for safe database schema changes
 - **GDPR-compliant** – all data stays local
@@ -128,7 +127,6 @@ JobHunter ist ein **vollständig lokales** Tool. Es gibt standardmäßig keine e
 
 #### Implementierte Schutzmaßnahmen
 - **AES-256-Verschlüsselung** für alle gespeicherten API-Keys (Fernet)
-- **Optionale JWT-Authentifizierung** (`AUTH_ENABLED=true` in `.env`)
 - **Keine Telemetrie**, keine externen Tracking-Dienste
 - **Alembic-Migrationen** für sichere Datenbank-Schemaänderungen
 - **DSGVO-konform** – alle Daten verbleiben lokal

@@ -9,7 +9,6 @@ JobHunter wird über zwei Wege konfiguriert: die `.env`-Datei für systemweite E
 | `DB_PASSWORD` | ✅ | PostgreSQL-Passwort |
 | `SECRET_KEY` | ✅ | JWT-Signaturschlüssel (token_hex 32) |
 | `ENCRYPTION_KEY` | ✅ | Fernet-Key für API-Key-Verschlüsselung |
-| `AUTH_ENABLED` | – | `true` aktiviert JWT-Login (Standard: `false`) |
 | `OLLAMA_BASE_URL` | – | Ollama-Endpunkt (Standard: `http://ollama:11434`) |
 | `SMTP_HOST` | – | SMTP-Server für E-Mail-Erinnerungen |
 | `SMTP_PORT` | – | SMTP-Port (Standard: `587`) |
@@ -68,17 +67,3 @@ Alle API-Keys werden AES-256-verschlüsselt in der Datenbank gespeichert:
 | Adzuna | Stellensuche (internationale Jobs) |
 | Bundesagentur für Arbeit | Stellensuche (DE) |
 | LinkedIn | Stellensuche |
-
-### 🔒 Authentifizierung (optional)
-
-JWT-Login aktivieren:
-
-```env
-AUTH_ENABLED=true
-```
-
-Verfügbare Endpunkte:
-
-- `POST /auth/register` – Benutzer anlegen
-- `POST /auth/token` – Login / Token holen
-- `POST /auth/change-password` – Passwort ändern

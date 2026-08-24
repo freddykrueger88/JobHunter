@@ -81,7 +81,6 @@ JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung.
 - 100 % lokal – keine externe Datenübertragung
 - DSGVO-konform (Art. 20 Datenexport)
 - AES-256-verschlüsselte API-Key-Speicherung
-- Optionale JWT-Authentifizierung (`AUTH_ENABLED=true`)
 - Alembic-Datenbankmigrationen
 
 ---

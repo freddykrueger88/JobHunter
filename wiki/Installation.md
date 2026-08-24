@@ -49,7 +49,6 @@ SECRET_KEY=<generierter Wert>
 ENCRYPTION_KEY=<generierter Fernet-Key>
 
 # Optional:
-AUTH_ENABLED=false
 OLLAMA_BASE_URL=http://ollama:11434
 ```
 

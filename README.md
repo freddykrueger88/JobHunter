@@ -81,7 +81,6 @@ JobHunter is a fully local job application tracker with AI assistance. All data 
 - 100% local – no external data transfer
 - GDPR-compliant (Art. 20 data export)
 - AES-256 encrypted API key storage
-- Optional JWT authentication (`AUTH_ENABLED=true`)
 - Alembic database migrations
 
 ---

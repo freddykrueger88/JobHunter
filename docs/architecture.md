@@ -108,7 +108,6 @@ Results saved in PostgreSQL, returned to frontend
 | Aspect | Implementation |
 |---|---|
 | API Key Storage | Fernet AES-128 encrypted in PostgreSQL |
-| JWT Auth | Optional (`AUTH_ENABLED=true`), bcrypt passwords |
 | Network | All services in isolated Docker network |
 | File Uploads | Type check + size limit, stored in volume |
 | External Requests | Only from backend, never from frontend directly |
@@ -163,7 +162,6 @@ backend/
 | Aspekt | Umsetzung |
 |---|---|
 | API-Key-Speicherung | Fernet AES-128 verschlüsselt in PostgreSQL |
-| JWT-Auth | Optional (`AUTH_ENABLED=true`), bcrypt-Passwörter |
 | Netzwerk | Alle Dienste im isolierten Docker-Netzwerk |
 | Datei-Uploads | Typ-Prüfung + Größenlimit, gespeichert im Volume |
 

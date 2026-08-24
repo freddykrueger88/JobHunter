@@ -343,11 +343,15 @@ geloest). D.3 bleibt wie im Rework-Plan vorgesehen ausserhalb des Scopes.
       korrigiert (eigene Produktentscheidung).
 
 Offene Funde aus Phase E (nicht geloest, bewusst vermerkt):
-- Settings.tsx hat wie Dashboard.tsx vor E.1 unvollstaendige i18n-Abdeckung
-  (z.B. Export/Import-Statusmeldungen weiterhin hartcodiertes Deutsch) -
-  nur die fuer den ESLint-Fix noetige Stelle wurde angefasst.
+- [x] Settings.tsx i18n-Luecke geschlossen (2026-08-24, Nutzerentscheidung
+      "Settings.tsx i18n-Luecke schliessen"): komplette Seite uebersetzt
+      (~60 neue Schluessel DE+EN, Trans-Komponente fuer den API-Keys-Intro-
+      Text mit <strong>-Markup). Verifiziert: Build/Lint/i18n-Check/Tests
+      gruen, echter curl-Abruf ueber den laufenden Dev-Server bestaetigt.
 - frontend/package.json-Version nicht synchron zu README/CHANGELOG (siehe
   E.5).
+- pages/Onboarding.tsx weiterhin toter, ungerouteter Code (aus D.2) -
+  Entscheidung (loeschen/behalten) steht noch aus.
 
 Phase E Status: ABGESCHLOSSEN (E.1-E.5 erledigt). Rework-Plan-Phasen A-E
 damit vollstaendig durchlaufen. Offen bleiben: B.2 (main.py-Konsolidierung,

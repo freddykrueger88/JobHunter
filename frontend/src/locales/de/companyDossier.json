@@ -1,0 +1,14 @@
+{
+  "title": "Firmen-Dossier",
+  "subtitle": "Automatische Recherche zu deiner Zielfirma",
+  "searchPlaceholder": "Firmenname, z.B. Siemens AG ...",
+  "searchAriaLabel": "Firmenname suchen",
+  "search": "Suchen",
+  "notFound": "Kein Dossier gefunden.",
+  "logoAlt": "{{company}} Logo",
+  "founded": "Gegründet {{year}}",
+  "employees": "{{value}} Mitarbeiter",
+  "wikipedia": "Wikipedia",
+  "website": "Website",
+  "source": "ℹ️ Quelle: {{source}}"
+}

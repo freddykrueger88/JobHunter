@@ -1,0 +1,14 @@
+{
+  "title": "Company Dossier",
+  "subtitle": "Automatic research on your target company",
+  "searchPlaceholder": "Company name, e.g. Siemens AG ...",
+  "searchAriaLabel": "Search company name",
+  "search": "Search",
+  "notFound": "No dossier found.",
+  "logoAlt": "{{company}} logo",
+  "founded": "Founded {{year}}",
+  "employees": "{{value}} employees",
+  "wikipedia": "Wikipedia",
+  "website": "Website",
+  "source": "ℹ️ Source: {{source}}"
+}

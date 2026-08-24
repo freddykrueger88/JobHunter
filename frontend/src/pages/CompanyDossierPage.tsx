@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import { Building2, Globe, Users, CalendarDays, ExternalLink, Search, AlertTriangle } from 'lucide-react'
 
@@ -17,6 +18,7 @@ interface Dossier {
 }
 
 export default function CompanyDossierPage() {
+  const { t } = useTranslation('companyDossier')
   const [query, setQuery] = useState('')
   const [dossier, setDossier] = useState<Dossier | null>(null)
   const [loading, setLoading] = useState(false)
@@ -31,7 +33,7 @@ export default function CompanyDossierPage() {
       const { data } = await axios.get('/api/company/dossier', { params: { name: query } })
       setDossier(data)
     } catch {
-      setError('Kein Dossier gefunden.')
+      setError(t('notFound'))
     } finally {
       setLoading(false)
     }
@@ -42,8 +44,8 @@ export default function CompanyDossierPage() {
       <div className="flex items-center gap-3 mb-6">
         <Building2 size={28} className="text-blue-500" aria-hidden />
         <div>
-          <h1 className="text-2xl font-bold">Firmen-Dossier</h1>
-          <p className="text-sm text-gray-400">Automatische Recherche zu deiner Zielfirma</p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-sm text-gray-400">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -53,9 +55,9 @@ export default function CompanyDossierPage() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && search()}
-          placeholder="Firmenname, z.B. Siemens AG ..."
+          placeholder={t('searchPlaceholder')}
           className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          aria-label="Firmenname suchen"
+          aria-label={t('searchAriaLabel')}
         />
         <button
           onClick={search}
@@ -63,7 +65,7 @@ export default function CompanyDossierPage() {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
         >
           {loading ? <span className="animate-spin text-xs">&#9696;</span> : <Search size={16} aria-hidden />}
-          Suchen
+          {t('search')}
         </button>
       </div>
 
@@ -80,7 +82,7 @@ export default function CompanyDossierPage() {
             {dossier.logo_url && (
               <img
                 src={dossier.logo_url}
-                alt={`${dossier.company} Logo`}
+                alt={t('logoAlt', { company: dossier.company })}
                 width={56}
                 height={56}
                 loading="lazy"
@@ -110,13 +112,13 @@ export default function CompanyDossierPage() {
               {dossier.founded && (
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <CalendarDays size={14} className="text-gray-400" aria-hidden />
-                  Gegründet {dossier.founded}
+                  {t('founded', { year: dossier.founded })}
                 </div>
               )}
               {dossier.employees && (
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <Users size={14} className="text-gray-400" aria-hidden />
-                  {dossier.employees} Mitarbeiter
+                  {t('employees', { value: dossier.employees })}
                 </div>
               )}
               {dossier.headquarters && (
@@ -136,7 +138,7 @@ export default function CompanyDossierPage() {
                   className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <ExternalLink size={12} aria-hidden />
-                  Wikipedia
+                  {t('wikipedia')}
                 </a>
               )}
               {dossier.website && (
@@ -147,12 +149,12 @@ export default function CompanyDossierPage() {
                   className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                 >
                   <Globe size={12} aria-hidden />
-                  Website
+                  {t('website')}
                 </a>
               )}
             </div>
 
-            <p className="text-xs text-gray-300 dark:text-gray-500 pt-2">ℹ️ Quelle: {dossier.source}</p>
+            <p className="text-xs text-gray-300 dark:text-gray-500 pt-2">{t('source', { source: dossier.source })}</p>
           </div>
         </div>
       )}

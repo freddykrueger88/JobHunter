@@ -1,0 +1,49 @@
+{
+  "title": "Kanban Board",
+  "status": {
+    "interessant": "Interesting",
+    "beworben": "Applied",
+    "interview": "Interview",
+    "angenommen": "Accepted",
+    "absage": "Rejected"
+  },
+  "count_one": "{{count}} application",
+  "count_other": "{{count}} applications",
+  "keyboardHint": {
+    "selected": "Card selected –",
+    "move": "to move,",
+    "cancel": "to cancel"
+  },
+  "column": {
+    "ariaLabel": "Column: {{label}}",
+    "addAriaLabel": "Add application to column {{label}}",
+    "add": "Add",
+    "empty": "Empty – drag here",
+    "searchPlaceholder": "Search job for \"{{label}}\"…",
+    "adding": "Adding…"
+  },
+  "card": {
+    "fallbackTitle": "Job",
+    "fallbackTitleWithId": "Job #{{id}}",
+    "ariaLabel": "{{title}} at {{company}} – status: {{status}}. Press Enter to select, then use arrow keys to move.",
+    "openDetails": "Open details for {{title}}",
+    "notesPlaceholder": "+ Add note…",
+    "notesAriaLabel": "Edit note",
+    "notesEditHint": "Double-click to edit"
+  },
+  "detail": {
+    "close": "Close",
+    "jobPosting": "🔗 Job Posting",
+    "toJob": "📋 View Job",
+    "coach": "Coach",
+    "coachAriaLabel": "Open application coach for this job",
+    "changeStatus": "Change Status",
+    "interviewDate": "Interview Date",
+    "interviewDateAriaLabel": "Interview date and time",
+    "setDate": "+ Set date",
+    "appliedOn": "Applied on:",
+    "timeline": "Status History",
+    "confirmDelete": "Really remove this application?",
+    "remove": "Remove"
+  }
+}

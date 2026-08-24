@@ -2,41 +2,29 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 // Namespace-Struktur statt Inline-Objekt, siehe docs/i18n/KONZEPT.md
-// (Rework-Plan Phase C.2) und ADR-0003. Jede Datei hier ist ein
-// eigenständiger i18next-Namespace, geladen unter demselben Schlüssel
-// wie ihr Dateiname.
-import deCommon from './locales/de/common.json'
-import deNav from './locales/de/nav.json'
-import deDashboard from './locales/de/dashboard.json'
-import deJobs from './locales/de/jobs.json'
-import deSettings from './locales/de/settings.json'
+// (Rework-Plan Phase C.2) und ADR-0003. Jede Datei unter locales/{de,en}/
+// ist ein eigenständiger i18next-Namespace, geladen unter demselben
+// Schlüssel wie ihr Dateiname - automatisch per import.meta.glob, damit
+// neue Namespace-Dateien hier NICHT manuell nachgetragen werden müssen
+// (Fehlerquelle bei der schrittweisen Migration in Phase C).
+const deModules = import.meta.glob('./locales/de/*.json', { eager: true }) as Record<string, { default: Record<string, unknown> }>
+const enModules = import.meta.glob('./locales/en/*.json', { eager: true }) as Record<string, { default: Record<string, unknown> }>
 
-import enCommon from './locales/en/common.json'
-import enNav from './locales/en/nav.json'
-import enDashboard from './locales/en/dashboard.json'
-import enJobs from './locales/en/jobs.json'
-import enSettings from './locales/en/settings.json'
-
-const resources = {
-  de: {
-    common: deCommon,
-    nav: deNav,
-    dashboard: deDashboard,
-    jobs: deJobs,
-    settings: deSettings,
-  },
-  en: {
-    common: enCommon,
-    nav: enNav,
-    dashboard: enDashboard,
-    jobs: enJobs,
-    settings: enSettings,
-  },
+function toNamespaceResources(modules: Record<string, { default: Record<string, unknown> }>) {
+  const out: Record<string, Record<string, unknown>> = {}
+  for (const path in modules) {
+    const ns = path.split('/').pop()!.replace('.json', '')
+    out[ns] = modules[path].default
+  }
+  return out
 }
 
+const deResources = toNamespaceResources(deModules)
+const enResources = toNamespaceResources(enModules)
+
 i18n.use(initReactI18next).init({
-  resources,
-  ns: Object.keys(resources.de),
+  resources: { de: deResources, en: enResources },
+  ns: Object.keys(deResources),
   defaultNS: 'common',
   lng: localStorage.getItem('lang') || 'de',
   fallbackLng: 'de',

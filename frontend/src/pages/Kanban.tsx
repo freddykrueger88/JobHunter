@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { GripVertical, X, Clock, Plus, Calendar, ChevronRight, Bot } from 'lucide-react'
@@ -55,6 +56,7 @@ function formatDateTime(iso: string): string {
 }
 
 export default function Kanban() {
+  const { t } = useTranslation(['kanban', 'common'])
   const qc = useQueryClient()
   const navigate = useNavigate()
 
@@ -237,20 +239,20 @@ export default function Kanban() {
     <div className="h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Kanban-Board</h1>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          {applications.length} Bewerbung{applications.length !== 1 ? 'en' : ''}
+          {t('count', { count: applications.length })}
         </p>
       </div>
 
       {/* Keyboard hint */}
       {kbSelected && (
         <div className="mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg text-xs text-blue-700 dark:text-blue-300">
-          Karte ausgewählt –{' '}
+          {t('keyboardHint.selected')}{' '}
           <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">←</kbd>{' '}
           <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">→</kbd>{' '}
-          zum Verschieben,{' '}
-          <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">Esc</kbd> zum Abbrechen
+          {t('keyboardHint.move')}{' '}
+          <kbd className="font-mono bg-white dark:bg-gray-800 px-1 rounded border">Esc</kbd> {t('keyboardHint.cancel')}
         </div>
       )}
 
@@ -272,12 +274,12 @@ export default function Kanban() {
               onDragLeave={() => { setDragOverCol(null); setDragOverCardId(null) }}
               onDrop={e => { e.preventDefault(); handleDrop(col.key, dragOverCardId) }}
               role="region"
-              aria-label={`Spalte: ${col.label}`}
+              aria-label={t('column.ariaLabel', { label: t(`status.${col.key}`) })}
             >
               {/* Column header */}
               <div className={clsx('border-t-4 rounded-t-xl px-3 py-2 flex items-center justify-between', col.borderClass, col.bgClass)}>
                 <span className={clsx('font-semibold text-sm', col.colorClass)}>
-                  {STATUS_ICONS[col.key]} {col.label}
+                  {STATUS_ICONS[col.key]} {t(`status.${col.key}`)}
                 </span>
                 <span className="text-xs bg-white/60 dark:bg-gray-800/60 rounded-full px-2 py-0.5 font-mono">
                   {cards.length}
@@ -312,7 +314,7 @@ export default function Kanban() {
                         onDrop={e => { e.preventDefault(); e.stopPropagation(); handleDrop(col.key, app.id) }}
                         tabIndex={0}
                         onKeyDown={e => handleCardKeyDown(e, app)}
-                        aria-label={`${job?.title ?? 'Stelle'} bei ${job?.company ?? '?'} – Status: ${col.label}. Enter zum Auswählen und mit Pfeiltasten verschieben.`}
+                        aria-label={t('card.ariaLabel', { title: job?.title ?? t('card.fallbackTitle'), company: job?.company ?? '?', status: t(`status.${col.key}`) })}
                         className={clsx(
                           'bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border transition-all cursor-grab active:cursor-grabbing select-none',
                           isKbSelected ? 'border-blue-500 ring-2 ring-blue-400' : 'border-transparent hover:border-gray-200 dark:hover:border-gray-600',
@@ -331,11 +333,11 @@ export default function Kanban() {
                           }}
                           role="button"
                           tabIndex={-1}
-                          aria-label={`${job?.title ?? 'Stelle'} Details öffnen`}
+                          aria-label={t('card.openDetails', { title: job?.title ?? t('card.fallbackTitle') })}
                         >
                           <GripVertical size={14} className="text-gray-300 mt-0.5 shrink-0" aria-hidden />
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">{job?.title ?? `Stelle #${app.job_id}`}</p>
+                            <p className="text-sm font-medium truncate">{job?.title ?? t('card.fallbackTitleWithId', { id: app.job_id })}</p>
                             <p className="text-xs text-gray-500 truncate">{job?.company}</p>
                             {job?.city && <p className="text-xs text-gray-400">{job.city}</p>}
                           </div>
@@ -364,15 +366,15 @@ export default function Kanban() {
                             onClick={e => e.stopPropagation()}
                             className="mt-2 w-full text-xs rounded px-2 py-1 bg-gray-100 dark:bg-gray-700 border border-blue-400 focus:outline-none resize-none"
                             rows={2}
-                            aria-label="Notiz bearbeiten"
+                            aria-label={t('card.notesAriaLabel')}
                           />
                         ) : (
                           <p
                             className="mt-1.5 text-xs text-gray-400 italic cursor-text hover:text-gray-600 dark:hover:text-gray-300 transition-colors line-clamp-2"
                             onDoubleClick={e => { e.stopPropagation(); startEditNotes(app) }}
-                            title="Doppelklick zum Bearbeiten"
+                            title={t('card.notesEditHint')}
                           >
-                            {app.notes || '+ Notiz hinzufügen…'}
+                            {app.notes || t('card.notesPlaceholder')}
                           </p>
                         )}
                       </div>
@@ -382,7 +384,7 @@ export default function Kanban() {
 
                 {/* Empty state */}
                 {cards.length === 0 && !isQuickAdd && (
-                  <p className="text-xs text-gray-400 text-center py-4 select-none">Leer – hierher ziehen</p>
+                  <p className="text-xs text-gray-400 text-center py-4 select-none">{t('column.empty')}</p>
                 )}
 
                 {/* Quick-Add – Dropdown */}
@@ -394,19 +396,19 @@ export default function Kanban() {
                       loading={jobsLoading}
                       onSelect={job => handleJobSelect(job, col.key)}
                       onCancel={() => setQuickAddCol(null)}
-                      placeholder={`Stelle für "${col.label}" suchen…`}
+                      placeholder={t('column.searchPlaceholder', { label: t(`status.${col.key}`) })}
                     />
                     {createMutation.isPending && (
-                      <p className="text-xs text-gray-400 text-center pt-1">Wird hinzugefügt…</p>
+                      <p className="text-xs text-gray-400 text-center pt-1">{t('column.adding')}</p>
                     )}
                   </div>
                 ) : (
                   <button
                     onClick={() => setQuickAddCol(col.key)}
                     className="w-full flex items-center justify-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg py-2 transition-colors"
-                    aria-label={`Bewerbung in Spalte ${col.label} hinzufügen`}
+                    aria-label={t('column.addAriaLabel', { label: t(`status.${col.key}`) })}
                   >
-                    <Plus size={12} aria-hidden /> Hinzufügen
+                    <Plus size={12} aria-hidden /> {t('column.add')}
                   </button>
                 )}
               </div>
@@ -435,7 +437,7 @@ export default function Kanban() {
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 pr-2">
                     <h2 id="detail-modal-title" className="text-lg font-bold truncate">
-                      {job?.title ?? `Stelle #${detailApp.job_id}`}
+                      {job?.title ?? t('card.fallbackTitleWithId', { id: detailApp.job_id })}
                     </h2>
                     <p className="text-sm text-gray-500">
                       {job?.company}{job?.city && ` • ${job.city}`}
@@ -443,7 +445,7 @@ export default function Kanban() {
                   </div>
                   <button
                     onClick={() => setDetailApp(null)}
-                    aria-label="Schließen"
+                    aria-label={t('detail.close')}
                     className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
                   >
                     <X size={20} aria-hidden />
@@ -459,14 +461,14 @@ export default function Kanban() {
                       rel="noopener noreferrer"
                       className="flex-1 text-center text-xs px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                     >
-                      🔗 Stellenanzeige
+                      {t('detail.jobPosting')}
                     </a>
                   )}
                   <button
                     onClick={() => navigate(`/jobs?highlight=${detailApp.job_id}`)}
                     className="flex-1 text-xs px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                   >
-                    📋 Zur Stelle
+                    {t('detail.toJob')}
                   </button>
                   {/* #63 – 1-Klick-Bewerbungspaket */}
                   <AutoApplyButton
@@ -480,15 +482,15 @@ export default function Kanban() {
                   <button
                     onClick={() => setCoachOpen(true)}
                     className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
-                    aria-label="Bewerbungscoach für diese Stelle öffnen"
+                    aria-label={t('detail.coachAriaLabel')}
                   >
-                    <Bot size={13} aria-hidden /> Coach
+                    <Bot size={13} aria-hidden /> {t('detail.coach')}
                   </button>
                 </div>
 
                 {/* Status buttons */}
                 <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">Status ändern</label>
+                  <label className="text-xs text-gray-500 mb-1.5 block">{t('detail.changeStatus')}</label>
                   <div className="flex flex-wrap gap-1">
                     {COLUMNS.map(col => (
                       <button
@@ -505,7 +507,7 @@ export default function Kanban() {
                         )}
                         aria-pressed={detailApp.status === col.key}
                       >
-                        {STATUS_ICONS[col.key]} {col.label}
+                        {STATUS_ICONS[col.key]} {t(`status.${col.key}`)}
                       </button>
                     ))}
                   </div>
@@ -514,7 +516,7 @@ export default function Kanban() {
                 {/* Interview date */}
                 <div>
                   <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                    <Calendar size={12} aria-hidden /> Gesprächstermin
+                    <Calendar size={12} aria-hidden /> {t('detail.interviewDate')}
                   </label>
                   {editingInterview ? (
                     <div className="flex gap-2">
@@ -523,19 +525,19 @@ export default function Kanban() {
                         value={interviewValue}
                         onChange={e => setInterviewValue(e.target.value)}
                         className="flex-1 text-xs px-2 py-1 rounded border border-blue-400 bg-gray-50 dark:bg-gray-700 focus:outline-none"
-                        aria-label="Gesprächstermin Datum und Uhrzeit"
+                        aria-label={t('detail.interviewDateAriaLabel')}
                       />
                       <button
                         onClick={() => interviewMutation.mutate({ id: detailApp.id, interview_at: interviewValue || null })}
                         className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                       >
-                        Speichern
+                        {t('common:save')}
                       </button>
                       <button
                         onClick={() => setEditingInterview(false)}
                         className="text-xs px-2 py-1 text-gray-500 hover:text-gray-700 transition-colors"
                       >
-                        Abbrechen
+                        {t('common:cancel')}
                       </button>
                     </div>
                   ) : (
@@ -543,7 +545,7 @@ export default function Kanban() {
                       onClick={() => setEditingInterview(true)}
                       className="text-xs text-left text-gray-600 dark:text-gray-300 hover:underline"
                     >
-                      {detailApp.interview_at ? formatDate(detailApp.interview_at) : '+ Termin setzen'}
+                      {detailApp.interview_at ? formatDate(detailApp.interview_at) : t('detail.setDate')}
                     </button>
                   )}
                 </div>
@@ -551,7 +553,7 @@ export default function Kanban() {
                 {/* Applied date */}
                 {detailApp.applied_at && (
                   <p className="text-xs text-gray-500">
-                    Beworben am: <span className="text-gray-700 dark:text-gray-300">{formatDate(detailApp.applied_at)}</span>
+                    {t('detail.appliedOn')} <span className="text-gray-700 dark:text-gray-300">{formatDate(detailApp.applied_at)}</span>
                   </p>
                 )}
 
@@ -559,7 +561,7 @@ export default function Kanban() {
                 {timeline.length > 0 && (
                   <div>
                     <label className="text-xs text-gray-500 mb-2 flex items-center gap-1">
-                      <Clock size={12} aria-hidden /> Statusverlauf
+                      <Clock size={12} aria-hidden /> {t('detail.timeline')}
                     </label>
                     <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-2 space-y-3">
                       {timeline.map((entry, i) => (
@@ -576,12 +578,12 @@ export default function Kanban() {
                 {/* Delete */}
                 <button
                   onClick={() => {
-                    if (window.confirm('Bewerbung wirklich entfernen?')) deleteMutation.mutate(detailApp.id)
+                    if (window.confirm(t('detail.confirmDelete'))) deleteMutation.mutate(detailApp.id)
                   }}
                   disabled={deleteMutation.isPending}
                   className="flex items-center gap-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  <X size={14} aria-hidden /> Entfernen
+                  <X size={14} aria-hidden /> {t('detail.remove')}
                 </button>
               </div>
             </div>

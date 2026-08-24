@@ -1,0 +1,49 @@
+{
+  "title": "Kanban-Board",
+  "status": {
+    "interessant": "Interessant",
+    "beworben": "Beworben",
+    "interview": "Interview",
+    "angenommen": "Angenommen",
+    "absage": "Absage"
+  },
+  "count_one": "{{count}} Bewerbung",
+  "count_other": "{{count}} Bewerbungen",
+  "keyboardHint": {
+    "selected": "Karte ausgewählt –",
+    "move": "zum Verschieben,",
+    "cancel": "zum Abbrechen"
+  },
+  "column": {
+    "ariaLabel": "Spalte: {{label}}",
+    "addAriaLabel": "Bewerbung in Spalte {{label}} hinzufügen",
+    "add": "Hinzufügen",
+    "empty": "Leer – hierher ziehen",
+    "searchPlaceholder": "Stelle für \"{{label}}\" suchen…",
+    "adding": "Wird hinzugefügt…"
+  },
+  "card": {
+    "fallbackTitle": "Stelle",
+    "fallbackTitleWithId": "Stelle #{{id}}",
+    "ariaLabel": "{{title}} bei {{company}} – Status: {{status}}. Enter zum Auswählen und mit Pfeiltasten verschieben.",
+    "openDetails": "{{title}} Details öffnen",
+    "notesPlaceholder": "+ Notiz hinzufügen…",
+    "notesAriaLabel": "Notiz bearbeiten",
+    "notesEditHint": "Doppelklick zum Bearbeiten"
+  },
+  "detail": {
+    "close": "Schließen",
+    "jobPosting": "🔗 Stellenanzeige",
+    "toJob": "📋 Zur Stelle",
+    "coach": "Coach",
+    "coachAriaLabel": "Bewerbungscoach für diese Stelle öffnen",
+    "changeStatus": "Status ändern",
+    "interviewDate": "Gesprächstermin",
+    "interviewDateAriaLabel": "Gesprächstermin Datum und Uhrzeit",
+    "setDate": "+ Termin setzen",
+    "appliedOn": "Beworben am:",
+    "timeline": "Statusverlauf",
+    "confirmDelete": "Bewerbung wirklich entfernen?",
+    "remove": "Entfernen"
+  }
+}

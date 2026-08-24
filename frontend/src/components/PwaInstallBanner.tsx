@@ -4,6 +4,7 @@
  * Wird nach Ablehnung 7 Tage nicht mehr gezeigt.
  */
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Download, X } from 'lucide-react'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -12,6 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function PwaInstallBanner() {
+  const { t } = useTranslation('pwaInstallBanner')
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [visible, setVisible] = useState(false)
 
@@ -49,14 +51,14 @@ export default function PwaInstallBanner() {
       role="banner">
       <Download size={22} className="shrink-0" aria-hidden />
       <div className="flex-1">
-        <p className="font-semibold text-sm">JobHunter installieren</p>
-        <p className="text-xs text-blue-100">Offline verfügbar, direkt vom Homescreen</p>
+        <p className="font-semibold text-sm">{t('title')}</p>
+        <p className="text-xs text-blue-100">{t('subtitle')}</p>
       </div>
       <button onClick={install}
         className="bg-white text-blue-600 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
-        Installieren
+        {t('install')}
       </button>
-      <button onClick={dismiss} aria-label="Schließen"
+      <button onClick={dismiss} aria-label={t('close')}
         className="text-blue-200 hover:text-white transition-colors">
         <X size={16} aria-hidden />
       </button>

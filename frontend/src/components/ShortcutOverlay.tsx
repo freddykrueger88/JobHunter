@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import { SHORTCUTS } from '../hooks/useKeyboardShortcuts'
 import { X, Keyboard } from 'lucide-react'
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function ShortcutOverlay({ isOpen, onClose }: Props) {
+  const { t } = useTranslation('shortcutOverlay')
   const containerRef = useFocusTrap(isOpen)
 
   useEffect(() => {
@@ -19,20 +21,20 @@ export default function ShortcutOverlay({ isOpen, onClose }: Props) {
 
   if (!isOpen) return null
 
-  const categories = [...new Set(SHORTCUTS.map(s => s.category))]
+  const categories = [...new Set(SHORTCUTS.map(s => s.categoryKey))]
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-      role="dialog" aria-modal="true" aria-label="Tastaturkürzel"
+      role="dialog" aria-modal="true" aria-label={t('dialogAriaLabel')}
       onClick={onClose}>
       <div ref={containerRef}
         className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-lg shadow-2xl"
         onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold flex items-center gap-2">
-            <Keyboard size={20} aria-hidden /> Tastaturkürzel
+            <Keyboard size={20} aria-hidden /> {t('title')}
           </h2>
-          <button onClick={onClose} aria-label="Schließen"
+          <button onClick={onClose} aria-label={t('close')}
             className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} aria-hidden />
           </button>
@@ -41,11 +43,11 @@ export default function ShortcutOverlay({ isOpen, onClose }: Props) {
         <div className="space-y-5">
           {categories.map(cat => (
             <div key={cat}>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{cat}</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t(cat)}</h3>
               <ul className="space-y-1.5">
-                {SHORTCUTS.filter(s => s.category === cat).map(s => (
+                {SHORTCUTS.filter(s => s.categoryKey === cat).map(s => (
                   <li key={s.key} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{s.description}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{t(s.descriptionKey)}</span>
                     <kbd className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200
                       border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5
                       text-xs font-mono ml-4 shrink-0">
@@ -59,7 +61,7 @@ export default function ShortcutOverlay({ isOpen, onClose }: Props) {
         </div>
 
         <p className="text-xs text-gray-400 mt-5 text-center">
-          Shortcuts sind deaktiviert wenn du in einem Eingabefeld tippst.
+          {t('hint')}
         </p>
       </div>
     </div>

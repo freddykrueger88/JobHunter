@@ -1,0 +1,21 @@
+{
+  "dialogAriaLabel": "Tastaturkürzel",
+  "title": "Tastaturkürzel",
+  "close": "Schließen",
+  "hint": "Shortcuts sind deaktiviert wenn du in einem Eingabefeld tippst.",
+  "categories": {
+    "general": "Allgemein",
+    "navigation": "Navigation"
+  },
+  "shortcuts": {
+    "help": "Shortcut-Übersicht",
+    "toggleFocus": "Fokus-Modus umschalten",
+    "closeModal": "Modal / Overlay schließen",
+    "goDashboard": "Zum Dashboard",
+    "goJobs": "Zu Stellen",
+    "goKanban": "Zum Kanban",
+    "goReminders": "Zu Erinnerungen",
+    "goSettings": "Zu Einstellungen",
+    "goSearchProfiles": "Zu Suchprofilen"
+  }
+}

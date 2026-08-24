@@ -15,20 +15,22 @@ function isTyping(): boolean {
 export interface ShortcutDef {
   key: string
   label: string
-  description: string
-  category: string
+  // i18n-Schluessel statt Klartext (Namespace "shortcutOverlay"), siehe
+  // components/ShortcutOverlay.tsx, das diese per t() aufloest.
+  descriptionKey: string
+  categoryKey: string
 }
 
 export const SHORTCUTS: ShortcutDef[] = [
-  { key: '?',   label: '?',       description: 'Shortcut-Übersicht', category: 'Allgemein' },
-  { key: 'f',   label: 'F',       description: 'Fokus-Modus umschalten', category: 'Allgemein' },
-  { key: 'Escape', label: 'Esc', description: 'Modal / Overlay schließen', category: 'Allgemein' },
-  { key: 'g d', label: 'G → D',   description: 'Zum Dashboard', category: 'Navigation' },
-  { key: 'g j', label: 'G → J',   description: 'Zu Stellen', category: 'Navigation' },
-  { key: 'g k', label: 'G → K',   description: 'Zum Kanban', category: 'Navigation' },
-  { key: 'g r', label: 'G → R',   description: 'Zu Erinnerungen', category: 'Navigation' },
-  { key: 'g s', label: 'G → S',   description: 'Zu Einstellungen', category: 'Navigation' },
-  { key: 'g p', label: 'G → P',   description: 'Zu Suchprofilen', category: 'Navigation' },
+  { key: '?',   label: '?',       descriptionKey: 'shortcuts.help', categoryKey: 'categories.general' },
+  { key: 'f',   label: 'F',       descriptionKey: 'shortcuts.toggleFocus', categoryKey: 'categories.general' },
+  { key: 'Escape', label: 'Esc', descriptionKey: 'shortcuts.closeModal', categoryKey: 'categories.general' },
+  { key: 'g d', label: 'G → D',   descriptionKey: 'shortcuts.goDashboard', categoryKey: 'categories.navigation' },
+  { key: 'g j', label: 'G → J',   descriptionKey: 'shortcuts.goJobs', categoryKey: 'categories.navigation' },
+  { key: 'g k', label: 'G → K',   descriptionKey: 'shortcuts.goKanban', categoryKey: 'categories.navigation' },
+  { key: 'g r', label: 'G → R',   descriptionKey: 'shortcuts.goReminders', categoryKey: 'categories.navigation' },
+  { key: 'g s', label: 'G → S',   descriptionKey: 'shortcuts.goSettings', categoryKey: 'categories.navigation' },
+  { key: 'g p', label: 'G → P',   descriptionKey: 'shortcuts.goSearchProfiles', categoryKey: 'categories.navigation' },
 ]
 
 export function useKeyboardShortcuts(

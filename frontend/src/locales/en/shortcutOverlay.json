@@ -1,0 +1,21 @@
+{
+  "dialogAriaLabel": "Keyboard Shortcuts",
+  "title": "Keyboard Shortcuts",
+  "close": "Close",
+  "hint": "Shortcuts are disabled while you're typing in an input field.",
+  "categories": {
+    "general": "General",
+    "navigation": "Navigation"
+  },
+  "shortcuts": {
+    "help": "Shortcut overview",
+    "toggleFocus": "Toggle focus mode",
+    "closeModal": "Close modal / overlay",
+    "goDashboard": "Go to Dashboard",
+    "goJobs": "Go to Jobs",
+    "goKanban": "Go to Kanban",
+    "goReminders": "Go to Reminders",
+    "goSettings": "Go to Settings",
+    "goSearchProfiles": "Go to Search Profiles"
+  }
+}

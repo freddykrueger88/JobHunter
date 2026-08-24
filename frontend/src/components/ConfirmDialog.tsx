@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import { AlertTriangle } from 'lucide-react'
 import type { ConfirmState } from '../hooks/useConfirm'
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function ConfirmDialog({ state, onConfirm, onCancel }: Props) {
+  const { t } = useTranslation(['confirmDialog', 'common'])
   const containerRef = useFocusTrap(state.isOpen)
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function ConfirmDialog({ state, onConfirm, onCancel }: Props) {
               bg-gray-100 dark:bg-gray-700 hover:bg-gray-200
               dark:hover:bg-gray-600 transition-colors"
           >
-            Abbrechen
+            {t('common:cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -71,12 +73,12 @@ export default function ConfirmDialog({ state, onConfirm, onCancel }: Props) {
             )}
             autoFocus
           >
-            Bestätigen
+            {t('confirm')}
           </button>
         </div>
 
         <p className="text-xs text-gray-400 text-center mt-3">
-          <kbd className="font-mono">Enter</kbd> = Bestätigen • <kbd className="font-mono">Esc</kbd> = Abbrechen
+          <kbd className="font-mono">Enter</kbd> = {t('confirm')} • <kbd className="font-mono">Esc</kbd> = {t('common:cancel')}
         </p>
       </div>
     </div>

@@ -1,0 +1,27 @@
+{
+  "heading": "Email Parsing",
+  "subtitle": "Connect your mailbox via IMAP (local, no cloud service). JobHunter automatically detects rejections, invitations, and follow-up questions.",
+  "statusLabels": {
+    "absage": "Rejection",
+    "einladung": "Invitation",
+    "nachfrage": "Follow-up"
+  },
+  "imapConfig": "IMAP Configuration",
+  "fields": {
+    "host": "IMAP Server",
+    "port": "Port",
+    "username": "Email Address",
+    "password": "Password / App Password",
+    "folder": "Folder",
+    "limit": "Last X Emails"
+  },
+  "gmailHint": "For Gmail: use an app password (not your Google password).",
+  "useSsl": "Use SSL (recommended)",
+  "testConnection": "Test Connection",
+  "scanning": "Scanning mailbox…",
+  "scan": "Scan Mailbox",
+  "noResults": "No relevant emails found.",
+  "resultsFound_one": "{{count}} relevant email found",
+  "resultsFound_other": "{{count}} relevant emails found",
+  "confidence": "Confidence: {{percent}}%"
+}

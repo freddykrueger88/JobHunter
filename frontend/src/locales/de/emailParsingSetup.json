@@ -1,0 +1,27 @@
+{
+  "heading": "E-Mail-Parsing",
+  "subtitle": "Verbinde dein Postfach per IMAP (lokal, kein Cloud-Dienst). JobHunter erkennt automatisch Absagen, Einladungen und Rückfragen.",
+  "statusLabels": {
+    "absage": "Absage",
+    "einladung": "Einladung",
+    "nachfrage": "Nachfrage"
+  },
+  "imapConfig": "IMAP-Konfiguration",
+  "fields": {
+    "host": "IMAP-Server",
+    "port": "Port",
+    "username": "E-Mail-Adresse",
+    "password": "Passwort / App-Passwort",
+    "folder": "Ordner",
+    "limit": "Letzte X E-Mails"
+  },
+  "gmailHint": "Bei Gmail: App-Passwort verwenden (nicht dein Google-Passwort).",
+  "useSsl": "SSL verwenden (empfohlen)",
+  "testConnection": "Verbindung testen",
+  "scanning": "Scanne Postfach…",
+  "scan": "Postfach scannen",
+  "noResults": "Keine relevanten E-Mails gefunden.",
+  "resultsFound_one": "{{count}} relevante E-Mail gefunden",
+  "resultsFound_other": "{{count}} relevante E-Mails gefunden",
+  "confidence": "Konfidenz: {{percent}} %"
+}

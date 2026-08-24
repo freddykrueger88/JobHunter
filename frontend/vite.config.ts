@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -47,5 +47,11 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  // Rework-Plan Phase E.2: Testpyramide - Vitest passt nativ zu Vite,
+  // teilt sich dieselbe Config statt einer separaten vitest.config.ts.
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
   },
 })

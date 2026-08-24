@@ -162,6 +162,97 @@ oder eine unbeabsichtigte Doppelung – als offene Frage für Phase 2 markiert.
   schlicht noch nicht umgesetzt ist – als Annahme markiert (aktuell als
   „bereits auftragskonform" gewertet, siehe oben).
 
+### 1.3 Backend-Bestandsaufnahme
+
+**Struktur** (`backend/`, Python 3.11 + FastAPI, alle Pfade unter `backend.*` importiert):
+
+| Verzeichnis | Dateien | Rolle |
+|---|---|---|
+| `api/` | 18 Module | Haupt-Endpunkt-Schicht (jobs, applications, settings, cv, ai, dashboard, history, reminders, export, interview, company, eures, calendar, company_dossier, email_parsing, auth, cover_letter_pdf) |
+| `routers/` | 3 Module | Neuere Endpunkte (`blocklist.py`, `followups.py`, `jobs_image.py`) – **zweiter, paralleler Ordner für dasselbe Konzept (Endpunkte)** neben `api/` |
+| `models/` | 12 Module + `__init__.py` | SQLAlchemy-ORM-Modelle (application, job, user, cv, reminder, settings, history, search_profile, cover_letter, cover_letter_template, blocklist, followup, backup_log, user_badge, application_status_log) |
+| `services/` | 30 Module + `job_search/`-Unterpaket | Business-Logik/Integrationen (KI-Prompts, ATS-Scorer, Auto-Apply, Backup, Kalender-Export, CV-Parser/-Optimizer, E-Mail-Parser/-Templates, Ghost-Job-Detector, Gehaltsrechner, Scheduler, Skill-Gap u. v. m.) |
+| `schemas/` | 3 Module | Pydantic-Schemas (nur `application`, `job`, `settings` – s. Befund unten) |
+| `core/` | 4 Module | `config.py` (Settings), `database.py`, `security.py` (JWT, optional), `crypto.py` (Fernet-Verschlüsselung) |
+| `alembic/` | – | Migrationen (siehe Abschnitt 1.4) |
+| `tests/` | 3 Dateien | s. Abschnitt 1.5 |
+
+**Befund – Endpunkt-Schicht gespalten (`api/` vs. `routers/`):**
+Es gibt keinen erkennbaren fachlichen Grund für die Trennung – `routers/`
+enthält lediglich die zuletzt hinzugefügten Endpunkte
+(`blocklist`, `followups`, `jobs_image`), während alle älteren Endpunkte in
+`api/` liegen. `main.py` importiert aus beiden Ordnern parallel. Für die
+Zielstruktur (Phase 3) empfiehlt sich eine Vereinheitlichung auf einen
+Ordnernamen.
+
+**Befund – `models.py` ist toter Code:**
+Neben dem Package `models/` existiert weiterhin die alte Einzeldatei
+`backend/models.py` (6,9 KB). Kein aktives Modul importiert daraus mehr
+(`grep` über alle `.py`-Dateien liefert keine echten Importe von
+`backend.models` als Einzeldatei). **Bestätigt durch den Code selbst**: Ein
+Kommentar in der neuen, aktuell in Arbeit befindlichen Migration
+(`backend/alembic/versions/0004_add_blocklist_badges_backup_templates.py`)
+hält ausdrücklich fest, dass `backend/models.py` „vom
+`backend/models/`-Package überschattet" wurde. `models.py` sollte in Phase 3
+als Altlast entfernt werden (Aufwand S, Risiko niedrig – es wird
+nachweislich nicht mehr importiert).
+
+**Befund – zwei nicht registrierte API-Module:**
+`main.py` bindet 16 Router ein; `api/auth.py` und `api/cover_letter_pdf.py`
+existieren, werden aber **nicht** in `main.py` eingebunden.
+- `cover_letter_pdf.py` passt zum in `README.md` als „planned – #89"
+  markierten Feature „Cover Letter Template" – nachvollziehbar unfertig,
+  kein Bug.
+- `auth.py` implementiert `/auth/token` und `/auth/register` passend zum
+  optionalen JWT-Mechanismus in `core/security.py`. Da der Router nicht
+  eingebunden ist, gibt es aktuell **keinen erreichbaren Weg, ein Token zu
+  erhalten**, selbst wenn `AUTH_ENABLED=true` gesetzt würde – der
+  Auth-Mechanismus ist im Ist-Zustand nicht nutzbar. Offen, ob das
+  Absicht ist (App laut README bewusst ohne Accounts/lokal-only) oder ein
+  Fragment einer geplanten Mehrbenutzer-Funktion.
+
+**Auth/Secrets-Handling:**
+- Authentifizierung ist **optional** über `AUTH_ENABLED`-Env-Variable
+  (Default `false`) – passend zum Produktversprechen „kein Account nötig,
+  lokal, self-hosted" aus dem README. Für Mehrbenutzerfähigkeit (im Auftrag
+  als Anforderung genannt) wäre der JWT-Mechanismus die Grundlage, ist aber
+  aktuell nicht verdrahtet (s. o.).
+- `core/config.py` definiert **Python-seitige Default-Fallbacks** für
+  `SECRET_KEY = "changeme"` und `DATABASE_URL` mit Passwort `changeme` –
+  falls `.env` fehlt oder unvollständig ist, startet die App also mit
+  schwachen Default-Secrets statt hart zu scheitern. `.env.example`
+  selbst leitet dagegen korrekt zur Generierung sicherer Werte an
+  (`secrets.token_hex(32)`, `Fernet.generate_key()`). **Sicherheitsrisiko,
+  wird in Abschnitt 1.6 (Security/OWASP) vertieft.**
+- `.env` ist korrekt in `.gitignore` gelistet und **nicht** im Git-Repo
+  getrackt (`git ls-files .env` liefert keinen Treffer) – kein
+  Secret-Leak im Repo festgestellt.
+- API-Keys Dritter (z. B. für Adzuna/StepStone/Arbeitsagentur, laut
+  `docs/api-keys.md`) werden laut `core/crypto.py` als Fernet-verschlüsselte
+  Werte in der DB abgelegt (`encrypt`/`decrypt`-Helper) – solides Muster
+  für „at rest"-Schutz sensibler Bewerbungs-/Zugangsdaten.
+- SMTP-Zugangsdaten (`services/mail.py`) werden pro Aufruf als Parameter
+  übergeben (`smtp_user`, `smtp_password`), nicht global gehalten – Herkunft
+  dieser Werte (vermutlich verschlüsselt aus den Settings) wird in Abschnitt
+  1.6 nachvollzogen.
+
+**Schemas-Schicht dünn:**
+Nur 3 Pydantic-Schema-Module (`application`, `job`, `settings`) stehen 18
+`api/`- und 3 `routers/`-Modulen sowie 12 Model-Modulen gegenüber. Viele
+Endpunkte validieren Requests vermutlich direkt über die SQLAlchemy-Modelle
+oder Inline-Pydantic-Klassen statt über eine einheitliche Schema-Schicht –
+wird in Phase 2 (Konsistenz der Datenverträge) vertieft, nicht hier im Detail
+geprüft.
+
+### Offene Fragen aus diesem Abschnitt
+
+- Ist `api/auth.py` ein bewusst ruhendes Feature für künftige
+  Mehrbenutzerfähigkeit, oder soll Auth dauerhaft ungenutzt bleiben? Diese
+  Produktentscheidung kann nicht aus dem Code allein beantwortet werden –
+  echte offene Frage für Phase 3.
+- Herkunft/Verschlüsselungsstatus der SMTP-Zugangsdaten in der DB noch nicht
+  verifiziert (folgt in 1.6).
+
 ---
 
-*Fortsetzung folgt (1.3 Backend-Bestandsaufnahme, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (1.4 Datenbank/Migrationen, …) gemäß `docs/analysis/BACKLOG.md`.*

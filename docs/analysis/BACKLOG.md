@@ -36,7 +36,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 ## Phase 1 – Repository-Inventur (Audit)
 - [x] 1.1 Projektstruktur & Modulgrenzen dokumentieren
 - [x] 1.2 Frontend-Bestandsaufnahme (Komponenten, Routing, State, i18n-Abdeckung gezaehlt)
-- [ ] 1.3 Backend-Bestandsaufnahme (Router, Models, Services, Auth/Secrets)
+- [x] 1.3 Backend-Bestandsaufnahme (Router, Models, Services, Auth/Secrets)
 - [ ] 1.4 Datenbank/Migrationen (Alembic-Historie, Schema)
 - [ ] 1.5 Tests/CI/Linting/Build-Bestandsaufnahme
 - [ ] 1.6 Security/OWASP/Datenschutz-Sichtung

@@ -1,0 +1,21 @@
+{
+  "dialogAriaLabel": "Bewerbungscoach",
+  "heading": "Bewerbungscoach",
+  "clearChat": "Chat löschen",
+  "close": "Schließen",
+  "welcome": "Hallo! Ich bin dein Bewerbungscoach.",
+  "welcomeSubtitle": "Stell mir alles rund um deine Jobsuche & Bewerbung.",
+  "quickQuestionsLabel": "Schnellfragen:",
+  "quickQuestions": [
+    "Wie formuliere ich eine höfliche Nachfass-Mail?",
+    "Wie erkläre ich eine Lücke im Lebenslauf?",
+    "Wann sollte ich nach dem Interview nachfragen?",
+    "Wie nenne ich meine Gehaltsvorstellung?",
+    "Was tun nach einer Absage?"
+  ],
+  "aiUnreachable": "❌ Fehler: KI nicht erreichbar. Ist Ollama gestartet?",
+  "inputPlaceholder": "Frag mich was... (Enter zum Senden)",
+  "inputAriaLabel": "Nachricht eingeben",
+  "sendAriaLabel": "Senden",
+  "footer": "Shift+Enter für Zeilenumbruch • läuft lokal via Ollama"
+}

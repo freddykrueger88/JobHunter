@@ -1,0 +1,21 @@
+{
+  "dialogAriaLabel": "Application Coach",
+  "heading": "Application Coach",
+  "clearChat": "Clear chat",
+  "close": "Close",
+  "welcome": "Hi! I'm your application coach.",
+  "welcomeSubtitle": "Ask me anything about your job search & application.",
+  "quickQuestionsLabel": "Quick questions:",
+  "quickQuestions": [
+    "How do I write a polite follow-up email?",
+    "How do I explain a gap in my resume?",
+    "When should I follow up after an interview?",
+    "How do I state my salary expectations?",
+    "What to do after a rejection?"
+  ],
+  "aiUnreachable": "❌ Error: AI unreachable. Is Ollama running?",
+  "inputPlaceholder": "Ask me anything... (Enter to send)",
+  "inputAriaLabel": "Enter a message",
+  "sendAriaLabel": "Send",
+  "footer": "Shift+Enter for a new line • runs locally via Ollama"
+}

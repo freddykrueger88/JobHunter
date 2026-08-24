@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import { X, Send, Bot, User, Trash2, Lightbulb } from 'lucide-react'
 import clsx from 'clsx'
@@ -18,14 +19,6 @@ interface Props {
   coverLetterSnippet?: string
 }
 
-const QUICK_QUESTIONS = [
-  'Wie formuliere ich eine höfliche Nachfass-Mail?',
-  'Wie erkläre ich eine Lücke im Lebenslauf?',
-  'Wann sollte ich nach dem Interview nachfragen?',
-  'Wie nenne ich meine Gehaltsvorstellung?',
-  'Was tun nach einer Absage?',
-]
-
 export default function CoachChatDrawer({
   open,
   onClose,
@@ -34,6 +27,8 @@ export default function CoachChatDrawer({
   status,
   coverLetterSnippet,
 }: Props) {
+  const { t } = useTranslation('coachChatDrawer')
+  const quickQuestions = t('quickQuestions', { returnObjects: true }) as string[]
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -71,7 +66,7 @@ export default function CoachChatDrawer({
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '❌ Fehler: KI nicht erreichbar. Ist Ollama gestartet?',
+        content: t('aiUnreachable'),
       }])
     } finally {
       setLoading(false)
@@ -99,7 +94,7 @@ export default function CoachChatDrawer({
       {/* Drawer */}
       <aside
         role="dialog"
-        aria-label="Bewerbungscoach"
+        aria-label={t('dialogAriaLabel')}
         aria-modal="true"
         className="fixed right-0 top-0 h-full w-full max-w-md z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl"
       >
@@ -107,7 +102,7 @@ export default function CoachChatDrawer({
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-blue-600 text-white">
           <Bot size={20} aria-hidden />
           <div className="flex-1">
-            <div className="font-semibold text-sm">Bewerbungscoach</div>
+            <div className="font-semibold text-sm">{t('heading')}</div>
             {(jobTitle || company) && (
               <div className="text-xs opacity-75 truncate">
                 {jobTitle}{company ? ` • ${company}` : ''}
@@ -117,14 +112,14 @@ export default function CoachChatDrawer({
           <button
             onClick={() => { setMessages([]); setInput('') }}
             className="p-1 rounded hover:bg-white/20 transition-colors"
-            aria-label="Chat löschen"
+            aria-label={t('clearChat')}
           >
             <Trash2 size={16} aria-hidden />
           </button>
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-white/20 transition-colors"
-            aria-label="Schließen"
+            aria-label={t('close')}
           >
             <X size={18} aria-hidden />
           </button>
@@ -135,13 +130,13 @@ export default function CoachChatDrawer({
           {messages.length === 0 && (
             <div className="text-center py-6">
               <Bot size={40} className="mx-auto text-blue-400 mb-3" aria-hidden />
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Hallo! Ich bin dein Bewerbungscoach.</p>
-              <p className="text-xs text-gray-400 mb-5">Stell mir alles rund um deine Jobsuche &amp; Bewerbung.</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('welcome')}</p>
+              <p className="text-xs text-gray-400 mb-5">{t('welcomeSubtitle')}</p>
               <div className="space-y-2 text-left">
                 <p className="text-xs text-gray-400 flex items-center gap-1">
-                  <Lightbulb size={12} aria-hidden /> Schnellfragen:
+                  <Lightbulb size={12} aria-hidden /> {t('quickQuestionsLabel')}
                 </p>
-                {QUICK_QUESTIONS.map(q => (
+                {quickQuestions.map(q => (
                   <button
                     key={q}
                     onClick={() => sendMessage(q)}
@@ -208,23 +203,23 @@ export default function CoachChatDrawer({
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Frag mich was... (Enter zum Senden)"
+              placeholder={t('inputPlaceholder')}
               rows={1}
               disabled={loading}
               className="flex-1 resize-none rounded-xl px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               style={{ maxHeight: 120 }}
-              aria-label="Nachricht eingeben"
+              aria-label={t('inputAriaLabel')}
             />
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading}
               className="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
-              aria-label="Senden"
+              aria-label={t('sendAriaLabel')}
             >
               <Send size={16} aria-hidden />
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-1.5">Shift+Enter für Zeilenumbruch • läuft lokal via Ollama</p>
+          <p className="text-xs text-gray-400 mt-1.5">{t('footer')}</p>
         </div>
       </aside>
     </>

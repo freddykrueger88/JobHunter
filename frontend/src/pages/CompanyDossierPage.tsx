@@ -16,7 +16,7 @@ interface Dossier {
   source: string
 }
 
-export default function CompanyDossier() {
+export default function CompanyDossierPage() {
   const [query, setQuery] = useState('')
   const [dossier, setDossier] = useState<Dossier | null>(null)
   const [loading, setLoading] = useState(false)

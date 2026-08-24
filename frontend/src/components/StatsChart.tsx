@@ -3,6 +3,7 @@
  * Zeigt Funnel, wochentliche Bewerbungsrate und Status-Verteilung.
  */
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, FunnelChart, Funnel, LabelList,
@@ -19,6 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export default function StatsChart() {
+  const { t } = useTranslation('statsChart')
   const [stats, setStats] = useState<any>(null)
   const [weekly, setWeekly] = useState<any[]>([])
 
@@ -29,25 +31,29 @@ export default function StatsChart() {
 
   if (!stats) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-gray-800 rounded-xl" />
 
-  const statusData = Object.entries(stats.nach_status || {}).map(([name, value]) => ({ name, value }))
+  const statusData = Object.entries(stats.nach_status || {}).map(([key, value]) => ({
+    key,
+    name: t(`statusLabels.${key}`, key),
+    value,
+  }))
   const funnelData = [
-    { name: 'Beworben',    value: stats.gesamt },
-    { name: 'Eingeladen',  value: (stats.nach_status?.eingeladen || 0) + (stats.nach_status?.gespraech || 0) },
-    { name: 'Gespraech',   value: stats.nach_status?.gespraech || 0 },
-    { name: 'Zusage',      value: stats.nach_status?.zusage || 0 },
+    { name: t('funnelLabels.applied'),   value: stats.gesamt },
+    { name: t('funnelLabels.invited'),   value: (stats.nach_status?.eingeladen || 0) + (stats.nach_status?.gespraech || 0) },
+    { name: t('funnelLabels.interview'), value: stats.nach_status?.gespraech || 0 },
+    { name: t('funnelLabels.offer'),     value: stats.nach_status?.zusage || 0 },
   ].filter(d => d.value > 0)
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Status-Verteilung */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-semibold mb-4 text-sm text-gray-500">Status-Verteilung</h3>
+        <h3 className="font-semibold mb-4 text-sm text-gray-500">{t('statusDistribution')}</h3>
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie data={statusData} dataKey="value" nameKey="name"
               cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
               {statusData.map((entry, i) => (
-                <Cell key={i} fill={STATUS_COLORS[entry.name] ?? '#94a3b8'} />
+                <Cell key={i} fill={STATUS_COLORS[entry.key] ?? '#94a3b8'} />
               ))}
             </Pie>
             <Tooltip />
@@ -57,7 +63,7 @@ export default function StatsChart() {
 
       {/* Wochentliche Rate */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-semibold mb-4 text-sm text-gray-500">Bewerbungen pro Woche</h3>
+        <h3 className="font-semibold mb-4 text-sm text-gray-500">{t('weeklyRate')}</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={weekly}>
             <XAxis dataKey="woche" tick={{ fontSize: 11 }} />
@@ -71,7 +77,7 @@ export default function StatsChart() {
       {/* Funnel */}
       {funnelData.length > 1 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm md:col-span-2">
-          <h3 className="font-semibold mb-4 text-sm text-gray-500">Bewerbungs-Funnel</h3>
+          <h3 className="font-semibold mb-4 text-sm text-gray-500">{t('funnel')}</h3>
           <ResponsiveContainer width="100%" height={180}>
             <FunnelChart>
               <Funnel dataKey="value" data={funnelData} isAnimationActive>

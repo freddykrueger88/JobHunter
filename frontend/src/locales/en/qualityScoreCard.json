@@ -1,0 +1,8 @@
+{
+  "title": "Application Quality",
+  "complete": "✅ Complete",
+  "stepsProgress": "{{done}}/{{total}} steps done",
+  "now": "Now",
+  "nextStep": "Next step:",
+  "start": "Start →"
+}

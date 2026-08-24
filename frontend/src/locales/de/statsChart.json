@@ -1,0 +1,19 @@
+{
+  "statusDistribution": "Status-Verteilung",
+  "weeklyRate": "Bewerbungen pro Woche",
+  "funnel": "Bewerbungs-Funnel",
+  "statusLabels": {
+    "beworben": "Beworben",
+    "eingeladen": "Eingeladen",
+    "gespraech": "Gespräch",
+    "zusage": "Zusage",
+    "absage": "Absage",
+    "zurueckgezogen": "Zurückgezogen"
+  },
+  "funnelLabels": {
+    "applied": "Beworben",
+    "invited": "Eingeladen",
+    "interview": "Gespräch",
+    "offer": "Zusage"
+  }
+}

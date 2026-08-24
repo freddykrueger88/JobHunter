@@ -3,6 +3,7 @@
  * Zeigt Fortschrittsring, Checkliste und naechsten Schritt.
  */
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import clsx from 'clsx'
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react'
@@ -32,6 +33,7 @@ const AMPEL_COLORS = {
 }
 
 export default function QualityScoreCard({ applicationId }: Props) {
+  const { t } = useTranslation('qualityScoreCard')
   const [data, setData] = useState<QualityResult | null>(null)
 
   useEffect(() => {
@@ -63,9 +65,9 @@ export default function QualityScoreCard({ applicationId }: Props) {
             fill={AMPEL_COLORS[data.ampel]}>{data.gesamt_score}</text>
         </svg>
         <div>
-          <p className="font-semibold">Bewerbungsqualität</p>
+          <p className="font-semibold">{t('title')}</p>
           <p className="text-xs text-gray-400">
-            {data.vollstaendig ? '✅ Vollständig' : `${data.checklist.filter(c => c.erledigt).length}/${data.checklist.length} Schritte erledigt`}
+            {data.vollstaendig ? t('complete') : t('stepsProgress', { done: data.checklist.filter(c => c.erledigt).length, total: data.checklist.length })}
           </p>
         </div>
       </div>
@@ -82,7 +84,7 @@ export default function QualityScoreCard({ applicationId }: Props) {
             </span>
             {!item.erledigt && item.link && (
               <a href={item.link} className="ml-auto text-xs text-blue-500 hover:underline flex items-center gap-0.5">
-                Jetzt <ArrowRight size={11} />
+                {t('now')} <ArrowRight size={11} />
               </a>
             )}
           </li>
@@ -92,10 +94,10 @@ export default function QualityScoreCard({ applicationId }: Props) {
       {/* Naechster Schritt */}
       {data.naechster_schritt && (
         <div className="text-xs bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
-          <span className="font-medium text-blue-600">Nächster Schritt: </span>
+          <span className="font-medium text-blue-600">{t('nextStep')} </span>
           <span className="text-gray-600 dark:text-gray-300">{data.naechster_schritt.label}</span>
           {data.naechster_schritt.link && (
-            <a href={data.naechster_schritt.link} className="ml-2 text-blue-500 hover:underline">Starten →</a>
+            <a href={data.naechster_schritt.link} className="ml-2 text-blue-500 hover:underline">{t('start')}</a>
           )}
         </div>
       )}

@@ -1,0 +1,8 @@
+{
+  "title": "Bewerbungsqualität",
+  "complete": "✅ Vollständig",
+  "stepsProgress": "{{done}}/{{total}} Schritte erledigt",
+  "now": "Jetzt",
+  "nextStep": "Nächster Schritt:",
+  "start": "Starten →"
+}

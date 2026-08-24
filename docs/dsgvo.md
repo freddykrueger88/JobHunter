@@ -16,7 +16,7 @@ JobHunter is a **locally operated** application (self-hosted via Docker).
 | CV (PDF/DOCX) | Local `/app/uploads/` | CV parsing | Art. 6(1)(b) GDPR |
 | Extracted CV data | PostgreSQL (local) | Cover letter generation | Art. 6(1)(b) GDPR |
 | Application data | PostgreSQL (local) | Application management | Art. 6(1)(b) GDPR |
-| API keys | PostgreSQL (encrypted, AES-256) | Job search | Art. 6(1)(a) GDPR |
+| API keys | PostgreSQL (encrypted, AES-128/Fernet) | Job search | Art. 6(1)(a) GDPR |
 | Settings | PostgreSQL + localStorage | Personalization | Art. 6(1)(a) GDPR |
 | Theme / Language | localStorage (browser) | UI personalization | Art. 6(1)(a) GDPR |
 
@@ -39,7 +39,7 @@ JobHunter is a **locally operated** application (self-hosted via Docker).
 
 ## Data Security
 
-- **AES-256 encryption** for all stored API keys (Fernet)
+- **AES-128 encryption (Fernet)** for all stored API keys
 - PostgreSQL runs in Docker network (not publicly accessible)
 - Uploads stored in `/app/uploads/` (Docker volume), supported formats only
 
@@ -73,7 +73,7 @@ Es werden **keine Daten an externe Server übertragen**, außer an die explizit 
 | Lebenslauf (PDF/DOCX) | Lokal `/app/uploads/` | CV-Parsing | Art. 6 Abs. 1 lit. b DSGVO |
 | Extrahierte CV-Daten | PostgreSQL (lokal) | Anschreiben-Generierung | Art. 6 Abs. 1 lit. b DSGVO |
 | Bewerbungsdaten | PostgreSQL (lokal) | Bewerbungsverwaltung | Art. 6 Abs. 1 lit. b DSGVO |
-| API-Keys | PostgreSQL (verschlüsselt, AES-256) | Stellensuche | Art. 6 Abs. 1 lit. a DSGVO |
+| API-Keys | PostgreSQL (verschlüsselt, AES-128/Fernet) | Stellensuche | Art. 6 Abs. 1 lit. a DSGVO |
 | Einstellungen | PostgreSQL + localStorage | Personalisierung | Art. 6 Abs. 1 lit. a DSGVO |
 | Theme / Sprache | localStorage (Browser) | UI-Personalisierung | Art. 6 Abs. 1 lit. a DSGVO |
 

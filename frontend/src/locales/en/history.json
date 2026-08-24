@@ -1,0 +1,18 @@
+{
+  "title": "History",
+  "filterByType": "Filter by type",
+  "allTypes": "All Types",
+  "limitAriaLabel": "Number of entries",
+  "count_one": "{{count}} entry",
+  "count_other": "{{count}} entries",
+  "deleteEntry": "Delete entry: {{description}}",
+  "empty": "No entries yet.",
+  "eventTypes": {
+    "job_created": "Job created",
+    "job_search": "Job search",
+    "application_created": "Application created",
+    "status_changed": "Status changed",
+    "cover_letter_generated": "Cover letter generated",
+    "cv_uploaded": "CV uploaded"
+  }
+}

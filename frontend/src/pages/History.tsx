@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { Trash2, Filter } from 'lucide-react'
+import { formatDateTime } from '../lib/formatDate'
 
 interface HistoryEntry {
   id: number
@@ -23,6 +25,7 @@ const EVENT_ICONS: Record<string, string> = {
 const EVENT_TYPES = Object.keys(EVENT_ICONS)
 
 export default function History() {
+  const { t, i18n } = useTranslation(['history', 'common'])
   const qc = useQueryClient()
   const [filter, setFilter] = useState('')
   const [limit, setLimit] = useState(50)
@@ -41,7 +44,7 @@ export default function History() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold mb-6">Verlauf</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
       {/* Filter */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
@@ -50,26 +53,26 @@ export default function History() {
           value={filter}
           onChange={e => setFilter(e.target.value)}
           className="rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Nach Typ filtern"
+          aria-label={t('filterByType')}
         >
-          <option value="">Alle Typen</option>
-          {EVENT_TYPES.map(t => (
-            <option key={t} value={t}>{EVENT_ICONS[t]} {t.replace(/_/g, ' ')}</option>
+          <option value="">{t('allTypes')}</option>
+          {EVENT_TYPES.map(evType => (
+            <option key={evType} value={evType}>{EVENT_ICONS[evType]} {t(`eventTypes.${evType}`)}</option>
           ))}
         </select>
         <select
           value={limit}
           onChange={e => setLimit(Number(e.target.value))}
           className="rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-          aria-label="Anzahl Einträge"
+          aria-label={t('limitAriaLabel')}
         >
-          {[25, 50, 100, 200].map(l => <option key={l} value={l}>{l} Einträge</option>)}
+          {[25, 50, 100, 200].map(l => <option key={l} value={l}>{t('count', { count: l })}</option>)}
         </select>
-        <span className="text-xs text-gray-400 ml-auto">{entries.length} Einträge</span>
+        <span className="text-xs text-gray-400 ml-auto">{t('count', { count: entries.length })}</span>
       </div>
 
       {/* Liste */}
-      {isLoading && <p className="text-gray-400 text-sm">Lädt...</p>}
+      {isLoading && <p className="text-gray-400 text-sm">{t('common:loading')}</p>}
       <ul className="space-y-1">
         {entries.map(entry => (
           <li
@@ -80,7 +83,7 @@ export default function History() {
             <div className="flex-1 min-w-0">
               <p className="truncate">{entry.description}</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                {new Date(entry.at).toLocaleString('de-DE')}
+                {formatDateTime(entry.at, i18n.language)}
                 {entry.meta && Object.keys(entry.meta).length > 0 && (
                   <span className="ml-2 text-gray-300">
                     {Object.entries(entry.meta).map(([k, v]) => `${k}: ${v}`).join(' • ')}
@@ -91,14 +94,14 @@ export default function History() {
             <button
               onClick={() => deleteMutation.mutate(entry.id)}
               className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1 rounded"
-              aria-label={`Eintrag löschen: ${entry.description}`}
+              aria-label={t('deleteEntry', { description: entry.description })}
             >
               <Trash2 size={14} aria-hidden />
             </button>
           </li>
         ))}
         {!isLoading && entries.length === 0 && (
-          <li className="text-gray-400 text-sm text-center py-8">Keine Einträge vorhanden.</li>
+          <li className="text-gray-400 text-sm text-center py-8">{t('empty')}</li>
         )}
       </ul>
     </div>

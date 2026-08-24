@@ -1,0 +1,18 @@
+{
+  "title": "Verlauf",
+  "filterByType": "Nach Typ filtern",
+  "allTypes": "Alle Typen",
+  "limitAriaLabel": "Anzahl Einträge",
+  "count_one": "{{count}} Eintrag",
+  "count_other": "{{count}} Einträge",
+  "deleteEntry": "Eintrag löschen: {{description}}",
+  "empty": "Keine Einträge vorhanden.",
+  "eventTypes": {
+    "job_created": "Stelle erstellt",
+    "job_search": "Stellensuche",
+    "application_created": "Bewerbung erstellt",
+    "status_changed": "Status geändert",
+    "cover_letter_generated": "Anschreiben generiert",
+    "cv_uploaded": "Lebenslauf hochgeladen"
+  }
+}

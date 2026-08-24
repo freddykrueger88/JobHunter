@@ -408,6 +408,93 @@ Keine – alle drei Kernbefunde (Test-Import-Fehler, fehlende ESLint-Config,
 fehlende tsconfig.json) sind durch tatsächliche Befehlsausführung
 zweifelsfrei bestätigt, nicht nur vermutet.
 
+### 1.6 Security/OWASP/Datenschutz-Sichtung
+
+**🔴 Kritischer Fund – Path Traversal / Arbitrary File Write beim CV-Upload:**
+`backend/api/cv.py`, Endpunkt `POST /cv/upload`:
+```python
+ext = os.path.splitext(file.filename)[1].lower()
+if ext not in allowed:                       # nur Endungspruefung
+    raise HTTPException(...)
+dest = os.path.join(UPLOAD_DIR, file.filename)  # <-- Dateiname UNGEPRUEFT
+with open(dest, "wb") as f:
+    shutil.copyfileobj(file.file, f)
+```
+`file.filename` stammt direkt aus dem vom Client gesendeten
+Multipart-Header und wird **ohne Sanitisierung** in `os.path.join`
+verwendet. Die Endungsprüfung schützt nicht davor, weil sie nur das Suffix
+prüft, nicht die Pfadstruktur davor – ein Dateiname wie
+`../../../app/irgendwas.pdf` erfüllt die Endungsprüfung trotzdem und
+würde außerhalb von `UPLOAD_DIR` schreiben (klassisches **OWASP
+A03:2021 – Injection / Path Traversal**, praktisch ein potenzieller
+Arbitrary-File-Write). Derselbe ungeprüfte Dateiname wird beim späteren
+Lesezugriff wiederverwendet (`api/cv.py:92`,
+`os.path.join(UPLOAD_DIR, cv.filename)`), das Problem pflanzt sich also
+fort. **Empfehlung (Phase 3/4, Aufwand S):** Dateinamen serverseitig neu
+generieren (z. B. UUID + geprüfte Endung) statt Client-Input zu
+übernehmen – Standardmuster, keine Architekturänderung nötig.
+Weitere Upload-Endpunkte (`routers/jobs_image.py` für Foto-Upload) nutzen
+kein vergleichbares Dateisystem-Pattern (Bilder werden direkt aus dem
+Request-Body verarbeitet, nicht dateibasiert gespeichert) – dort kein
+gleichartiges Risiko gefunden.
+
+**Bereits in 1.3/1.4 dokumentierte, hier eingeordnete Sicherheitsbefunde**
+(nicht wiederholt, nur klassifiziert):
+- **OWASP A02 (Cryptographic Failures) / A05 (Security Misconfiguration):**
+  Schwache Default-Secrets (`SECRET_KEY="changeme"`) als Python-Fallback in
+  `core/config.py`, falls `.env` fehlt.
+- **OWASP A01 (Broken Access Control):** Der optionale JWT-Auth-Mechanismus
+  ist nicht erreichbar (Router nicht eingebunden, vermutlich keine
+  DB-Tabelle) – für den aktuellen Einsatzzweck (rein lokal, kein
+  Netzwerk-Exposure vorgesehen) kein akutes Risiko, wird aber **kritisch**,
+  falls die App jemals über `localhost` hinaus exponiert wird (z. B. Reverse
+  Proxy, Zugriff aus dem Heimnetz), ohne dass vorher ein funktionierender
+  Auth-Layer nachgerüstet wird.
+
+**Positiv verifizierte Punkte:**
+- Kein Treffer für rohe SQL-String-Interpolation (`text(f"..."`,
+  `.format()` in Queries) – SQLAlchemy-ORM wird durchgängig parametrisiert
+  genutzt, kein erkennbares SQL-Injection-Risiko.
+- Kein `dangerouslySetInnerHTML` im gesamten Frontend – kein
+  offensichtliches XSS-Einfallstor über React-Rendering.
+- Kein `eval`/`exec`/`os.system`/`subprocess` im Backend – kein
+  Command-Injection-Risiko durch dynamische Codeausführung gefunden.
+- CORS (`main.py`) ist auf `http://localhost:3000` fest eingestellt, kein
+  Wildcard (`*`) – korrekt restriktiv für den self-hosted Einsatzzweck.
+- `.env` nicht im Git getrackt (s. 1.3); API-Keys Dritter werden
+  Fernet-verschlüsselt in der DB abgelegt (s. 1.3).
+- DB-Service ohne Host-Port-Exposure (s. 1.4).
+
+**Fehlendes Rate-Limiting:** Keine Rate-Limiting-Bibliothek (z. B. `slowapi`)
+oder eigene Implementierung im Backend gefunden. Für ein rein lokal
+laufendes Tool aktuell geringes Risiko, sollte aber spätestens beim
+Nachrüsten von Auth/Netzwerk-Exposure (s. o.) mitgedacht werden – insbesondere
+für KI-Endpunkte (`api/ai.py`), die Rechenzeit/Ollama-Ressourcen kosten.
+
+**Dependency-Risiken:** Kein `dependabot.yml` oder vergleichbare
+automatisierte Abhängigkeits-Überwachung im Repo (`.github/` enthält nur
+Templates, s. 1.1/1.5). Backend- und Frontend-Abhängigkeiten sind zwar exakt
+gepinnt (gut für Reproduzierbarkeit), aber ohne automatisierte
+Sicherheits-Scans (`pip-audit`, `npm audit`, Dependabot/Renovate) bleiben
+bekanntwerdende CVEs in den gepinnten Versionen unbemerkt. Dies wurde hier
+nicht durch einen tatsächlichen Scan verifiziert (kein Internetzugriff aus
+dem Audit-Kontext angenommen/nicht geprüft) – als Empfehlung für die
+Engineering-Phase markiert, nicht als bestätigter Fund einzelner CVEs.
+
+**Datenschutz/DSGVO:** `docs/dsgvo.md` und `docs/PRIVACY.md` existieren
+bereits und sind inhaltlich substanziell (Datenkategorien, Speicherort,
+Zweck, Rechtsgrundlage tabellarisch aufgeführt; lokal-only-Architektur
+als zentrales Datenschutzversprechen). Deckt die vom Auftrag geforderten
+Datenschutz-Aspekte für sensible Bewerbungsdaten bereits gut ab – wird in
+Phase 4/5 lediglich um die fehlende englische Vollständigkeit geprüft
+(beide Dateien sind laut Kopfzeile bereits zweisprachig
+angelegt, Detailprüfung der EN-Vollständigkeit folgt bei Bedarf in Phase 4).
+
+### Offene Fragen aus diesem Abschnitt
+
+- Keine offenen Fragen – der Path-Traversal-Fund ist eindeutig im Code
+  nachvollziehbar, keine Annahme nötig.
+
 ---
 
-*Fortsetzung folgt (1.6 Security/OWASP/Datenschutz, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (1.7 Architekturdiagramm, …) gemäß `docs/analysis/BACKLOG.md`.*

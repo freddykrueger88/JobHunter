@@ -55,7 +55,7 @@ async def upload_cv(
     db.add(cv)
     await db.commit()
     await db.refresh(cv)
-    db.add(HistoryEntry(event_type="cv_uploaded", description=f"Lebenslauf '{file.filename}' hochgeladen, Parsing gestartet"))
+    db.add(HistoryEntry(event_type="cv_uploaded", description=f"Lebenslauf '{safe_filename}' hochgeladen, Parsing gestartet"))
     await db.commit()
     background_tasks.add_task(_parse_and_save, cv.id, dest, db)
     return {"id": cv.id, "filename": cv.filename, "status": "parsing_started"}

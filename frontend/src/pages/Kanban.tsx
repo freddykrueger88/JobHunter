@@ -5,6 +5,7 @@ import axios from 'axios'
 import { GripVertical, X, Clock, Plus, Calendar, ChevronRight, Bot } from 'lucide-react'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
+import { formatDate as formatDateIntl, formatDateTime as formatDateTimeIntl } from '../lib/formatDate'
 import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
 import AutoApplyButton from '../components/AutoApplyButton'
 import CoachChatDrawer from '../components/CoachChatDrawer'
@@ -46,17 +47,8 @@ const STATUS_ICONS: Record<string, string> = {
   absage: '❌',
 }
 
-function formatDate(iso: string | null): string {
-  if (!iso) return ''
-  return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
-}
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-}
-
 export default function Kanban() {
-  const { t } = useTranslation(['kanban', 'common'])
+  const { t, i18n } = useTranslation(['kanban', 'common'])
   const qc = useQueryClient()
   const navigate = useNavigate()
 
@@ -348,7 +340,7 @@ export default function Kanban() {
                         {app.interview_at && (
                           <div className="mt-1.5 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 rounded px-1.5 py-0.5">
                             <Calendar size={10} aria-hidden />
-                            <span>{formatDate(app.interview_at)}</span>
+                            <span>{formatDateIntl(app.interview_at, i18n.language)}</span>
                           </div>
                         )}
 
@@ -545,7 +537,7 @@ export default function Kanban() {
                       onClick={() => setEditingInterview(true)}
                       className="text-xs text-left text-gray-600 dark:text-gray-300 hover:underline"
                     >
-                      {detailApp.interview_at ? formatDate(detailApp.interview_at) : t('detail.setDate')}
+                      {detailApp.interview_at ? formatDateIntl(detailApp.interview_at, i18n.language) : t('detail.setDate')}
                     </button>
                   )}
                 </div>
@@ -553,7 +545,7 @@ export default function Kanban() {
                 {/* Applied date */}
                 {detailApp.applied_at && (
                   <p className="text-xs text-gray-500">
-                    {t('detail.appliedOn')} <span className="text-gray-700 dark:text-gray-300">{formatDate(detailApp.applied_at)}</span>
+                    {t('detail.appliedOn')} <span className="text-gray-700 dark:text-gray-300">{formatDateIntl(detailApp.applied_at, i18n.language)}</span>
                   </p>
                 )}
 
@@ -568,7 +560,7 @@ export default function Kanban() {
                         <li key={i} className="ml-4">
                           <span className="absolute -left-1.5 w-3 h-3 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800" aria-hidden />
                           <p className="text-xs font-medium">{STATUS_ICONS[entry.status] ?? '🟡'} {entry.status}</p>
-                          <p className="text-xs text-gray-400">{formatDateTime(entry.changed_at)}</p>
+                          <p className="text-xs text-gray-400">{formatDateTimeIntl(entry.changed_at, i18n.language)}</p>
                         </li>
                       ))}
                     </ol>

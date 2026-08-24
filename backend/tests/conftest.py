@@ -11,7 +11,7 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.models import Base
+from backend.core.database import Base
 
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 

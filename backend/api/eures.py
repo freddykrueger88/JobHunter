@@ -1,11 +1,12 @@
 """#72 – EURES-Stellensuche API."""
 from fastapi import APIRouter, Query
 from backend.services.job_search.eures_scraper import search_eures
+from backend.schemas.eures import EuresSearchResult
 
 router = APIRouter(prefix="/api/eures", tags=["EURES"])
 
 
-@router.get("/search")
+@router.get("/search", response_model=EuresSearchResult)
 async def eures_search(
     q: str = Query(..., description="Suchbegriff (z.B. IT-Support)"),
     country: str = Query("DE", description="Ländercode (DE, EU, SE, NO, ...)"),

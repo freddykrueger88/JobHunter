@@ -125,10 +125,20 @@ niedrige Prioritaet).
       CompanyDossierPage.tsx). Nebenbefund: components/CompanyDossier.tsx wird
       nirgends importiert - totes, unverdrahtetes Fragment, aehnlich Auth-Muster,
       absichtlich nicht geloescht (Produktentscheidung)
-- [~] B.6 Backend-Schema-Schicht ausbauen - begonnen: backend/schemas/cv.py (CVUploadResponse/CVListItem/CVDetail) fuer api/cv.py ergaenzt und verifiziert. reminders.py hatte bereits gute Inline-Schemas (kein Handlungsbedarf). Verbleibend: ai, applications, company, cover_letter_pdf, dashboard, eures, export, history, interview, jobs, search_profiles - schrittweise in Folgesessions.
+- [~] B.6 Backend-Schema-Schicht ausbauen - 3 von ~12 Domaenen erledigt und einzeln
+      per echtem HTTP-Request verifiziert:
+      - backend/schemas/cv.py (CVUploadResponse/CVListItem/CVDetail) -> api/cv.py
+      - backend/schemas/history.py (HistoryEntryRead) -> api/history.py
+      - backend/schemas/dashboard.py (DashboardStats/DueReminder, nutzt HistoryEntryRead) -> api/dashboard.py
+      reminders.py und jobs.py hatten bereits gute Inline-Schemas (kein Handlungsbedarf).
+      BEWUSST NICHT angefasst: applications.py (haengt an models/application.py,
+      Nutzer-eigene uncommittete Datei - nicht ohne Ruecksprache aendern).
+      Verbleibend, jeweils eigener Aufwand: ai, company, cover_letter_pdf, eures
+      (Rueckgabeform kommt aus services/job_search/eures_scraper.py, noch nicht
+      geprueft), export, interview, search_profiles.
 - [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
 
-Phase B Status: 4 von 7 abgeschlossen, B.6 begonnen (1 von ~12 Domaenen).
+Phase B Status: 4 von 7 abgeschlossen, B.6 in Arbeit (3 von ~12 Domaenen).
 Produktentscheidung/main.py-Konflikt -, B.6 noch offen).
 
 Naechster Schritt: B.6 (Schema-Schicht) oder Review durch den Nutzer, insbesondere

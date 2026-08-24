@@ -30,7 +30,7 @@ function AppInner() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <TopNav focusMode={focusMode} />
+      <TopNav />
 
       <main id="main-content" className="container mx-auto px-4 py-6">
         <Routes>

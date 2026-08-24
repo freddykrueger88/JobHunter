@@ -40,7 +40,22 @@ Nur das JSON, keine Erklärungen."""
             import re, json
             match = re.search(r"\[.*\]", raw, re.DOTALL)
             if match:
-                return json.loads(match.group(0))
+                try:
+                    parsed = json.loads(match.group(0))
+                    # Nutzerentscheidung (Rework-Plan): KI-Endpunkte werden strikt
+                    # gegen ein Schema validiert, aber mit garantiertem Fallback,
+                    # falls die KI kein exakt passendes JSON liefert - sonst wuerde
+                    # ein spaeteres response_model einen 500er erzeugen statt
+                    # den (dann unbrauchbaren) Rohtext durchzureichen.
+                    if isinstance(parsed, list) and parsed and all(
+                        isinstance(item, dict)
+                        and isinstance(item.get("question"), str)
+                        and isinstance(item.get("category"), str)
+                        for item in parsed
+                    ):
+                        return parsed
+                except (ValueError, TypeError):
+                    pass
             return [{"question": raw, "category": "allgemein"}]
     except Exception as e:
         return [{"question": f"KI nicht erreichbar: {e}", "category": "fehler"}]
@@ -81,7 +96,18 @@ Nur das JSON, keine Erklärungen."""
             raw = r.json().get("response", "{}").strip()
             match = re.search(r"\{.*\}", raw, re.DOTALL)
             if match:
-                return json.loads(match.group(0))
+                try:
+                    parsed = json.loads(match.group(0))
+                    if (
+                        isinstance(parsed, dict)
+                        and isinstance(parsed.get("feedback"), str)
+                        and isinstance(parsed.get("tip"), str)
+                        and isinstance(parsed.get("score"), (int, float))
+                    ):
+                        score = max(0, min(10, int(parsed["score"])))
+                        return {"score": score, "feedback": parsed["feedback"], "tip": parsed["tip"]}
+                except (ValueError, TypeError):
+                    pass
             return {"score": 5, "feedback": raw, "tip": ""}
     except Exception as e:
         return {"score": 0, "feedback": f"KI-Fehler: {e}", "tip": "Ollama prüfen"}

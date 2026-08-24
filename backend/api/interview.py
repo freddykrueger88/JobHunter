@@ -7,6 +7,7 @@ from backend.core.database import get_db
 from backend.models.job import Job
 from backend.models.settings import UserSettings
 from backend.services.interview_simulator import generate_interview_questions, evaluate_answer
+from backend.schemas.interview import InterviewQuestionsResponse, AnswerEvaluationResponse
 
 router = APIRouter(prefix="/api/interview", tags=["Interview-Simulator"])
 
@@ -17,7 +18,7 @@ class EvaluateRequest(BaseModel):
     answer: str
 
 
-@router.get("/questions/{job_id}")
+@router.get("/questions/{job_id}", response_model=InterviewQuestionsResponse)
 async def get_interview_questions(job_id: int, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, job_id)
     if not job:
@@ -33,7 +34,7 @@ async def get_interview_questions(job_id: int, db: AsyncSession = Depends(get_db
     return {"job_id": job_id, "job_title": job.title, "questions": questions}
 
 
-@router.post("/evaluate")
+@router.post("/evaluate", response_model=AnswerEvaluationResponse)
 async def evaluate_interview_answer(data: EvaluateRequest, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, data.job_id)
     if not job:

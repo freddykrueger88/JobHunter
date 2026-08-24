@@ -96,14 +96,15 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
       Angriffsversuch verifiziert
 - [x] A.6 Harte Secret-Validierung in core/config.py (kein "changeme"-Fallback mehr),
       positiv+negativ verifiziert
-- [!] NEU ENTDECKT waehrend Verifikation: 14 von 21 Backend-Routern hatten kein /api-Praefix,
+- [x] NEU ENTDECKT waehrend Verifikation: 14 von 21 Backend-Routern hatten kein /api-Praefix,
       obwohl ALLE Frontend-Calls durchgaengig /api/... nutzen -> Grossteil der App war ueber
       den Browser/Dev-Proxy nicht erreichbar (404). 12 Router gefixt und verifiziert.
-      OFFEN (Produktentscheidung/main.py-Konflikt, absichtlich nicht angefasst):
-      - api/company.py vs api/company_dossier.py: /dossier-Route wuerde kollidieren
-      - api/jobs.py vs routers/jobs_image.py: potenzielle Pfad-Kollision, main.py-abhaengig
-      - api/search_profiles.py: Praefix gefixt, aber Router war schon vorher nicht in main.py
-        eingebunden (separater Bug) - SearchProfiles-Seite im Frontend aktuell tot
+      - api/company.py vs api/company_dossier.py: GELOEST (2026-08-24, Nutzerentscheidung,
+        s. Entscheidungsblock unten) - company_dossier.py behalten, company.py entfernt.
+      - api/jobs.py vs routers/jobs_image.py: weiterhin offen, main.py-abhaengig (s. B.2).
+      - api/search_profiles.py: Praefix gefixt, aber Router weiterhin nicht in main.py
+        eingebunden (separater Bug) - SearchProfiles-Seite im Frontend weiterhin tot,
+        haengt an B.2 (main.py-Konsolidierung).
 - [x] A.4 Frontend-Dockerfile auf Mehrstufen-Build umgestellt (nginx statt Dev-Server), verifiziert per isoliertem docker build+run, Dev-Workflow via docker-compose.override.yml erhalten
 - [ ] A.7 Punktuelle docs/*.md Korrekturen - zurueckgestellt (niedrige Prioritaet, kein Blocker)
 
@@ -116,16 +117,31 @@ niedrige Prioritaet).
 - [!] B.2 Endpunkt-Schicht vereinheitlichen (api/ -> routers/) - ZURUECKGESTELLT:
       betrifft main.py, das Nutzer-eigene, uncommittete Arbeit enthaelt. Nicht ohne
       Ruecksprache angefasst.
-- [!] B.3 Produktentscheidung User/Auth (vervollstaendigen vs. entfernen) - ZURUECKGESTELLT:
-      echte Produktentscheidung, kann nicht autonom getroffen werden.
+- [x] B.3 Produktentscheidung User/Auth: ENTFERNEN (Nutzerentscheidung 2026-08-24).
+      backend/models/user.py, backend/api/auth.py, backend/core/security.py komplett
+      geloescht (nur von auth.py importiert - keine Teilausduennung noetig).
+      python-jose/passlib aus requirements.txt entfernt. AUTH_ENABLED-Erwaehnungen aus
+      laufend gepflegter Doku entfernt (README×2, SECURITY.md, docs/architecture.md,
+      wiki/Installation.md, wiki/Konfiguration.md) - CHANGELOG.md/wiki/Changelog.md
+      bewusst unangetastet (historische Aufzeichnung). Verifiziert: Backend startet
+      sauber, Health-Check OK, pytest unveraendert 15/22.
+      Nebenbefund: SECRET_KEY in core/config.py wird jetzt von keinem Code mehr
+      gelesen (war nur fuer JWT). Bewusst nicht entfernt (schadet nicht).
 - [x] B.4 Zentraler Frontend-API-Client frontend/src/lib/api.ts eingefuehrt,
       Dashboard.tsx als erste Datei migriert (Proof of Concept), verifiziert per
       npm run build + echtem HTTP-Request
 - [x] B.5 Namenskollision CompanyDossier aufgeloest (pages/CompanyDossier.tsx ->
-      CompanyDossierPage.tsx). Nebenbefund: components/CompanyDossier.tsx wird
-      nirgends importiert - totes, unverdrahtetes Fragment, aehnlich Auth-Muster,
-      absichtlich nicht geloescht (Produktentscheidung)
-- [~] B.6 Backend-Schema-Schicht ausbauen - 6 Domaenen erledigt, jede einzeln per
+      CompanyDossierPage.tsx). components/CompanyDossier.tsx (totes, unverdrahtetes
+      Fragment) am 2026-08-24 per Nutzerentscheidung geloescht (statt behalten/einbauen),
+      verifiziert per npm run build.
+- [x] Company-Dossier-Konsolidierung (2026-08-24, Nutzerentscheidung, main.py-Aenderung):
+      company_dossier.py behalten (hatte bereits /api-Praefix), Job-ID-Variante
+      (GET /dossier/{job_id}) aus company.py dorthin uebernommen, company.py geloescht.
+      main.py chirurgisch angepasst (nur company-Importzeile + include_router-Zeile
+      entfernt, sonst unveraendert - main.py enthaelt weiterhin Nutzer-eigene
+      uncommittete Aenderungen an anderer Stelle). Verifiziert: beide Varianten
+      funktionieren unter /api/company/dossier[...], pytest unveraendert.
+- [x] B.6 Backend-Schema-Schicht ausbauen - 8 Domaenen erledigt, jede einzeln per
       echtem HTTP-Request gegen die laufende API verifiziert:
       - backend/schemas/cv.py (CVUploadResponse/CVListItem/CVDetail) -> api/cv.py
       - backend/schemas/history.py (HistoryEntryRead) -> api/history.py
@@ -140,29 +156,32 @@ niedrige Prioritaet).
         dort greift response_model nicht). Nebenbefund: import_data() verarbeitet
         "applications" aus dem JSON gar nicht (nur jobs/reminders/history) - separater
         Bug, nicht gefixt (waere Verhaltensaenderung, kein reiner Schema-Fix).
+      - backend/schemas/interview.py (InterviewQuestionsResponse/AnswerEvaluationResponse)
+        -> api/interview.py. Nutzerentscheidung KI-Schema-Strenge: STRIKT MIT FALLBACK.
+        services/interview_simulator.py validiert die von der KI geparste JSON-Antwort
+        jetzt gegen die erwartete Form, bevor sie zurueckgegeben wird - bei Abweichung
+        greift der vorhandene Text-Fallback statt eines falsch geformten Objekts.
+        Verifiziert per echtem End-to-End-Test (Job anlegen -> Fragen generieren);
+        sogar im echten Ollama-Fehlerfall kam eine schema-konforme 200-Antwort zurueck.
+      - backend/schemas/ai.py (ModelsResponse/ChatResponse/CoverLetterResponse) ->
+        api/ai.py. Diese Endpunkte geben einfache Strings/Listen zurueck (kein
+        json.loads() auf LLM-Freitext) - ohne zusaetzliche Fallback-Logik sicher
+        schembar. Verifiziert per echtem Request inkl. echter Ollama-Antwort.
       reminders.py und jobs.py hatten bereits gute Inline-Schemas (kein Handlungsbedarf).
 
       BEWUSST NICHT angefasst, mit Grund:
       - applications.py: haengt an models/application.py, Nutzer-eigene uncommittete
         Datei - nicht ohne Ruecksprache aendern.
-      - ai.py, interview.py: geben teils direkt geparste LLM-Rohausgaben zurueck
-        (services/interview_simulator.py parst z.B. json.loads() auf KI-Freitext ohne
-        Formatgarantie) - eine strikte Schema-Erzwingung koennte bei abweichender
-        KI-Antwort einen neuen 500er erzeugen, wo heute durchgereicht wird. Echte
-        Designfrage (wie streng KI-Output validiert werden soll), keine reine
-        Bugfix-Aufgabe - zurueckgestellt.
-      - cover_letter_pdf.py, search_profiles.py: beide nicht in main.py eingebunden
-        (bereits als Fund aus Phase A dokumentiert) - nicht per echtem HTTP-Request
-        verifizierbar, daher zurueckgestellt bis die Registrierung geklaert ist.
-
-      Damit sind praktisch alle ohne main.py-Aenderung oder KI-Design-Entscheidung
-      sicher bearbeitbaren Domaenen abgedeckt.
+      - cover_letter_pdf.py, search_profiles.py: beide weiterhin nicht in main.py
+        eingebunden (haengt an B.2) - nicht per echtem HTTP-Request verifizierbar.
 - [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
 
-Phase B Status: 4 von 7 abgeschlossen, B.6 so weit wie ohne main.py-Aenderungen bzw.
-Produktentscheidungen moeglich (6 Domaenen).
+Phase B Status: 6 von 7 abgeschlossen (B.3 GELOEST: Auth entfernt; B.6 fuer alle
+erreichbaren Domaenen abgeschlossen). Nur B.2 (main.py-Konsolidierung api/->routers/)
+bleibt zurueckgestellt - main.py enthaelt weiterhin Nutzer-eigene, uncommittete Arbeit;
+davon haengen auch cover_letter_pdf.py/search_profiles.py-Registrierung und die
+jobs.py/jobs_image.py-Pfadkollision ab.
 
-Naechster Schritt: Review durch den Nutzer, insbesondere zu den zurueckgestellten
-Punkten B.2/B.3 sowie den main.py-abhaengigen Themen (company.py/jobs.py/
-search_profiles.py/cover_letter_pdf.py Registrierung) und der KI-Schema-Designfrage.
-Danach Phase C (Internationalisierung) gemaess REWORK_PLAN_DE.md.
+Naechster Schritt (Nutzerentscheidung 2026-08-24: "nach dem Plan weiter"): Phase C
+(Internationalisierung) gemaess REWORK_PLAN_DE.md. B.2 bleibt als offener Punkt
+stehen, bis main.py fertig/committet ist.

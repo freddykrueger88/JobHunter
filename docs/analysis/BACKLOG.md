@@ -125,10 +125,10 @@ niedrige Prioritaet).
       CompanyDossierPage.tsx). Nebenbefund: components/CompanyDossier.tsx wird
       nirgends importiert - totes, unverdrahtetes Fragment, aehnlich Auth-Muster,
       absichtlich nicht geloescht (Produktentscheidung)
-- [ ] B.6 Backend-Schema-Schicht ausbauen (pro Domaene) - noch offen
+- [~] B.6 Backend-Schema-Schicht ausbauen - begonnen: backend/schemas/cv.py (CVUploadResponse/CVListItem/CVDetail) fuer api/cv.py ergaenzt und verifiziert. reminders.py hatte bereits gute Inline-Schemas (kein Handlungsbedarf). Verbleibend: ai, applications, company, cover_letter_pdf, dashboard, eures, export, history, interview, jobs, search_profiles - schrittweise in Folgesessions.
 - [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
 
-Phase B Status: 4 von 7 Aufgaben erledigt (B.2/B.3 bewusst zurueckgestellt -
+Phase B Status: 4 von 7 abgeschlossen, B.6 begonnen (1 von ~12 Domaenen).
 Produktentscheidung/main.py-Konflikt -, B.6 noch offen).
 
 Naechster Schritt: B.6 (Schema-Schicht) oder Review durch den Nutzer, insbesondere

@@ -80,6 +80,11 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - 2026-08-24: Backlog angelegt, gh installiert, Auth als blockiert markiert.
 - 2026-08-24: Phase D (Produktqualitaet) umgesetzt - einheitliche Fehleranzeige,
   Code-Splitting, dsgvo.md-Sachfehler korrigiert. Naechster Schritt: Phase E.
+- 2026-08-24 (Fortsetzung): Phase E (Engineering) umgesetzt - CI-Workflow,
+  Testpyramide (26 Backend-/8 Frontend-Tests), Dependabot, Pre-Commit,
+  Release-Prozess dokumentiert. Dabei 2 echte Bugs gefunden+gefixt
+  (Dashboard-Counter-Labels, Dashboard-Stats "soon"-Bucket). Rework-Plan
+  Phasen A-E damit vollstaendig durchlaufen.
 
 - 2026-08-24 (Fortsetzung): Phase 1 (Audit DE+EN), Phase 2 (Codequalitaet + Stack-Eignung DE+EN)
   und Phase 3 (Rework-Entscheidung, REWORK_PLAN_DE/EN.md, docs/architecture/ mit 3 ADRs) auf
@@ -286,5 +291,66 @@ verschoben statt doppelt gemacht).
 
 Phase D Status: D.1/D.2/D.4/D.5 abgeschlossen (D.2 mit offenem Fund, nicht
 geloest). D.3 bleibt wie im Rework-Plan vorgesehen ausserhalb des Scopes.
-Naechster Schritt: Phase E (Engineering - CI, Testpyramide, Dependabot,
-Release-Prozess) gemaess REWORK_PLAN_DE.md.
+
+## Phase E - Engineering (2026-08-24, Umsetzung)
+- [x] Vorbedingung fuer E.1: alle 11 ESLint-Errors behoben (waren
+      @typescript-eslint/no-explicit-any), sonst waere der neue CI-Lint-Job
+      sofort dauerhaft rot gewesen. Dabei Nebenbefund in Dashboard.tsx
+      gefixt: t(`dashboard.${tKey}`) suchte einen verschachtelten Schluessel
+      der so nicht existiert - die 5 Counter-Kachel-Labels auf der
+      Startseite zeigten vermutlich den rohen i18next-Fallback statt Text.
+      Dashboard.tsx war nicht Teil der 38 in Phase C migrierten Dateien und
+      dadurch uebersehen worden; dabei vollstaendig i18n-migriert.
+      Settings.tsx hat denselben Luecken-Status (nur die Type-Error-Stelle
+      gefixt, Rest bewusst offen) - siehe Fund unten.
+- [x] E.2 Testpyramide: 4 neue Backend-Tests (backend/tests/test_cv_upload.py
+      - Path-Traversal-Regressionsschutz fuer den Phase-A-Fix + X-Error-Code-
+      Verifikation fuer cv.not_found/cv.invalid_file_type, ueber echten
+      httpx.AsyncClient/ASGITransport gegen die echte FastAPI-App). Dabei
+      einen ECHTEN Produktivbug gefunden und gefixt (siehe E.2b unten).
+      4+4 neue Frontend-Tests (vitest + @testing-library/react neu
+      eingerichtet): lib/api.test.ts (alle 4 Fallback-Pfade von
+      getApiErrorMessage()), pages/CoverLetter.test.tsx (Rendering mit
+      echten DE-Uebersetzungen, Ton-Auswahl, echter Generieren-Flow mit
+      gemocktem axios.post, disabled-State). Ergebnis: Backend 26/26 gruen
+      (vorher 22), Frontend 8/8 gruen (vorher 0).
+- [x] E.2b (Nebenbefund waehrend E.2, nicht separat geplant): 7 von 22
+      vorbestehenden Backend-Tests schlugen fehl (Job(titel=..., firma=...)
+      - Modell nutzt aber title/company). Gefixt, wodurch ein bisher nie
+      erreichter Assertion-Pfad zum ersten Mal lief und einen ECHTEN Bug in
+      berechne_dashboard_stats() aufdeckte: der "soon"-Bucket (morgen
+      faellig) nutzte func.current_date() + 1, was auf SQLite als schwach
+      typisierte Zahlen-Arithmetik behandelt wird (kein gueltiges Datum) -
+      der Bucket blieb dadurch immer leer. Gefixt auf Python-seitig
+      berechnetes today/tomorrow als gebundene Parameter (dialektneutral).
+- [x] E.1 CI-Workflow: .github/workflows/ci.yml, 3 Jobs (Backend-pytest,
+      Frontend Lint+Test+Build, i18n-Check), laeuft auf jedem PR/Push gegen
+      main. Lokal verifiziert (kein gh-Runner verfuegbar): alle Schritte
+      einzeln mit Exit-Code 0 nachvollzogen.
+- [x] E.3 Dependabot: .github/dependabot.yml, woechentlich, pip+npm+
+      github-actions, kein Auto-Merge (Produktentscheidung bewusst offen
+      gelassen).
+- [x] E.4 Pre-Commit: .pre-commit-config.yaml, allgemeine Hygiene-Hooks +
+      lokaler Frontend-ESLint-Hook (via "docker compose exec", da auf dem
+      LXC-Host kein natives npm existiert - verifiziert). Echter Testlauf
+      via "pre-commit run --all-files" durchgefuehrt, deckte 9 Dateien mit
+      trailing whitespace/fehlendem Zeilenumbruch auf (rein kosmetisch
+      gefixt).
+- [x] E.5 Release-Prozess: CONTRIBUTING.md Abschnitt 8 (DE+EN) - SemVer-
+      Regeln, Schritt-fuer-Schritt-Ablauf. Dabei Fund: frontend/package.json
+      ("version": "0.4.0") laeuft der README-Badge-Version (v1.9.0)
+      hinterher - als bekannte Luecke dokumentiert, nicht rueckwirkend
+      korrigiert (eigene Produktentscheidung).
+
+Offene Funde aus Phase E (nicht geloest, bewusst vermerkt):
+- Settings.tsx hat wie Dashboard.tsx vor E.1 unvollstaendige i18n-Abdeckung
+  (z.B. Export/Import-Statusmeldungen weiterhin hartcodiertes Deutsch) -
+  nur die fuer den ESLint-Fix noetige Stelle wurde angefasst.
+- frontend/package.json-Version nicht synchron zu README/CHANGELOG (siehe
+  E.5).
+
+Phase E Status: ABGESCHLOSSEN (E.1-E.5 erledigt). Rework-Plan-Phasen A-E
+damit vollstaendig durchlaufen. Offen bleiben: B.2 (main.py-Konsolidierung,
+wartet auf den Nutzer), restliche B.6-Schemas (applications.py etc., haengen
+ebenfalls an main.py), C.7/Phase 5 (echtes GitHub-Wiki), D.3 (Accessibility-
+Audit, expliziter Nicht-Scope), die beiden i18n-Luecken oben.

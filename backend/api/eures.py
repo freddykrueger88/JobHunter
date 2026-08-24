@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Query
 from backend.services.job_search.eures_scraper import search_eures
 
-router = APIRouter(prefix="/eures", tags=["EURES"])
+router = APIRouter(prefix="/api/eures", tags=["EURES"])
 
 
 @router.get("/search")

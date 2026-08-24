@@ -6,7 +6,7 @@ from backend.models.settings import UserSettings
 from backend.schemas.settings import SettingsRead, SettingsUpdate
 from backend.core.crypto import encrypt
 
-router = APIRouter(prefix="/settings", tags=["Einstellungen"])
+router = APIRouter(prefix="/api/settings", tags=["Einstellungen"])
 
 
 async def get_or_create_settings(db: AsyncSession) -> UserSettings:

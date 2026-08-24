@@ -7,7 +7,7 @@ from backend.models.search_profile import SearchProfile
 from backend.services.scheduler import schedule_profile, run_search_profile
 from backend.models.history import HistoryEntry
 
-router = APIRouter(prefix="/search-profiles", tags=["Suchprofile"])
+router = APIRouter(prefix="/api/search-profiles", tags=["Suchprofile"])
 
 
 class ProfileCreate(BaseModel):

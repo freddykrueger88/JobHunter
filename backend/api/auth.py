@@ -7,7 +7,7 @@ from backend.core.database import get_db
 from backend.models.user import User
 from backend.core.security import verify_password, hash_password, create_access_token, AUTH_ENABLED
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
 
 class RegisterRequest(BaseModel):

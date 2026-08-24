@@ -11,7 +11,7 @@ from backend.models.history import HistoryEntry
 from backend.services.auto_apply import build_application_zip
 import io
 
-router = APIRouter(prefix="/applications", tags=["Bewerbungen"])
+router = APIRouter(prefix="/api/applications", tags=["Bewerbungen"])
 
 
 class ApplicationCreate(BaseModel):

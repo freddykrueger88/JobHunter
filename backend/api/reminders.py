@@ -6,7 +6,7 @@ from datetime import datetime
 from backend.core.database import get_db
 from backend.models.reminder import Reminder
 
-router = APIRouter(prefix="/reminders", tags=["Erinnerungen"])
+router = APIRouter(prefix="/api/reminders", tags=["Erinnerungen"])
 
 
 class ReminderCreate(BaseModel):

@@ -4,7 +4,7 @@ from sqlalchemy import select, delete
 from backend.core.database import get_db
 from backend.models.history import HistoryEntry
 
-router = APIRouter(prefix="/history", tags=["Verlauf"])
+router = APIRouter(prefix="/api/history", tags=["Verlauf"])
 
 
 @router.get("/")

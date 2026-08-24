@@ -7,7 +7,7 @@ from backend.models.history import HistoryEntry
 from backend.models.reminder import Reminder
 from datetime import datetime, timezone
 
-router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
 
 
 @router.get("/stats")

@@ -17,7 +17,7 @@ from backend.models.history import HistoryEntry
 from backend.models.reminder import Reminder
 from backend.models.settings import UserSettings
 
-router = APIRouter(prefix="/export", tags=["Export/Import"])
+router = APIRouter(prefix="/api/export", tags=["Export/Import"])
 EXPORT_VERSION = "1.2"
 
 

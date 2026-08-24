@@ -8,7 +8,7 @@ from backend.models.job import Job
 from backend.models.settings import UserSettings
 from backend.services.interview_simulator import generate_interview_questions, evaluate_answer
 
-router = APIRouter(prefix="/interview", tags=["Interview-Simulator"])
+router = APIRouter(prefix="/api/interview", tags=["Interview-Simulator"])
 
 
 class EvaluateRequest(BaseModel):

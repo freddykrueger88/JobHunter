@@ -12,7 +12,7 @@ from backend.models.history import HistoryEntry
 from backend.services.ai_service import generate_cover_letter, coach_chat, list_ollama_models
 import json
 
-router = APIRouter(prefix="/ai", tags=["KI"])
+router = APIRouter(prefix="/api/ai", tags=["KI"])
 
 
 class CoverLetterRequest(BaseModel):

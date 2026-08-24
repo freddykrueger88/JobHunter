@@ -8,7 +8,7 @@ from backend.models.cv import CVData
 from backend.models.history import HistoryEntry
 from backend.services.cv_parser import extract_text, parse_cv_with_ai
 
-router = APIRouter(prefix="/cv", tags=["Lebenslauf"])
+router = APIRouter(prefix="/api/cv", tags=["Lebenslauf"])
 UPLOAD_DIR = "/app/uploads"
 
 

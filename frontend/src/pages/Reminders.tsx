@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { Bell, BellOff, Plus, Trash2 } from 'lucide-react'
 import clsx from 'clsx'
+import { formatDateTime } from '../lib/formatDate'
 
 interface Reminder {
   id: number
@@ -13,6 +15,7 @@ interface Reminder {
 }
 
 export default function Reminders() {
+  const { t, i18n } = useTranslation(['reminders', 'common'])
   const qc = useQueryClient()
   const [showDone, setShowDone] = useState(false)
   const [newMsg, setNewMsg] = useState('')
@@ -41,34 +44,34 @@ export default function Reminders() {
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <Bell size={22} aria-hidden /> Erinnerungen
+        <Bell size={22} aria-hidden /> {t('title')}
       </h1>
 
       {/* Neue Erinnerung */}
       <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 mb-6 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500">Neue Erinnerung</h2>
+        <h2 className="text-sm font-semibold text-gray-500">{t('newReminder')}</h2>
         <div className="flex gap-2">
           <input
             type="datetime-local"
             value={newDate}
             onChange={e => setNewDate(e.target.value)}
             className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Datum und Uhrzeit"
+            aria-label={t('dateAriaLabel')}
           />
           <input
             className="flex-1 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Nachricht, z.B. 'Bei Firma XY nachfragen'"
+            placeholder={t('messagePlaceholder')}
             value={newMsg}
             onChange={e => setNewMsg(e.target.value)}
-            aria-label="Erinnerungsnachricht"
+            aria-label={t('messageAriaLabel')}
           />
           <button
             onClick={() => createMutation.mutate()}
             disabled={!newDate || createMutation.isPending}
             className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            aria-label="Erinnerung hinzufügen"
+            aria-label={t('addAriaLabel')}
           >
-            <Plus size={15} aria-hidden /> Hinzufügen
+            <Plus size={15} aria-hidden /> {t('add')}
           </button>
         </div>
       </div>
@@ -77,13 +80,13 @@ export default function Reminders() {
       <div className="flex items-center gap-2 mb-4">
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input type="checkbox" checked={showDone} onChange={e => setShowDone(e.target.checked)} className="rounded" />
-          Erledigte anzeigen
+          {t('showDone')}
         </label>
-        <span className="text-xs text-gray-400 ml-auto">{reminders.length} Einträge</span>
+        <span className="text-xs text-gray-400 ml-auto">{t('count', { count: reminders.length })}</span>
       </div>
 
       {/* Liste */}
-      {isLoading && <p className="text-gray-400 text-sm">Lädt...</p>}
+      {isLoading && <p className="text-gray-400 text-sm">{t('common:loading')}</p>}
       <ul className="space-y-2">
         {reminders.map(r => (
           <li
@@ -97,9 +100,9 @@ export default function Reminders() {
           >
             <Bell size={16} className={r.is_done ? 'text-gray-400' : 'text-yellow-500'} aria-hidden />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{r.message ?? 'Erinnerung'}</p>
+              <p className="text-sm font-medium truncate">{r.message ?? t('fallbackMessage')}</p>
               <p className="text-xs text-gray-400">
-                {new Date(r.remind_at).toLocaleString('de-DE')}
+                {formatDateTime(r.remind_at, i18n.language)}
               </p>
             </div>
             <div className="flex gap-1 shrink-0">
@@ -107,7 +110,7 @@ export default function Reminders() {
                 <button
                   onClick={() => doneMutation.mutate(r.id)}
                   className="text-green-500 hover:text-green-700 p-1 rounded transition-colors"
-                  aria-label="Als erledigt markieren"
+                  aria-label={t('markDone')}
                 >
                   <BellOff size={15} aria-hidden />
                 </button>
@@ -115,7 +118,7 @@ export default function Reminders() {
               <button
                 onClick={() => deleteMutation.mutate(r.id)}
                 className="text-red-400 hover:text-red-600 p-1 rounded transition-colors"
-                aria-label="Erinnerung löschen"
+                aria-label={t('delete')}
               >
                 <Trash2 size={15} aria-hidden />
               </button>
@@ -124,7 +127,7 @@ export default function Reminders() {
         ))}
         {!isLoading && reminders.length === 0 && (
           <li className="text-gray-400 text-sm text-center py-8">
-            {showDone ? 'Keine erledigten Erinnerungen.' : 'Keine offenen Erinnerungen 🎉'}
+            {showDone ? t('emptyDone') : t('emptyPending')}
           </li>
         )}
       </ul>

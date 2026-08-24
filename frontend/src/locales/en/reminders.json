@@ -1,0 +1,17 @@
+{
+  "title": "Reminders",
+  "newReminder": "New Reminder",
+  "dateAriaLabel": "Date and time",
+  "messagePlaceholder": "Message, e.g. 'Follow up with company XY'",
+  "messageAriaLabel": "Reminder message",
+  "addAriaLabel": "Add reminder",
+  "add": "Add",
+  "showDone": "Show completed",
+  "count_one": "{{count}} entry",
+  "count_other": "{{count}} entries",
+  "fallbackMessage": "Reminder",
+  "markDone": "Mark as done",
+  "delete": "Delete reminder",
+  "emptyDone": "No completed reminders.",
+  "emptyPending": "No open reminders 🎉"
+}

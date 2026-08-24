@@ -1,0 +1,17 @@
+{
+  "title": "Erinnerungen",
+  "newReminder": "Neue Erinnerung",
+  "dateAriaLabel": "Datum und Uhrzeit",
+  "messagePlaceholder": "Nachricht, z.B. 'Bei Firma XY nachfragen'",
+  "messageAriaLabel": "Erinnerungsnachricht",
+  "addAriaLabel": "Erinnerung hinzufügen",
+  "add": "Hinzufügen",
+  "showDone": "Erledigte anzeigen",
+  "count_one": "{{count}} Eintrag",
+  "count_other": "{{count}} Einträge",
+  "fallbackMessage": "Erinnerung",
+  "markDone": "Als erledigt markieren",
+  "delete": "Erinnerung löschen",
+  "emptyDone": "Keine erledigten Erinnerungen.",
+  "emptyPending": "Keine offenen Erinnerungen 🎉"
+}

@@ -1,0 +1,19 @@
+{
+  "dialogAriaLabel": "Salary Negotiation Coach",
+  "heading": "Salary Negotiation Coach",
+  "close": "Close",
+  "copied": "Copied",
+  "copy": "Copy",
+  "scenarioTypes": {
+    "konservativ": "Conservative",
+    "realistisch": "Realistic ★",
+    "optimistisch": "Optimistic"
+  },
+  "generating": "Generating…",
+  "generate": "Generate Strategy",
+  "tabEmail": "📧 Email",
+  "tabPhone": "📞 Phone Call",
+  "perYear": "{{amount}} / year",
+  "generalTips": "General Tips:",
+  "introPrefix": "AI is generating 3 negotiation scenarios for"
+}

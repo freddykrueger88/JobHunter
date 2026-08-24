@@ -25,3 +25,15 @@ export function formatDateTime(iso: string | null | undefined, i18nLanguage: str
     minute: '2-digit',
   })
 }
+
+export function formatNumber(value: number, i18nLanguage: string): string {
+  return new Intl.NumberFormat(toIntlLocale(i18nLanguage)).format(value)
+}
+
+export function formatCurrencyEur(value: number, i18nLanguage: string): string {
+  return new Intl.NumberFormat(toIntlLocale(i18nLanguage), {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(value)
+}

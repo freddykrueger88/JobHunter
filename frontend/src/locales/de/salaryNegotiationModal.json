@@ -1,0 +1,19 @@
+{
+  "dialogAriaLabel": "Gehaltsverhandlungs-Coach",
+  "heading": "Gehaltsverhandlungs-Coach",
+  "close": "Schließen",
+  "copied": "Kopiert",
+  "copy": "Kopieren",
+  "scenarioTypes": {
+    "konservativ": "Konservativ",
+    "realistisch": "Realistisch ★",
+    "optimistisch": "Optimistisch"
+  },
+  "generating": "Generiere…",
+  "generate": "Strategie generieren",
+  "tabEmail": "📧 E-Mail",
+  "tabPhone": "📞 Telefonat",
+  "perYear": "{{amount}} / Jahr",
+  "generalTips": "Allgemeine Tipps:",
+  "introPrefix": "KI generiert 3 Verhandlungsszenarien für"
+}

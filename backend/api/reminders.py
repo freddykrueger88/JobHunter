@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from backend.core.database import get_db
 from backend.models.reminder import Reminder
+from backend.core.errors import api_error
 
 router = APIRouter(prefix="/api/reminders", tags=["Erinnerungen"])
 
@@ -46,7 +47,7 @@ async def create_reminder(data: ReminderCreate, db: AsyncSession = Depends(get_d
 async def mark_done(reminder_id: int, db: AsyncSession = Depends(get_db)):
     reminder = await db.get(Reminder, reminder_id)
     if not reminder:
-        raise HTTPException(status_code=404, detail="Erinnerung nicht gefunden")
+        raise api_error(404, "reminders.not_found", "Erinnerung nicht gefunden")
     reminder.is_done = True
     await db.commit()
     await db.refresh(reminder)

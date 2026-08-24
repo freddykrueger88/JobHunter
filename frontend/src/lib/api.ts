@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios'
+import type { TFunction } from 'i18next'
 
 /**
  * Zentraler API-Client - loest den in REPOSITORY_AUDIT_DE.md Abschnitt 1.2
@@ -28,5 +29,29 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+/**
+ * Liefert eine nutzersichtbare Fehlermeldung fuer einen API-Fehler.
+ *
+ * Backend-Endpunkte, die auf core.errors.api_error() umgestellt wurden
+ * (Rework-Plan Phase C.4), senden den Fehlercode im X-Error-Code-Header.
+ * Existiert dafuer ein Eintrag unter common:errors.<code>, wird dieser
+ * uebersetzt zurueckgegeben - sonst faellt es auf den deutschen Klartext
+ * aus response.data.detail zurueck (bei noch nicht migrierten Endpunkten).
+ *
+ * t muss den "common"-Namespace geladen haben (useTranslation([..., 'common'])).
+ */
+export function getApiErrorMessage(error: unknown, t: TFunction): string {
+  if (axios.isAxiosError(error)) {
+    const code = error.response?.headers?.['x-error-code'] as string | undefined
+    if (code && t('common:errors.' + code, { defaultValue: '' })) {
+      return t('common:errors.' + code)
+    }
+    const detail = (error.response?.data as { detail?: string } | undefined)?.detail
+    if (detail) return detail
+    return error.message
+  }
+  return t('common:errors.unknown')
+}
 
 export default api

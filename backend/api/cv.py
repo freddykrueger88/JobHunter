@@ -8,6 +8,7 @@ from backend.models.cv import CVData
 from backend.models.history import HistoryEntry
 from backend.services.cv_parser import extract_text, parse_cv_with_ai
 from backend.schemas.cv import CVUploadResponse, CVListItem, CVDetail
+from backend.core.errors import api_error
 
 router = APIRouter(prefix="/api/cv", tags=["Lebenslauf"])
 UPLOAD_DIR = "/app/uploads"
@@ -47,7 +48,7 @@ async def upload_cv(
     safe_filename = os.path.basename(file.filename)
     ext = os.path.splitext(safe_filename)[1].lower()
     if not safe_filename or ext not in allowed:
-        raise HTTPException(status_code=400, detail=f"Nur {allowed} erlaubt")
+        raise api_error(400, "cv.invalid_file_type", f"Nur {allowed} erlaubt")
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     dest = os.path.join(UPLOAD_DIR, safe_filename)
     with open(dest, "wb") as f:
@@ -81,7 +82,7 @@ async def list_cvs(db: AsyncSession = Depends(get_db)):
 async def get_cv(cv_id: int, db: AsyncSession = Depends(get_db)):
     cv = await db.get(CVData, cv_id)
     if not cv:
-        raise HTTPException(status_code=404, detail="CV nicht gefunden")
+        raise api_error(404, "cv.not_found", "CV nicht gefunden")
     return {
         "id": cv.id, "filename": cv.filename, "full_name": cv.full_name,
         "email": cv.email, "phone": cv.phone, "address": cv.address,
@@ -94,7 +95,7 @@ async def get_cv(cv_id: int, db: AsyncSession = Depends(get_db)):
 async def delete_cv(cv_id: int, db: AsyncSession = Depends(get_db)):
     cv = await db.get(CVData, cv_id)
     if not cv:
-        raise HTTPException(status_code=404, detail="CV nicht gefunden")
+        raise api_error(404, "cv.not_found", "CV nicht gefunden")
     filepath = os.path.join(UPLOAD_DIR, os.path.basename(cv.filename))
     if os.path.exists(filepath):
         os.remove(filepath)

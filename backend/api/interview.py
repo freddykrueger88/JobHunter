@@ -8,6 +8,7 @@ from backend.models.job import Job
 from backend.models.settings import UserSettings
 from backend.services.interview_simulator import generate_interview_questions, evaluate_answer
 from backend.schemas.interview import InterviewQuestionsResponse, AnswerEvaluationResponse
+from backend.core.errors import api_error
 
 router = APIRouter(prefix="/api/interview", tags=["Interview-Simulator"])
 
@@ -22,7 +23,7 @@ class EvaluateRequest(BaseModel):
 async def get_interview_questions(job_id: int, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Job nicht gefunden")
+        raise api_error(404, "interview.job_not_found", "Job nicht gefunden")
     result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
     s = result.scalar_one_or_none()
     model = s.ai_model if s else "mistral"
@@ -38,7 +39,7 @@ async def get_interview_questions(job_id: int, db: AsyncSession = Depends(get_db
 async def evaluate_interview_answer(data: EvaluateRequest, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, data.job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Job nicht gefunden")
+        raise api_error(404, "interview.job_not_found", "Job nicht gefunden")
     result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
     s = result.scalar_one_or_none()
     model = s.ai_model if s else "mistral"

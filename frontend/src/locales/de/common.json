@@ -2,5 +2,28 @@
   "save": "Speichern",
   "cancel": "Abbrechen",
   "delete": "Löschen",
-  "loading": "Lädt..."
+  "loading": "Lädt...",
+  "errors": {
+    "unknown": "Unbekannter Fehler",
+    "cv": {
+      "not_found": "Lebenslauf nicht gefunden.",
+      "invalid_file_type": "Dieser Dateityp wird nicht unterstützt (nur PDF, DOCX, DOC)."
+    },
+    "reminders": {
+      "not_found": "Erinnerung nicht gefunden."
+    },
+    "export": {
+      "json_only": "Nur .json-Dateien können importiert werden.",
+      "invalid_json": "Die Datei enthält kein gültiges JSON.",
+      "openpyxl_missing": "Excel-Export ist auf dem Server aktuell nicht verfügbar."
+    },
+    "company": {
+      "job_not_found": "Stelle nicht gefunden.",
+      "no_company_name": "Zu dieser Stelle ist kein Firmenname hinterlegt.",
+      "empty_name": "Bitte einen Firmennamen eingeben."
+    },
+    "interview": {
+      "job_not_found": "Stelle nicht gefunden."
+    }
+  }
 }

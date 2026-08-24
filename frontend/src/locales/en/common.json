@@ -2,5 +2,28 @@
   "save": "Save",
   "cancel": "Cancel",
   "delete": "Delete",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "errors": {
+    "unknown": "Unknown error",
+    "cv": {
+      "not_found": "CV not found.",
+      "invalid_file_type": "This file type is not supported (only PDF, DOCX, DOC)."
+    },
+    "reminders": {
+      "not_found": "Reminder not found."
+    },
+    "export": {
+      "json_only": "Only .json files can be imported.",
+      "invalid_json": "The file does not contain valid JSON.",
+      "openpyxl_missing": "Excel export is currently unavailable on the server."
+    },
+    "company": {
+      "job_not_found": "Job not found.",
+      "no_company_name": "No company name is set for this job.",
+      "empty_name": "Please enter a company name."
+    },
+    "interview": {
+      "job_not_found": "Job not found."
+    }
+  }
 }

@@ -17,6 +17,7 @@ from backend.models.history import HistoryEntry
 from backend.models.reminder import Reminder
 from backend.models.settings import UserSettings
 from backend.schemas.export import ImportResult
+from backend.core.errors import api_error
 
 router = APIRouter(prefix="/api/export", tags=["Export/Import"])
 EXPORT_VERSION = "1.2"
@@ -86,7 +87,7 @@ async def export_xlsx(db: AsyncSession = Depends(get_db)):
         import openpyxl
         from openpyxl.styles import Font, PatternFill, Alignment
     except ImportError:
-        raise HTTPException(status_code=500, detail="openpyxl nicht installiert (pip install openpyxl)")
+        raise api_error(500, "export.openpyxl_missing", "openpyxl nicht installiert (pip install openpyxl)")
 
     apps = (await db.execute(select(Application).order_by(Application.created_at.desc()))).scalars().all()
     wb = openpyxl.Workbook()
@@ -152,12 +153,12 @@ async def import_data(
 ):
     """Importiert einen JobHunter-JSON-Export. Bestehende Daten werden nicht überschrieben."""
     if not file.filename.endswith(".json"):
-        raise HTTPException(status_code=400, detail="Nur .json-Dateien erlaubt")
+        raise api_error(400, "export.json_only", "Nur .json-Dateien erlaubt")
     raw = await file.read()
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Ungültiges JSON")
+        raise api_error(400, "export.invalid_json", "Ungültiges JSON")
 
     version = data.get("version", "unknown")
     stats = {"jobs": 0, "applications": 0, "reminders": 0, "history": 0}

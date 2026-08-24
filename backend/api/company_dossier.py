@@ -11,6 +11,7 @@ from backend.core.database import get_db
 from backend.models.job import Job
 from backend.services.company_research import fetch_company_dossier
 from backend.schemas.company import CompanyDossier
+from backend.core.errors import api_error
 
 router = APIRouter(prefix="/api/company", tags=["company"])
 
@@ -20,9 +21,9 @@ async def get_company_dossier_by_job(job_id: int, db: AsyncSession = Depends(get
     """Dossier zur Firma einer bestehenden Bewerbung/Stelle (ehem. api/company.py)."""
     job = await db.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Job nicht gefunden")
+        raise api_error(404, "company.job_not_found", "Job nicht gefunden")
     if not job.company:
-        raise HTTPException(status_code=400, detail="Job hat keinen Firmennamen")
+        raise api_error(400, "company.no_company_name", "Job hat keinen Firmennamen")
     return await fetch_company_dossier(job.company)
 
 
@@ -30,6 +31,6 @@ async def get_company_dossier_by_job(job_id: int, db: AsyncSession = Depends(get
 async def get_company_dossier(name: str = Query(..., min_length=2, description="Firmenname")):
     """Gibt öffentliche Infos zur Firma zurück (Wikipedia, Logo, Warnung)."""
     if not name.strip():
-        raise HTTPException(status_code=400, detail="Firmenname darf nicht leer sein")
+        raise api_error(400, "company.empty_name", "Firmenname darf nicht leer sein")
     data = await fetch_company_dossier(name.strip())
     return data

@@ -72,7 +72,7 @@ export default function CoverLetter({ jobId, cvId }: { jobId?: number; cvId?: nu
       {/* Optionale Vorlage */}
       <div>
         <label className="text-sm text-gray-500 block mb-1">
-          Vorlage (optional) – Platzhalter wie {{Ansprechpartner}} werden ersetzt
+          Vorlage (optional) – Platzhalter wie {'{{Ansprechpartner}}'} werden ersetzt
         </label>
         <textarea
           className="w-full h-28 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"

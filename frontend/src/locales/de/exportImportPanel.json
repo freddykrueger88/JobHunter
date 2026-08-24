@@ -1,0 +1,22 @@
+{
+  "heading": "Export / Import",
+  "export": "Exportieren",
+  "exportJson": "JSON (vollständig)",
+  "exportCsv": "CSV",
+  "exportXlsx": "Excel (.xlsx)",
+  "exportHint": "JSON enthält alle Daten (DSGVO Art. 20). CSV & XLSX enthalten Bewerbungen + Stellen.",
+  "import": "Importieren",
+  "chooseFile": "Datei wählen",
+  "orDrop": "oder hierher ziehen",
+  "importHint": ".json (JobHunter-Export)",
+  "importing": "Import läuft…",
+  "importSuccess": "Import erfolgreich (Version {{version}})",
+  "statLabels": {
+    "jobs": "Stellen",
+    "applications": "Bewerbungen",
+    "reminders": "Erinnerungen",
+    "history": "Verlaufseinträge"
+  },
+  "errorJsonOnly": "Nur .json-Dateien erlaubt.",
+  "errorUnknown": "Unbekannter Fehler"
+}

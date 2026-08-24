@@ -3,11 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from backend.core.database import get_db
 from backend.models.history import HistoryEntry
+from backend.schemas.history import HistoryEntryRead
 
 router = APIRouter(prefix="/api/history", tags=["Verlauf"])
 
 
-@router.get("/")
+@router.get("/", response_model=list[HistoryEntryRead])
 async def get_history(
     event_type: str | None = None,
     limit: int = Query(default=50, le=200),

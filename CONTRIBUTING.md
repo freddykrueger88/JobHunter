@@ -17,7 +17,8 @@ Thank you for contributing to JobHunter! All help is welcome – whether it's a 
 5. [Commit Conventions](#5-commit-conventions)
 6. [Creating a Pull Request](#6-creating-a-pull-request)
 7. [Code Style](#7-code-style)
-8. [Questions & Help](#8-questions--help)
+8. [Release Process](#8-release-process)
+9. [Questions & Help](#9-questions--help)
 
 ---
 
@@ -167,7 +168,32 @@ PRs are only merged if:
 
 ---
 
-### 8. Questions & Help
+### 8. Release Process
+
+*(Made explicit in Rework-Plan Phase E.5 – previously informal/undocumented, see `docs/analysis/REPOSITORY_AUDIT_EN.md`.)*
+
+JobHunter follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+
+| Bump | When |
+|---|---|
+| `MAJOR` | Breaking changes (incompatible API/DB migration, removed feature) |
+| `MINOR` | New features, backward-compatible (the common case – see `CHANGELOG.md` history) |
+| `PATCH` | Bugfixes only, no new features |
+
+**Steps to cut a release:**
+
+1. Make sure CI (`.github/workflows/ci.yml`) is green on `main` – releases are only cut from a green commit.
+2. Move the relevant `[Unreleased]` entries in `CHANGELOG.md` into a new `[X.Y.Z] – YYYY-MM-DD` section, **both** in the English and German half of the file (single-file DE/EN scheme, see file header).
+3. Update the version badge in `README.md` and `README.de.md`.
+4. Commit: `git commit -m "chore(release): vX.Y.Z"`.
+5. Tag and push: `git tag -a vX.Y.Z -m "vX.Y.Z"` then `git push origin main --tags`.
+6. Optionally create a GitHub Release from the tag, using the matching `CHANGELOG.md` section as the description.
+
+> **Known gap (as of this writing):** `frontend/package.json`'s `"version"` field is not currently kept in sync with the README/CHANGELOG version (README shows v1.9.0, `package.json` shows 0.4.0). Keep it in sync going forward when cutting a release; retroactively fixing the existing drift is a separate decision, not assumed here.
+
+---
+
+### 9. Questions & Help
 
 Simply open an [Issue](https://github.com/freddykrueger88/JobHunter/issues) with the label `question`. No question is too simple!
 
@@ -191,7 +217,8 @@ Danke, dass du zu JobHunter beitragen möchtest! Jede Hilfe ist willkommen – e
 5. [Commit-Konventionen](#5-commit-konventionen)
 6. [Pull Request erstellen](#6-pull-request-erstellen)
 7. [Code-Stil](#7-code-stil)
-8. [Fragen & Hilfe](#8-fragen--hilfe-1)
+8. [Release-Prozess](#8-release-prozess)
+9. [Fragen & Hilfe](#9-fragen--hilfe)
 
 ---
 
@@ -341,7 +368,32 @@ PRs werden nur gemergt wenn:
 
 ---
 
-### 8. Fragen & Hilfe
+### 8. Release-Prozess
+
+*(Explizit gemacht in Rework-Plan Phase E.5 – zuvor informell/undokumentiert, siehe `docs/analysis/REPOSITORY_AUDIT_DE.md`.)*
+
+JobHunter folgt [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+
+| Erhöhung | Wann |
+|---|---|
+| `MAJOR` | Breaking Changes (inkompatible API-/DB-Migration, entferntes Feature) |
+| `MINOR` | Neue Features, abwärtskompatibel (der Regelfall – siehe `CHANGELOG.md`-Historie) |
+| `PATCH` | Nur Bugfixes, keine neuen Features |
+
+**Schritte für einen Release:**
+
+1. Sicherstellen, dass CI (`.github/workflows/ci.yml`) auf `main` grün ist – Releases werden nur von einem grünen Commit aus geschnitten.
+2. Die relevanten `[Unreleased]`-Einträge in `CHANGELOG.md` in einen neuen Abschnitt `[X.Y.Z] – YYYY-MM-DD` verschieben, **sowohl** im englischen als auch im deutschen Teil der Datei (Ein-Datei-DE/EN-Schema, siehe Dateikopf).
+3. Das Versions-Badge in `README.md` und `README.de.md` aktualisieren.
+4. Committen: `git commit -m "chore(release): vX.Y.Z"`.
+5. Taggen und pushen: `git tag -a vX.Y.Z -m "vX.Y.Z"`, dann `git push origin main --tags`.
+6. Optional einen GitHub Release aus dem Tag erstellen, mit dem passenden `CHANGELOG.md`-Abschnitt als Beschreibung.
+
+> **Bekannte Lücke (Stand jetzt):** Das `"version"`-Feld in `frontend/package.json` wird aktuell nicht mit der README-/CHANGELOG-Version synchron gehalten (README zeigt v1.9.0, `package.json` zeigt 0.4.0). Ab jetzt bei jedem Release synchron halten; die bestehende Abweichung rückwirkend zu korrigieren ist eine eigene Entscheidung, die hier nicht vorausgesetzt wird.
+
+---
+
+### 9. Fragen & Hilfe
 
 Einfach ein [Issue](https://github.com/freddykrueger88/JobHunter/issues) mit dem Label `question` öffnen. Keine Frage ist zu simpel!
 

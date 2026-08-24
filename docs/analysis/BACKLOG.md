@@ -83,3 +83,24 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
   Schritt: inhaltliches Review durch den Nutzer, danach Start Phase 4 (i18n-Umsetzung) gemaess
   REWORK_PLAN_DE.md Phase A-E. Laufende uncommittete Arbeitsdateien des Nutzers weiterhin
   unveraendert (verifiziert: git status zeigt dieselben 10 Dateien wie bei Sessionbeginn).
+
+## Phase A - Umsetzung (2026-08-24, waehrend Nutzer abwesend, auf expliziten Wunsch)
+- [x] A.1 conftest.py Base-Import gefixt (0 -> 15 gruene Tests, 7 separate Bugs sichtbar geworden)
+- [x] A.2 ESLint-Config ergaenzt (.eslintrc.cjs) - 26 echte Lint-Findings jetzt sichtbar
+- [x] A.3 tsconfig.json ergaenzt - deckte 2 echte Bugs auf (fehlende recharts/date-fns
+      Dependencies, totes focusMode-Prop, JSX-Syntaxfehler in CoverLetter.tsx) - alle gefixt,
+      npm run build laeuft jetzt komplett durch
+- [x] A.5 Path-Traversal-Luecke in api/cv.py geschlossen (os.path.basename), per echtem
+      Angriffsversuch verifiziert
+- [x] A.6 Harte Secret-Validierung in core/config.py (kein "changeme"-Fallback mehr),
+      positiv+negativ verifiziert
+- [!] NEU ENTDECKT waehrend Verifikation: 14 von 21 Backend-Routern hatten kein /api-Praefix,
+      obwohl ALLE Frontend-Calls durchgaengig /api/... nutzen -> Grossteil der App war ueber
+      den Browser/Dev-Proxy nicht erreichbar (404). 12 Router gefixt und verifiziert.
+      OFFEN (Produktentscheidung/main.py-Konflikt, absichtlich nicht angefasst):
+      - api/company.py vs api/company_dossier.py: /dossier-Route wuerde kollidieren
+      - api/jobs.py vs routers/jobs_image.py: potenzielle Pfad-Kollision, main.py-abhaengig
+      - api/search_profiles.py: Praefix gefixt, aber Router war schon vorher nicht in main.py
+        eingebunden (separater Bug) - SearchProfiles-Seite im Frontend aktuell tot
+- [ ] A.4 Frontend-Dockerfile auf Mehrstufen-Build umstellen - in Arbeit
+- [ ] A.7 Punktuelle docs/*.md Korrekturen - noch offen

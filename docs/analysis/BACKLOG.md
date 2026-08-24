@@ -125,22 +125,44 @@ niedrige Prioritaet).
       CompanyDossierPage.tsx). Nebenbefund: components/CompanyDossier.tsx wird
       nirgends importiert - totes, unverdrahtetes Fragment, aehnlich Auth-Muster,
       absichtlich nicht geloescht (Produktentscheidung)
-- [~] B.6 Backend-Schema-Schicht ausbauen - 3 von ~12 Domaenen erledigt und einzeln
-      per echtem HTTP-Request verifiziert:
+- [~] B.6 Backend-Schema-Schicht ausbauen - 6 Domaenen erledigt, jede einzeln per
+      echtem HTTP-Request gegen die laufende API verifiziert:
       - backend/schemas/cv.py (CVUploadResponse/CVListItem/CVDetail) -> api/cv.py
       - backend/schemas/history.py (HistoryEntryRead) -> api/history.py
-      - backend/schemas/dashboard.py (DashboardStats/DueReminder, nutzt HistoryEntryRead) -> api/dashboard.py
+      - backend/schemas/dashboard.py (DashboardStats/DueReminder) -> api/dashboard.py
+      - backend/schemas/eures.py (EuresSearchResult/EuresJob, deckt Erfolgs- UND
+        Fehlerfall des Scrapers ab) -> api/eures.py
+      - backend/schemas/company.py (CompanyDossier) -> api/company.py UND
+        api/company_dossier.py (beide liefern nachweislich identisches Format -
+        bestaetigt die bereits dokumentierte Ueberschneidung)
+      - backend/schemas/export.py (ImportStats/ImportResult) -> POST /api/export/import
+        (die drei GET-Export-Endpunkte liefern StreamingResponse/Datei-Downloads,
+        dort greift response_model nicht). Nebenbefund: import_data() verarbeitet
+        "applications" aus dem JSON gar nicht (nur jobs/reminders/history) - separater
+        Bug, nicht gefixt (waere Verhaltensaenderung, kein reiner Schema-Fix).
       reminders.py und jobs.py hatten bereits gute Inline-Schemas (kein Handlungsbedarf).
-      BEWUSST NICHT angefasst: applications.py (haengt an models/application.py,
-      Nutzer-eigene uncommittete Datei - nicht ohne Ruecksprache aendern).
-      Verbleibend, jeweils eigener Aufwand: ai, company, cover_letter_pdf, eures
-      (Rueckgabeform kommt aus services/job_search/eures_scraper.py, noch nicht
-      geprueft), export, interview, search_profiles.
+
+      BEWUSST NICHT angefasst, mit Grund:
+      - applications.py: haengt an models/application.py, Nutzer-eigene uncommittete
+        Datei - nicht ohne Ruecksprache aendern.
+      - ai.py, interview.py: geben teils direkt geparste LLM-Rohausgaben zurueck
+        (services/interview_simulator.py parst z.B. json.loads() auf KI-Freitext ohne
+        Formatgarantie) - eine strikte Schema-Erzwingung koennte bei abweichender
+        KI-Antwort einen neuen 500er erzeugen, wo heute durchgereicht wird. Echte
+        Designfrage (wie streng KI-Output validiert werden soll), keine reine
+        Bugfix-Aufgabe - zurueckgestellt.
+      - cover_letter_pdf.py, search_profiles.py: beide nicht in main.py eingebunden
+        (bereits als Fund aus Phase A dokumentiert) - nicht per echtem HTTP-Request
+        verifizierbar, daher zurueckgestellt bis die Registrierung geklaert ist.
+
+      Damit sind praktisch alle ohne main.py-Aenderung oder KI-Design-Entscheidung
+      sicher bearbeitbaren Domaenen abgedeckt.
 - [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
 
-Phase B Status: 4 von 7 abgeschlossen, B.6 in Arbeit (3 von ~12 Domaenen).
-Produktentscheidung/main.py-Konflikt -, B.6 noch offen).
+Phase B Status: 4 von 7 abgeschlossen, B.6 so weit wie ohne main.py-Aenderungen bzw.
+Produktentscheidungen moeglich (6 Domaenen).
 
-Naechster Schritt: B.6 (Schema-Schicht) oder Review durch den Nutzer, insbesondere
-zu den zurueckgestellten Punkten B.2/B.3 sowie den in Phase A neu gefundenen
-main.py-abhaengigen Themen (company.py/jobs.py/search_profiles.py Registrierung).
+Naechster Schritt: Review durch den Nutzer, insbesondere zu den zurueckgestellten
+Punkten B.2/B.3 sowie den main.py-abhaengigen Themen (company.py/jobs.py/
+search_profiles.py/cover_letter_pdf.py Registrierung) und der KI-Schema-Designfrage.
+Danach Phase C (Internationalisierung) gemaess REWORK_PLAN_DE.md.

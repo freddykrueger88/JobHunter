@@ -78,6 +78,8 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 
 ## Änderungsprotokoll
 - 2026-08-24: Backlog angelegt, gh installiert, Auth als blockiert markiert.
+- 2026-08-24: Phase D (Produktqualitaet) umgesetzt - einheitliche Fehleranzeige,
+  Code-Splitting, dsgvo.md-Sachfehler korrigiert. Naechster Schritt: Phase E.
 
 - 2026-08-24 (Fortsetzung): Phase 1 (Audit DE+EN), Phase 2 (Codequalitaet + Stack-Eignung DE+EN)
   und Phase 3 (Rework-Entscheidung, REWORK_PLAN_DE/EN.md, docs/architecture/ mit 3 ADRs) auf
@@ -245,3 +247,44 @@ stehen, bis main.py fertig/committet ist.
 
 Phase C Status: ABGESCHLOSSEN (C.1-C.6 erledigt, C.7 bewusst nach Phase 5
 verschoben statt doppelt gemacht).
+
+## Phase D - Produktqualitaet (2026-08-24, Umsetzung)
+- [x] D.1 Einheitliche Fehleranzeige: lib/errorToast.ts (window-CustomEvent-Kanal)
+      + components/ErrorToastContainer.tsx (Toast im UndoToast-Stil, Auto-Dismiss
+      6s, in App.tsx eingehaengt) + lib/api.ts-Interceptor nutzt jetzt
+      getApiErrorMessage() statt nur console.error. Neuer Namespace
+      errorToastContainer (DE/EN). Verifiziert: Build/Lint/i18n-Check + echter
+      Request gegen GET /api/cv/999999 liefert x-error-code: cv.not_found,
+      der Interceptor uebersetzt und zeigt ihn an.
+- [x] D.2 Ladezustaende: Spot-Check aller 9 gerouteten Seiten - 8/9 haben bereits
+      isLoading/Loader2-Muster (grossteils waehrend Phase-C-Batches miterledigt,
+      wie im Rework-Plan D.2 vorgesehen). Einzige Ausnahme: pages/Onboarding.tsx
+      hat keinerlei Ladezustand UND ist nirgends in App.tsx/anderswo referenziert
+      bzw. geroutet (toter Code, bisher nicht entdeckt) - deshalb bewusst NICHT
+      angefasst/geloescht in diesem Schritt: anders als das kleine tote Fragment
+      aus B.5 ist das eine vollstaendige, potenziell unfertige Onboarding-Seite;
+      Loeschen ohne Rueckfrage waere eine Annahme ueber Nutzerabsicht. Als offener
+      Punkt vermerkt, nicht stillschweigend geloest.
+- [!] D.3 Accessibility: laut Rework-Plan explizit NICHT Teil dieses Plans
+      (eigener dedizierter Accessibility-Audit-Pass empfohlen). Bleibt offen,
+      bewusst nicht in diesem Release-Zyklus behandelt.
+- [x] D.4 Performance/Bundle-Groesse: vite build zeigte vor der Aenderung einen
+      einzigen 470.78KB/143.97KB-gzip-Hauptchunk. Alle Routen ausser Dashboard
+      (bleibt eager wg. Suspense-Flackern) per React.lazy() umgestellt -
+      einheitlich fuer alle 8 Nicht-Startseiten statt nur der zwei im Plan
+      genannten Beispiele (InterviewSimulator/CompanyDossierPage sind darunter).
+      Ergebnis: Hauptchunk 393.23KB/126.90KB gzip (-17%/-12%), Rest als
+      eigene 3-24KB-Chunks. RouteFallback-Spinner nutzt vorhandenen
+      common:loading-Key. Verifiziert: Build/Lint/i18n-Check.
+- [x] D.5 Datenschutz-Dokumente geprueft: docs/dsgvo.md UND docs/PRIVACY.md sind
+      beide bereits vollstaendig zweisprachig (Ein-Datei-Schema mit Sprunganker,
+      strukturell symmetrisch DE/EN). Dabei Sachfehler gefunden: dsgvo.md nannte
+      an 3 Stellen AES-256, tatsaechlich genutzt wird cryptography.fernet.Fernet
+      (backend/core/crypto.py) = spezifiziert als AES-128-CBC+HMAC-SHA256;
+      PRIVACY.md hatte bereits korrekt AES-128 (Fernet) stehen. dsgvo.md korrigiert
+      und an PRIVACY.md angeglichen.
+
+Phase D Status: D.1/D.2/D.4/D.5 abgeschlossen (D.2 mit offenem Fund, nicht
+geloest). D.3 bleibt wie im Rework-Plan vorgesehen ausserhalb des Scopes.
+Naechster Schritt: Phase E (Engineering - CI, Testpyramide, Dependabot,
+Release-Prozess) gemaess REWORK_PLAN_DE.md.

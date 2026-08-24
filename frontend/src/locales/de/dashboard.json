@@ -4,5 +4,11 @@
   "rejected": "Absagen",
   "accepted": "Angenommen",
   "interview": "Interview",
-  "open": "Interessant"
+  "open": "Interessant",
+  "reminderDefaultMessage": "Erinnerung fällig",
+  "dismissReminderAriaLabel": "Erinnerung als erledigt markieren",
+  "totalBefore": "Gesamt:",
+  "totalAfter": "Bewerbungen verfolgt",
+  "recentActivityHeading": "Letzte Aktivitäten",
+  "noActivity": "Noch keine Aktivitäten vorhanden."
 }

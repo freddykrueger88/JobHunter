@@ -19,10 +19,20 @@ const STATUS_COLORS: Record<string, string> = {
   zurueckgezogen: '#6b7280',
 }
 
+interface Stats {
+  gesamt: number
+  nach_status?: Record<string, number>
+}
+
+interface WeeklyEntry {
+  woche: string
+  anzahl: number
+}
+
 export default function StatsChart() {
   const { t } = useTranslation('statsChart')
-  const [stats, setStats] = useState<any>(null)
-  const [weekly, setWeekly] = useState<any[]>([])
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [weekly, setWeekly] = useState<WeeklyEntry[]>([])
 
   useEffect(() => {
     axios.get('/api/stats/').then(r => setStats(r.data))

@@ -4,5 +4,11 @@
   "rejected": "Rejected",
   "accepted": "Accepted",
   "interview": "Interview",
-  "open": "Interesting"
+  "open": "Interesting",
+  "reminderDefaultMessage": "Reminder due",
+  "dismissReminderAriaLabel": "Mark reminder as done",
+  "totalBefore": "Total:",
+  "totalAfter": "applications tracked",
+  "recentActivityHeading": "Recent Activity",
+  "noActivity": "No activity yet."
 }

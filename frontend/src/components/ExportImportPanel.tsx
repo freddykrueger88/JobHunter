@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Upload, FileJson, FileSpreadsheet, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, FileJson, FileSpreadsheet, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 type ImportStatus = { state: 'idle' } | { state: 'loading' } | { state: 'success'; stats: Record<string, number>; version: string } | { state: 'error'; message: string };
 
@@ -34,8 +34,8 @@ export default function ExportImportPanel() {
       }
       const data = await res.json();
       setStatus({ state: 'success', stats: data.imported, version: data.source_version });
-    } catch (e: any) {
-      setStatus({ state: 'error', message: e.message });
+    } catch (e) {
+      setStatus({ state: 'error', message: e instanceof Error ? e.message : String(e) });
     }
   };
 

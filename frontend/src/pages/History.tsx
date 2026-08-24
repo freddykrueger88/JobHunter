@@ -9,7 +9,7 @@ interface HistoryEntry {
   id: number
   type: string
   description: string
-  meta: Record<string, any> | null
+  meta: Record<string, unknown> | null
   at: string
 }
 

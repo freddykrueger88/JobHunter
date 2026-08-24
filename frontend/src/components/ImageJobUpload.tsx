@@ -50,8 +50,9 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
       setResult(data)
       setState('success')
       onJobCreated(data.job)
-    } catch (err: any) {
-      setError(err.response?.data?.detail ?? t('errorUploadFailed'))
+    } catch (err) {
+      const detail = axios.isAxiosError(err) ? (err.response?.data as { detail?: string } | undefined)?.detail : undefined
+      setError(detail ?? t('errorUploadFailed'))
       setState('error')
     }
   }, [onJobCreated, t])

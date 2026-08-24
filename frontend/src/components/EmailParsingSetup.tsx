@@ -42,7 +42,7 @@ export default function EmailParsingSetup() {
   const [results, setResults] = useState<ScanResult[]>([]);
   const [scanError, setScanError] = useState('');
 
-  const set = (k: keyof IMAPConfig, v: any) => setConfig((c) => ({ ...c, [k]: v }));
+  const set = (k: keyof IMAPConfig, v: IMAPConfig[keyof IMAPConfig]) => setConfig((c) => ({ ...c, [k]: v }));
 
   const testConnection = async () => {
     setConnState('testing');
@@ -56,9 +56,9 @@ export default function EmailParsingSetup() {
       if (!res.ok) throw new Error(data.detail);
       setConnState('ok');
       setConnMsg(data.message);
-    } catch (e: any) {
+    } catch (e) {
       setConnState('error');
-      setConnMsg(e.message);
+      setConnMsg(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -76,8 +76,8 @@ export default function EmailParsingSetup() {
       setResults(data.results);
       setScanState('done');
       setConfigOpen(false);
-    } catch (e: any) {
-      setScanError(e.message);
+    } catch (e) {
+      setScanError(e instanceof Error ? e.message : String(e));
       setScanState('error');
     }
   };

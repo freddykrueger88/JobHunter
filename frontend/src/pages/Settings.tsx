@@ -317,8 +317,9 @@ export default function Settings() {
       const d = res.data.imported
       setImportMsg(`✅ Importiert: ${d.jobs} Stellen, ${d.reminders} Erinnerungen, ${d.history} Verlaufseinträge`)
       qc.invalidateQueries()
-    } catch (err: any) {
-      setImportMsg(`❌ Fehler: ${err.response?.data?.detail ?? err.message}`)
+    } catch (err) {
+      const detail = axios.isAxiosError(err) ? (err.response?.data as { detail?: string } | undefined)?.detail : undefined
+      setImportMsg(`❌ Fehler: ${detail ?? (err instanceof Error ? err.message : String(err))}`)
     } finally { setImporting(false); e.target.value = '' }
   }
 

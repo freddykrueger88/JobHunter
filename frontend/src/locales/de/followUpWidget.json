@@ -1,0 +1,33 @@
+{
+  "due": {
+    "overdue_one": "{{count}} Tag überfällig",
+    "overdue_other": "{{count}} Tage überfällig",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "inDays": "in {{count}} Tagen"
+  },
+  "loadingAriaLabel": "Lade Wiedervorlagen…",
+  "statsAriaLabel": "Wiedervorlagen-Übersicht",
+  "statsUrgent": "🔴 {{count}} heute",
+  "statsSoon": "🟡 {{count}} morgen",
+  "statsLater": "🟢 {{count}} diese Woche",
+  "fallbackJob": "Stelle",
+  "fallbackCompany": "Firma",
+  "rowAriaLabel": "{{job}} bei {{company}} – {{due}}",
+  "unknownJob": "Unbekannte Stelle",
+  "unknownCompany": "Unbekannte Firma",
+  "copyTemplateTitle": "Nachfass-Vorlage kopieren",
+  "copyTemplateAriaLabel": "Nachfass-E-Mail-Vorlage in Zwischenablage kopieren",
+  "markDoneTitle": "Als erledigt markieren",
+  "markDoneAriaLabel": "Wiedervorlage als erledigt markieren",
+  "loadError": "Wiedervorlagen konnten nicht geladen werden.",
+  "retry": "Erneut versuchen",
+  "emptyAriaLabel": "Keine Wiedervorlagen fällig",
+  "emptyText": "Keine offenen Wiedervorlagen",
+  "showAll": "Alle anzeigen",
+  "listAriaLabel": "Offene Wiedervorlagen",
+  "showMoreAriaLabel_one": "{{count}} weitere Wiedervorlage anzeigen",
+  "showMoreAriaLabel_other": "{{count}} weitere Wiedervorlagen anzeigen",
+  "showMore_one": "{{count}} weitere anzeigen",
+  "showMore_other": "{{count}} weitere anzeigen"
+}

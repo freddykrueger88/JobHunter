@@ -11,6 +11,8 @@
  *  - Skeleton-Loader, Empty-State, Fehler-State
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import axios from 'axios'
 import {
   AlertCircle,
@@ -55,37 +57,34 @@ export interface FollowUpStats {
 
 const AMPEL: Record<
   Exclude<AmpelStatus, 'done'>,
-  { icon: typeof AlertCircle; dot: string; text: string; badge: string; label: string }
+  { icon: typeof AlertCircle; dot: string; text: string; badge: string }
 > = {
   urgent: {
     icon: AlertCircle,
     dot: 'bg-red-500',
     text: 'text-red-500 dark:text-red-400',
     badge: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-800',
-    label: 'Heute fällig',
   },
   soon: {
     icon: Clock,
     dot: 'bg-yellow-400',
     text: 'text-yellow-600 dark:text-yellow-400',
     badge: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 ring-1 ring-yellow-200 dark:ring-yellow-800',
-    label: 'Morgen fällig',
   },
   later: {
     icon: Clock,
     dot: 'bg-green-500',
     text: 'text-green-600 dark:text-green-400',
     badge: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 ring-1 ring-green-200 dark:ring-green-800',
-    label: '',
   },
 }
 
-function formatDue(item: FollowUpItem): string {
+function formatDue(item: FollowUpItem, t: TFunction): string {
   const diff = item.tage_bis_faellig
-  if (diff < 0)  return `${Math.abs(diff)} Tage überfällig`
-  if (diff === 0) return 'Heute'
-  if (diff === 1) return 'Morgen'
-  return `in ${diff} Tagen`
+  if (diff < 0)  return t('due.overdue', { count: Math.abs(diff) })
+  if (diff === 0) return t('due.today')
+  if (diff === 1) return t('due.tomorrow')
+  return t('due.inDays', { count: diff })
 }
 
 // ---------------------------------------------------------------------------
@@ -93,8 +92,9 @@ function formatDue(item: FollowUpItem): string {
 // ---------------------------------------------------------------------------
 
 function Skeleton() {
+  const { t } = useTranslation('followUpWidget')
   return (
-    <div className="space-y-2" aria-busy="true" aria-label="Lade Wiedervorlagen…">
+    <div className="space-y-2" aria-busy="true" aria-label={t('loadingAriaLabel')}>
       {[1, 2, 3].map(i => (
         <div
           key={i}
@@ -110,22 +110,23 @@ function Skeleton() {
 // ---------------------------------------------------------------------------
 
 function StatsRow({ stats }: { stats: FollowUpStats }) {
+  const { t } = useTranslation('followUpWidget')
   if (stats.gesamt_offen === 0) return null
   return (
-    <div className="flex gap-2 flex-wrap mb-3" role="status" aria-label="Wiedervorlagen-Übersicht">
+    <div className="flex gap-2 flex-wrap mb-3" role="status" aria-label={t('statsAriaLabel')}>
       {stats.urgent > 0 && (
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${AMPEL.urgent.badge}`}>
-          🔴 {stats.urgent} heute
+          {t('statsUrgent', { count: stats.urgent })}
         </span>
       )}
       {stats.soon > 0 && (
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${AMPEL.soon.badge}`}>
-          🟡 {stats.soon} morgen
+          {t('statsSoon', { count: stats.soon })}
         </span>
       )}
       {stats.later > 0 && (
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${AMPEL.later.badge}`}>
-          🟢 {stats.later} diese Woche
+          {t('statsLater', { count: stats.later })}
         </span>
       )}
     </div>
@@ -145,6 +146,7 @@ interface RowProps {
 }
 
 function FollowUpRow({ item, onDone, onCopy, copyingId, donePending }: RowProps) {
+  const { t } = useTranslation('followUpWidget')
   const cfg = item.ampel !== 'done' ? AMPEL[item.ampel] : AMPEL.later
   const Icon = cfg.icon
   const isPending = donePending.has(item.id)
@@ -165,16 +167,16 @@ function FollowUpRow({ item, onDone, onCopy, copyingId, donePending }: RowProps)
       <Link
         to={`/applications/${item.application_id}`}
         className="flex-1 min-w-0 flex items-center gap-2"
-        aria-label={`${item.stelle ?? 'Stelle'} bei ${item.firma ?? 'Firma'} – ${formatDue(item)}`}
+        aria-label={t('rowAriaLabel', { job: item.stelle ?? t('fallbackJob'), company: item.firma ?? t('fallbackCompany'), due: formatDue(item, t) })}
       >
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
-            {item.stelle ?? 'Unbekannte Stelle'}
+            {item.stelle ?? t('unknownJob')}
           </p>
           <p className="text-xs text-gray-400 truncate">
-            {item.firma ?? 'Unbekannte Firma'}
+            {item.firma ?? t('unknownCompany')}
             <span className={`ml-2 font-semibold ${cfg.text}`}>
-              {formatDue(item)}
+              {formatDue(item, t)}
             </span>
           </p>
           {item.notiz && (
@@ -195,8 +197,8 @@ function FollowUpRow({ item, onDone, onCopy, copyingId, donePending }: RowProps)
         onClick={() => onCopy(item.id)}
         className="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-600
           hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-        title="Nachfass-Vorlage kopieren"
-        aria-label="Nachfass-E-Mail-Vorlage in Zwischenablage kopieren"
+        title={t('copyTemplateTitle')}
+        aria-label={t('copyTemplateAriaLabel')}
       >
         {copyingId === item.id
           ? <Check size={14} className="text-green-500" />
@@ -208,8 +210,8 @@ function FollowUpRow({ item, onDone, onCopy, copyingId, donePending }: RowProps)
         onClick={() => onDone(item.id)}
         className="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-green-600
           hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors"
-        title="Als erledigt markieren"
-        aria-label="Wiedervorlage als erledigt markieren"
+        title={t('markDoneTitle')}
+        aria-label={t('markDoneAriaLabel')}
       >
         <Check size={14} />
       </button>
@@ -229,6 +231,7 @@ interface FollowUpWidgetProps {
 }
 
 export default function FollowUpWidget({ maxItems = 5, onDone }: FollowUpWidgetProps) {
+  const { t } = useTranslation('followUpWidget')
   const [items, setItems]           = useState<FollowUpItem[]>([])
   const [stats, setStats]           = useState<FollowUpStats | null>(null)
   const [loading, setLoading]       = useState(true)
@@ -318,12 +321,12 @@ export default function FollowUpWidget({ maxItems = 5, onDone }: FollowUpWidgetP
     return (
       <div className="flex flex-col items-center py-6 text-gray-400 text-sm gap-2">
         <AlertCircle size={24} className="text-red-400" aria-hidden />
-        <p>Wiedervorlagen konnten nicht geladen werden.</p>
+        <p>{t('loadError')}</p>
         <button
           onClick={load}
           className="text-xs text-blue-500 hover:underline"
         >
-          Erneut versuchen
+          {t('retry')}
         </button>
       </div>
     )
@@ -334,15 +337,15 @@ export default function FollowUpWidget({ maxItems = 5, onDone }: FollowUpWidgetP
       <div
         className="flex flex-col items-center py-6 text-gray-400"
         role="status"
-        aria-label="Keine Wiedervorlagen fällig"
+        aria-label={t('emptyAriaLabel')}
       >
         <Bell size={28} className="mb-2" aria-hidden />
-        <p className="text-sm">Keine offenen Wiedervorlagen</p>
+        <p className="text-sm">{t('emptyText')}</p>
         <Link
           to="/followups"
           className="mt-2 text-xs text-blue-500 hover:underline"
         >
-          Alle anzeigen
+          {t('showAll')}
         </Link>
       </div>
     )
@@ -355,7 +358,7 @@ export default function FollowUpWidget({ maxItems = 5, onDone }: FollowUpWidgetP
     <div>
       {stats && <StatsRow stats={stats} />}
 
-      <ul className="space-y-0.5" role="list" aria-label="Offene Wiedervorlagen">
+      <ul className="space-y-0.5" role="list" aria-label={t('listAriaLabel')}>
         {visible.map(item => (
           <FollowUpRow
             key={item.id}
@@ -372,10 +375,10 @@ export default function FollowUpWidget({ maxItems = 5, onDone }: FollowUpWidgetP
         <Link
           to="/followups"
           className="mt-3 flex items-center gap-1 text-xs text-blue-500 hover:underline px-3"
-          aria-label={`${hidden} weitere Wiedervorlagen anzeigen`}
+          aria-label={t('showMoreAriaLabel', { count: hidden })}
         >
           <ChevronRight size={12} aria-hidden />
-          {hidden} weitere anzeigen
+          {t('showMore', { count: hidden })}
         </Link>
       )}
     </div>

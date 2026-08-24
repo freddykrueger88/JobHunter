@@ -1,0 +1,33 @@
+{
+  "due": {
+    "overdue_one": "{{count}} day overdue",
+    "overdue_other": "{{count}} days overdue",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "inDays": "in {{count}} days"
+  },
+  "loadingAriaLabel": "Loading follow-ups…",
+  "statsAriaLabel": "Follow-up overview",
+  "statsUrgent": "🔴 {{count}} today",
+  "statsSoon": "🟡 {{count}} tomorrow",
+  "statsLater": "🟢 {{count}} this week",
+  "fallbackJob": "Job",
+  "fallbackCompany": "Company",
+  "rowAriaLabel": "{{job}} at {{company}} – {{due}}",
+  "unknownJob": "Unknown job",
+  "unknownCompany": "Unknown company",
+  "copyTemplateTitle": "Copy follow-up template",
+  "copyTemplateAriaLabel": "Copy follow-up email template to clipboard",
+  "markDoneTitle": "Mark as done",
+  "markDoneAriaLabel": "Mark follow-up as done",
+  "loadError": "Follow-ups could not be loaded.",
+  "retry": "Try again",
+  "emptyAriaLabel": "No follow-ups due",
+  "emptyText": "No open follow-ups",
+  "showAll": "Show all",
+  "listAriaLabel": "Open follow-ups",
+  "showMoreAriaLabel_one": "Show {{count}} more follow-up",
+  "showMoreAriaLabel_other": "Show {{count}} more follow-ups",
+  "showMore_one": "Show {{count}} more",
+  "showMore_other": "Show {{count}} more"
+}

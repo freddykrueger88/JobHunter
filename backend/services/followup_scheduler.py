@@ -204,8 +204,13 @@ async def berechne_dashboard_stats(db: AsyncSession) -> dict:
             'gesamt_offen': 7,
         }
     """
-    today = func.current_date()
-    tomorrow = func.current_date() + 1  # SQLite + Postgres kompatibel
+    # In Python statt in SQL berechnet (nicht func.current_date() + 1): SQLite
+    # behandelt "TEXT-Datum + 1" als schwach typisierte Arithmetik und liefert
+    # keine gueltige Tages-Verschiebung (der "soon"-Bucket blieb dadurch immer
+    # leer) - als gebundene Parameter funktioniert der Vergleich auf beiden
+    # Dialekten korrekt. Gefunden bei Testfall test_stats_zaehlt_korrekt.
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
 
     bucket = case(
         (FollowUp.erledigt.is_(True), "done"),

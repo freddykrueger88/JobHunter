@@ -31,7 +31,10 @@ from backend.services.followup_scheduler import (
     tage_bis_faellig,
 )
 
-pytestmark = pytest.mark.asyncio
+# pytest.ini setzt asyncio_mode = auto - async Tests werden automatisch
+# erkannt, ein globales pytestmark = pytest.mark.asyncio wuerde faelschlich
+# auch auf die synchronen Unit-Tests (TestBerechneAmpel u.a.) angewandt und
+# PytestWarning fuer jeden davon erzeugen.
 
 
 # ---------------------------------------------------------------------------
@@ -50,7 +53,7 @@ def _make_followup(days_from_now: float, erledigt: bool = False) -> FollowUp:
 
 async def _seed_application(db: AsyncSession) -> int:
     """Legt einen minimalen Job + Application an und gibt die application.id zurueck."""
-    job = Job(titel="IT-Support Specialist", firma="Dataport AoeR")
+    job = Job(title="IT-Support Specialist", company="Dataport AoeR")
     db.add(job)
     await db.flush()  # id benoetigt
 

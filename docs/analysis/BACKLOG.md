@@ -47,7 +47,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 ## Phase 2 – Qualitäts-/Architekturbewertung
 - [x] 2.1 Codequalitaet bewertet (Befund/Prioritaet/Empfehlung/Aufwand/Risiko je Punkt)
 - [x] 2.2 Stack-Eignung fuers Job-Tool bewertet (Ist vs. Ziel)
-- [ ] 2.3 Ergebnisse in REPOSITORY_AUDIT_{DE,EN}.md einarbeiten
+- [x] 2.3 Ergebnisse in REPOSITORY_AUDIT_{DE,EN}.md eingearbeitet (Kapitel 2 komplett, beide Sprachen)
 
 ## Phase 3 – Rework-Entscheidung & Roadmap
 - [ ] 3.1 Entscheidung ableiten (Refactor / Restrukturierung / Teil-Neuaufbau) mit Begründung

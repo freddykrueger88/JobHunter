@@ -1,11 +1,11 @@
 # JobHunter – Repository Audit (English)
 
-> **Status of this document:** Phase 1 (repository inventory) complete.
-> Phase 2 (quality/architecture assessment with prioritized recommendations)
-> follows in a separate work step and will be added as its own section
-> "## 2. Quality and Architecture Assessment" (see `docs/analysis/BACKLOG.md`
-> for progress). German version: `docs/analysis/REPOSITORY_AUDIT_DE.md`
-> (equivalent content).
+> **Status of this document:** Chapter 1 (repository inventory) and
+> Chapter 2 (quality/architecture assessment) complete. The rework decision
+> and roadmap follow as their own documents `docs/analysis/REWORK_PLAN_DE.md`
+> / `docs/analysis/REWORK_PLAN_EN.md` (see `docs/analysis/BACKLOG.md` for
+> progress). German version of this audit:
+> `docs/analysis/REPOSITORY_AUDIT_DE.md` (equivalent content).
 >
 > As of: 2026-08-24. All statements are based on actual inspection of the
 > checkout in LXC 142 (`/root/JobHunter`, branch `main`,
@@ -619,6 +619,114 @@ This summary is deliberately still **unassessed** (no prioritization, no
 effort estimate) – that is the subject of Chapter 2 ("Quality and
 Architecture Assessment"), which follows as its own work step.
 
+## 2. Quality and Architecture Assessment
+
+Systematically assesses the findings from Chapter 1 by priority, effort,
+and risk. Format per recommendation: Observation → Problem/Opportunity →
+Priority → Recommendation → Effort (S/M/L/XL) → Implementation risk.
+Priority refers to urgency *before* starting the i18n implementation
+(Phase 4) or real production operation – not necessarily the order in the
+roadmap (that follows in Chapter 3).
+
+### 2.1 Code Quality
+
+| # | Observation (ref.) | Priority | Recommendation | Effort | Implementation risk |
+|---|---|---|---|---|---|
+| 1 | Backend tests broken: wrong `Base` import in `conftest.py` (1.5) | **Critical** | Fix import to `from backend.core.database import Base` | S | Very low – one-line fix, immediately verifiable via a green test run |
+| 2 | No ESLint config in the frontend (1.5) | **Critical** | Add `eslint.config.js` (flat config, matching ESLint 8.57) with TypeScript+React rules | S | Low – config creation; the first run may surface many initial findings (separate follow-up effort) |
+| 3 | No `tsconfig.json`, `npm run build` effectively never runnable (1.5) | **Critical** | Add a `tsconfig.json` matching Vite/React/TS 5.4 (`tsc --init` + Vite preset as a base), then verify `npm run build` | S–M | Medium – TypeScript strict mode may surface pre-existing, never type-checked errors; an iterative approach is recommended |
+| 4 | "Production" container starts the Vite dev server instead of a build (1.5) | **High** | Multi-stage `frontend/Dockerfile` (build stage with `npm run build`, serve stage e.g. `nginx`/`vite preview`) | M | Medium – deployment behavior changes visibly, test locally before switching over |
+| 5 | Path traversal on CV upload (1.6) | **Critical** | Use server-side UUID filenames instead of the client `filename` | S | Low – locally isolated fix in `api/cv.py`, no schema change |
+| 6 | Weak default secrets in `core/config.py` (1.3/1.6) | **High** | Fail hard (`raise`) instead of a silent fallback when `SECRET_KEY`/`ENCRYPTION_KEY` are missing | S | Low – pure hardening, only affects the error case of a misconfigured `.env` |
+| 7 | Two dead code paths: `backend/models.py`, top-level `/alembic/` (1.1/1.3/1.4) | **Low** | Remove both (demonstrably unused) | S | Very low – pure deletion, verifiable afterward via tests/build |
+| 8 | Split endpoint layer `api/` vs. `routers/` (1.3) | **Medium** | Unify on one directory name (e.g. move everything to `routers/`, dissolve `api/`) | M | Medium – a pure move, but many import paths affected; best done in Phase 3 together with other structural cleanup |
+| 9 | `User` model without registration/migration/router (1.3/1.4) | **Medium** *(product decision needed)* | Decide first: complete the auth feature (add the migration, include the router) **or** remove it entirely (model, parts of `core/security.py`, `api/auth.py`) | M–L depending on decision | Medium – the decision has domain impact (multi-user capability is requested in the brief) |
+| 10 | No central frontend API client, `axios` used directly 22× (1.2) | **Medium** | Introduce a central `frontend/src/lib/api.ts` with `axios.create({baseURL})` + an error-handling interceptor, migrate calls incrementally | M | Low – can be introduced additively, old calls keep working in parallel during migration |
+| 11 | Thin schema layer (3 Pydantic modules vs. 18+3 API modules) (1.3) | **Medium** | Add a dedicated schema module per domain (e.g. `reminders`, `cv`, `interview`) wherever validation is currently inline/ORM-direct | L | Low – additive, can be done incrementally per endpoint |
+| 12 | No rate limiting (1.6) | **Low** *(rises with network exposure)* | Add `slowapi` or a simple middleware once auth/exposure is tackled | S | Low |
+| 13 | No dependency scanning (1.6) | **Medium** | Set up `dependabot.yml` (or Renovate) for `pip`/`npm`; run `pip-audit`/`npm audit` once | S | Very low – pure automation |
+| 14 | Naming collision `pages/CompanyDossier.tsx` / `components/CompanyDossier.tsx` (1.2) | **Low** | Rename one of the two files (e.g. `CompanyDossierPage.tsx`) after clarifying roles | S | Very low |
+| 15 | `pages/CoverLetter.tsx` without its own route (1.2) | **Low** | Document the integration path (comment/ADR), no code change strictly required | S | None – informational |
+
+**Cross-cutting observation:** The three critical broken findings (#1, #2,
+#3) are deliberately placed **ahead** of every other recommendation –
+without runnable tests/lint/build, none of the other measures (least of
+all the large-scale i18n migration in Phase 4) can be reliably verified.
+This materially determines the order of the roadmap in Chapter 3.
+
+### Open Questions from this Section
+
+- The product decision on item 9 (`User` model/auth) remains open – already
+  noted in 1.3/1.4, only classified here in the prioritization.
+
+### 2.2 Full-Stack Fitness (Current vs. Target)
+
+Assesses the existing stack pragmatically against the requirements of a
+job-management tool with one maintainer/small team, self-hosted, GDPR-
+sensitive. Principle from the brief: **no technology switch just because
+something looks more modern** – every row assesses whether a switch is
+*mandatory*, *sensible*, or *not justified*.
+
+| Layer | Current state | Fit for the product | Switch? |
+|---|---|---|---|
+| Backend framework (FastAPI 0.111) | Async, typed, automatic OpenAPI docs, well suited for many small domain endpoints (30 services, 21 endpoint modules) | Very fitting: async I/O helps with external calls (job-board scraping, Ollama, IMAP/SMTP); the OpenAPI schema will ease a clean, i18n-capable API contract going forward | **Not justified** – a switch would only create migration risk, no added value for this product |
+| ORM/DB access (SQLAlchemy 2.0 async + Alembic) | Clean migration pattern (aside from the legacy tree found in 1.4), ORM instead of raw SQL (see 1.6, no injection risk) | The Alembic history shows disciplined, incremental handling of schema changes – exactly right for a data model that is growing but not huge (15 tables) | **Not justified** |
+| Database (PostgreSQL 16) | Local, no host port exposure, volume persistence, health check | Clearly better suited than NoSQL for structured application data with relations (Application↔Job↔CV↔Reminder↔History); self-hosting overhead for solo operation is low (one Docker volume, one health check) | **Not justified** |
+| Frontend framework (React 18 + Vite + TS) | 45 files, manageable size, TanStack Query for server state, no additional client-state store needed | Appropriate for current and foreseeable complexity (dashboard, kanban, several forms/panels); React+Vite has the widest ecosystem coverage for i18next, directly supporting the required bilingualism | **Not justified** |
+| Styling (TailwindCSS) | Utility-first, fits the existing accessibility themes (dyslexia, color-blind filters, ADHD mode) | Well suited for many theme variants without a CSS explosion; no signs of maintenance problems found in the code | **Not justified** |
+| i18n library (i18next/react-i18next) | Already installed, just insufficiently used (see 1.2) – **the problem is usage level, not library choice** | i18next is the de facto standard for React, supports namespaces, interpolation, pluralization, date/number formatting (`Intl` integration) – already technically covers all i18n requirements from the brief | **Not justified** – the problem is solved in Phase 4 through *usage*, not a library switch |
+| AI integration (Ollama, local) | Runs as its own compose service, models pulled at runtime (currently `mistral`), no forced cloud API | Central unique selling point of the product (100% local AI, GDPR-compliant) – exactly right for sensitive application data, no reason for a cloud LLM connection | **Not justified** – on the contrary: preserve this core strength |
+| Auth model (optional, JWT scaffold present but inactive) | See 1.3/1.4 – incomplete, no DB table | For multi-user capability (a requirement named in the brief), a working path is currently missing – **this is not a technology problem** (JWT+bcrypt is standard), but a completion/product-decision matter (see 2.1, #9) | **Not justified to switch** – finish or deliberately discard the existing approach, no new auth technology needed |
+| Deployment (Docker Compose, 4 services) | Very low operational barrier for solo/small-team self-hosting (`docker compose up`), no Kubernetes overhead | Fits the target audience (technically capable individual users hosting locally) – managed hosting/Kubernetes would clearly be overengineering for this product | **Not justified** |
+
+**2.2 overall conclusion:** Not a single part of the stack justifies a
+technology switch. The problems found in Chapter 1/2.1 are consistently
+**completion, configuration, and usage gaps** (broken configs, incomplete
+features, low i18n usage rate), not evidence of a wrongly chosen stack.
+This is an important signal for Chapter 3: the answer to the rework
+question clearly leans toward **targeted repair + modular structural
+cleanup**, not a rebuild.
+
+**Product requirements cross-check (short check, details already
+evidenced in 1.1–1.7):**
+
+| Requirement | Coverage in current state |
+|---|---|
+| Job management, status/workflow | Present (kanban, `Application` model with status log) |
+| Notes, contacts | Contacts feature present per README (not audited in detail) |
+| Documents (CV, cover letter) | Present (`CVData`, `CoverLetter`, upload path – with the security finding from 1.6) |
+| Reminders | Present (`Reminder` model, `reminders` API, follow-up scheduler) |
+| Search/filter | Present (`Jobs.tsx`, search function per 1.2) |
+| Import/export | Present (`export.py`, `ExportImportPanel.tsx`, JSON/CSV/XLSX per README) |
+| Multi-user capability | **Gap** – auth fragment incomplete (see above), real multi-user capability requires completion + a data-model extension (an owner field or similar not currently observed) |
+
+### Open Questions from this Section
+
+- Whether multi-user capability is even an active product goal, or the
+  `User` model was an abandoned approach, remains a product decision
+  (identical to the open question from 1.3/1.4/2.1 – only classified here
+  in the stack context, not raised anew).
+
+## Chapter 2 Summary
+
+Chapter 2 prioritized the 15 code-quality findings from Chapter 1 (2.1) and
+systematically mirrored the stack against the product requirements (2.2).
+Two core statements carry the rework decision in Chapter 3:
+
+1. **No element of the stack justifies a technology switch** – FastAPI,
+   SQLAlchemy/Postgres, React/Vite/TypeScript, TailwindCSS, i18next, and
+   Ollama are all well chosen for the product's size, target audience
+   (solo maintainer, self-hosted, GDPR-sensitive), and feature scope.
+2. **Every problem found is a completion, configuration, or usage gap**,
+   not an architecture flaw: three broken command-line pipelines
+   (test/lint/build), one concrete security hole, several dead code paths,
+   an incomplete auth feature, and an i18n system that is 89% unused
+   rather than missing.
+
+Together, these two statements provide a clear starting point for Chapter
+3: **targeted repair and modular structural cleanup**, not a rebuild of
+any layer.
+
 ---
 
-*Phase 1 complete. Continued with Chapter 2 (Quality/Architecture Assessment) per `docs/analysis/BACKLOG.md`.*
+*Chapter 2 complete. Continued with Chapter 3 (Rework Decision & Roadmap) per `docs/analysis/BACKLOG.md`.*

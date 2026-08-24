@@ -1,11 +1,11 @@
 # JobHunter – Repository-Audit (Deutsch)
 
-> **Status dieses Dokuments:** Phase 1 (Repository-Inventur) abgeschlossen.
-> Phase 2 (Qualitäts-/Architekturbewertung mit priorisierten Empfehlungen)
-> folgt in einem separaten Arbeitsschritt und wird als eigener Abschnitt
-> „## 2. Qualitäts- und Architekturbewertung" ergänzt (siehe
-> `docs/analysis/BACKLOG.md` für den Fortschritt). Englische Fassung:
-> `docs/analysis/REPOSITORY_AUDIT_EN.md` (inhaltsgleich).
+> **Status dieses Dokuments:** Kapitel 1 (Repository-Inventur) und Kapitel 2
+> (Qualitäts-/Architekturbewertung) abgeschlossen. Die Rework-Entscheidung
+> und Roadmap folgen als eigene Dokumente
+> `docs/analysis/REWORK_PLAN_DE.md` / `docs/analysis/REWORK_PLAN_EN.md`
+> (siehe `docs/analysis/BACKLOG.md` für den Fortschritt). Englische Fassung
+> dieses Audits: `docs/analysis/REPOSITORY_AUDIT_EN.md` (inhaltsgleich).
 >
 > Stand: 2026-08-24. Alle Aussagen beruhen auf tatsächlicher Sichtung des
 > Checkouts in LXC 142 (`/root/JobHunter`, Branch `main`,
@@ -718,6 +718,27 @@ belegt):**
   Produktentscheidung (identisch zur offenen Frage aus 1.3/1.4/2.1 – hier
   nur im Stack-Kontext eingeordnet, nicht erneut aufgeworfen).
 
+## Zusammenfassung Kapitel 2
+
+Kapitel 2 hat die 15 Codequalitäts-Befunde aus Kapitel 1 priorisiert (2.1)
+und den Stack systematisch gegen die Produktanforderungen gespiegelt (2.2).
+Zwei Kernaussagen tragen die Rework-Entscheidung in Kapitel 3:
+
+1. **Kein Element des Stacks rechtfertigt einen Technologiewechsel** – FastAPI,
+   SQLAlchemy/Postgres, React/Vite/TypeScript, TailwindCSS, i18next und
+   Ollama sind für Größe, Zielgruppe (Solo-Maintainer, self-hosted,
+   DSGVO-sensibel) und Funktionsumfang des Produkts durchweg passend
+   gewählt.
+2. **Alle gefundenen Probleme sind Fertigstellungs-, Konfigurations- und
+   Nutzungslücken**, keine Architekturfehler: drei kaputte Kommandozeilen-
+   Pipelines (Test/Lint/Build), ein konkretes Sicherheitsleck, mehrere tote
+   Code-Pfade, eine unvollständige Auth-Funktion und ein i18n-System, das
+   zu 89 % ungenutzt ist statt zu fehlen.
+
+Diese beiden Aussagen zusammen ergeben eine klare Ausgangslage für Kapitel
+3: **gezielte Reparatur und modulare Strukturbereinigung**, kein
+Neuaufbau irgendeiner Schicht.
+
 ---
 
-*Fortsetzung folgt (2.3 Ergebnisse einarbeiten / Kapitel-2-Abschluss, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Kapitel 2 abgeschlossen. Fortsetzung mit Kapitel 3 (Rework-Entscheidung & Roadmap) gemäß `docs/analysis/BACKLOG.md`.*

@@ -42,7 +42,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 1.6 Security/OWASP/Datenschutz-Sichtung
 - [x] 1.7 Architekturdiagramm (Mermaid) auf Basis realer Struktur
 - [x] 1.8 docs/analysis/REPOSITORY_AUDIT_DE.md fertiggestellt (Phase 1)
-- [ ] 1.9 docs/analysis/REPOSITORY_AUDIT_EN.md schreiben (inhaltsgleich)
+- [x] 1.9 docs/analysis/REPOSITORY_AUDIT_EN.md geschrieben (inhaltsgleich)
 
 ## Phase 2 – Qualitäts-/Architekturbewertung
 - [ ] 2.1 Codequalität bewerten (Befund/Problem/Impact/Empfehlung/Aufwand/Risiko je Punkt)

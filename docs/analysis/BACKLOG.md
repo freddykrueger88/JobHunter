@@ -52,7 +52,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 ## Phase 3 – Rework-Entscheidung & Roadmap
 - [x] 3.1 Entscheidung abgeleitet (gezielte Reparatur + modulare Restrukturierung)
 - [x] 3.2 docs/analysis/REWORK_PLAN_DE.md geschrieben (5 Phasen)
-- [ ] 3.3 docs/analysis/REWORK_PLAN_EN.md
+- [x] 3.3 docs/analysis/REWORK_PLAN_EN.md geschrieben (inhaltsgleich)
 - [ ] 3.4 docs/architecture/ (Diagramme + 1-3 ADRs für die wichtigsten Entscheidungen)
 - [ ] >>> CHECKPOINT: Nutzer prüft Audit + Rework-Plan, bevor Code/i18n/Wiki angefasst wird <<<
 

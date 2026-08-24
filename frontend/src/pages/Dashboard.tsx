@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
+import { api } from '../lib/api'
 import { Briefcase, XCircle, CheckCircle, MessageSquare, Star, Bell, BellOff } from 'lucide-react'
 
-const fetchStats = () => axios.get('/api/dashboard/stats').then(r => r.data)
+const fetchStats = () => api.get('/dashboard/stats').then(r => r.data)
 
 const statConfig = [
   { key: 'beworben',    icon: Briefcase,     color: 'bg-blue-500',   tKey: 'applied' },
@@ -23,7 +23,7 @@ export default function Dashboard() {
   })
 
   const dismissReminder = useMutation({
-    mutationFn: (id: number) => axios.patch(`/api/reminders/${id}/done`),
+    mutationFn: (id: number) => api.patch(`/reminders/${id}/done`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['stats'] }),
   })
 

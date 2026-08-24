@@ -669,6 +669,55 @@ werden. Dies bestimmt maßgeblich die Reihenfolge der Roadmap in Kapitel 3.
   – siehe bereits in 1.3/1.4 vermerkt, hier nur in die Priorisierung
   eingeordnet.
 
+### 2.2 Full-Stack-Eignung (Ist vs. Ziel)
+
+Bewertet den vorhandenen Stack pragmatisch gegen die Anforderungen eines
+Job-Management-Tools mit einem Maintainer/kleinem Team, self-hosted,
+DSGVO-sensibel. Grundsatz aus dem Auftrag: **kein Technologiewechsel nur
+weil etwas moderner wirkt** – jede Zeile bewertet, ob ein Wechsel
+*zwingend*, *sinnvoll* oder *nicht gerechtfertigt* ist.
+
+| Schicht | Ist-Zustand | Eignung fürs Produkt | Wechsel? |
+|---|---|---|---|
+| Backend-Framework (FastAPI 0.111) | Async, typisiert, OpenAPI-Docs automatisch, gut geeignet für viele kleine Domänen-Endpunkte (30 Services, 21 Endpunkt-Module) | Sehr passend: async I/O nützt bei externen Aufrufen (Jobbörsen-Scraping, Ollama, IMAP/SMTP), OpenAPI-Schema erleichtert künftig einen sauberen, i18n-fähigen API-Vertrag | **Nicht gerechtfertigt** – Wechsel würde nur Migrationsrisiko erzeugen, kein Mehrwert für dieses Produkt |
+| ORM/DB-Zugriff (SQLAlchemy 2.0 async + Alembic) | Sauberes Migrationsmuster (abgesehen vom in 1.4 gefundenen Altlast-Baum), ORM statt Raw-SQL (s. 1.6, kein Injection-Risiko) | Alembic-Historie zeigt disziplinierten inkrementellen Umgang mit Schema-Änderungen – genau richtig für ein wachsendes, aber nicht riesiges Datenmodell (15 Tabellen) | **Nicht gerechtfertigt** |
+| Datenbank (PostgreSQL 16) | Lokal, kein Host-Port-Exposure, Volume-Persistenz, Healthcheck | Für strukturierte Bewerbungsdaten mit Relationen (Application↔Job↔CV↔Reminder↔History) klar besser geeignet als NoSQL; Self-Hosting-Aufwand für Solo-Betrieb gering (ein Docker-Volume, ein Healthcheck) | **Nicht gerechtfertigt** |
+| Frontend-Framework (React 18 + Vite + TS) | 45 Dateien, überschaubare Größe, TanStack Query für Server-State, kein zusätzlicher Client-State-Store nötig | Für die aktuelle und absehbare Komplexität (Dashboard, Kanban, mehrere Formulare/Panels) angemessen; React+Vite hat die größte Ökosystem-Abdeckung für i18next, was die geforderte Zweisprachigkeit direkt unterstützt | **Nicht gerechtfertigt** |
+| Styling (TailwindCSS) | Utility-first, passt zu den vorhandenen Accessibility-Themes (Dyslexie, Farbenblind-Filter, ADHS-Modus) | Gut geeignet für viele Theme-Varianten ohne CSS-Explosion; keine Hinweise auf Wartungsprobleme im Code gefunden | **Nicht gerechtfertigt** |
+| i18n-Bibliothek (i18next/react-i18next) | Bereits installiert, nur unzureichend genutzt (s. 1.2) – **das Problem ist Nutzungsgrad, nicht Bibliothekswahl** | i18next ist der De-facto-Standard für React, unterstützt Namespaces, Interpolation, Pluralisierung, Datums-/Zahlenformatierung (`Intl`-Anbindung) – deckt alle im Auftrag geforderten i18n-Anforderungen technisch bereits ab | **Nicht gerechtfertigt** – das Problem wird in Phase 4 durch *Nutzung*, nicht durch Bibliothekswechsel gelöst |
+| KI-Integration (Ollama, lokal) | Läuft als eigener Compose-Service, Modelle laufzeitseitig gezogen (aktuell `mistral`), kein Cloud-API-Zwang | Zentrales Alleinstellungsmerkmal des Produkts (100% lokale KI, DSGVO-konform) – exakt richtig für sensible Bewerbungsdaten, kein Grund für Cloud-LLM-Anbindung | **Nicht gerechtfertigt**, im Gegenteil: Kernstärke des Produkts erhalten |
+| Auth-Modell (optional, JWT-Grundgerüst vorhanden aber inaktiv) | S. 1.3/1.4 – unvollständig, keine DB-Tabelle | Für Mehrbenutzerfähigkeit (im Auftrag als Anforderung genannt) fehlt aktuell ein funktionierender Weg – **das ist kein Technologieproblem** (JWT+bcrypt ist Standard), sondern ein Fertigstellungs-/Produktentscheidungs-Thema (s. 2.1, #9) | **Nicht gerechtfertigt zu wechseln** – vorhandener Ansatz nur zu Ende bringen oder bewusst zu verwerfen, keine neue Auth-Technologie nötig |
+| Deployment (Docker Compose, 4 Services) | Für Solo-/Kleinteam-Self-Hosting sehr niedrige Betriebshürde (`docker compose up`), kein Kubernetes-Overhead | Passend zur Zielgruppe (technisch versierte Einzelnutzer, die lokal hosten) – Managed-Hosting/Kubernetes wäre für dieses Produkt eindeutig Overengineering | **Nicht gerechtfertigt** |
+
+**Gesamtfazit 2.2:** Kein einziger Bestandteil des Stacks rechtfertigt einen
+Technologiewechsel. Die in Kapitel 1/2.1 gefundenen Probleme sind
+durchgehend **Fertigstellungs-, Konfigurations- und Nutzungslücken**
+(kaputte Configs, unvollständige Features, geringe i18n-Nutzungsquote),
+nicht Ausdruck eines falsch gewählten Stacks. Das ist eine wichtige
+Weichenstellung für Kapitel 3: Die Antwort auf die Rework-Frage tendiert
+klar in Richtung **gezielte Reparatur + modulare Strukturbereinigung**,
+nicht Neuaufbau.
+
+**Produktanforderungen im Abgleich (Kurzcheck, Details bereits in 1.1–1.7
+belegt):**
+
+| Anforderung | Abdeckung im Ist-Zustand |
+|---|---|
+| Stellenverwaltung, Status/Workflow | Vorhanden (Kanban, `Application`-Modell mit Status-Log) |
+| Notizen, Kontakte | Kontakte-Feature laut README vorhanden (nicht im Detail auditiert) |
+| Dokumente (CV, Anschreiben) | Vorhanden (`CVData`, `CoverLetter`, Upload-Pfad – mit Sicherheitsfund aus 1.6) |
+| Erinnerungen | Vorhanden (`Reminder`-Modell, `reminders`-API, Follow-up-Scheduler) |
+| Suche/Filter | Vorhanden (`Jobs.tsx`, Suchfunktion laut 1.2) |
+| Import/Export | Vorhanden (`export.py`, `ExportImportPanel.tsx`, laut README JSON/CSV/XLSX) |
+| Mehrbenutzerfähigkeit | **Lücke** – Auth-Fragment unvollständig (s. o.), echte Mehrbenutzerfähigkeit erfordert Fertigstellung + Datenmodell-Erweiterung (Owner-Feld o. ä. aktuell nicht gesichtet) |
+
+### Offene Fragen aus diesem Abschnitt
+
+- Ob Mehrbenutzerfähigkeit überhaupt ein aktives Produktziel ist oder das
+  `User`-Modell ein verworfener Ansatz war, ist weiterhin eine
+  Produktentscheidung (identisch zur offenen Frage aus 1.3/1.4/2.1 – hier
+  nur im Stack-Kontext eingeordnet, nicht erneut aufgeworfen).
+
 ---
 
-*Fortsetzung folgt (2.2 Stack-Eignung, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (2.3 Ergebnisse einarbeiten / Kapitel-2-Abschluss, …) gemäß `docs/analysis/BACKLOG.md`.*

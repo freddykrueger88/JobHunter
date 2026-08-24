@@ -102,5 +102,9 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
       - api/jobs.py vs routers/jobs_image.py: potenzielle Pfad-Kollision, main.py-abhaengig
       - api/search_profiles.py: Praefix gefixt, aber Router war schon vorher nicht in main.py
         eingebunden (separater Bug) - SearchProfiles-Seite im Frontend aktuell tot
-- [ ] A.4 Frontend-Dockerfile auf Mehrstufen-Build umstellen - in Arbeit
-- [ ] A.7 Punktuelle docs/*.md Korrekturen - noch offen
+- [x] A.4 Frontend-Dockerfile auf Mehrstufen-Build umgestellt (nginx statt Dev-Server), verifiziert per isoliertem docker build+run, Dev-Workflow via docker-compose.override.yml erhalten
+- [ ] A.7 Punktuelle docs/*.md Korrekturen - zurueckgestellt (niedrige Prioritaet, kein Blocker)
+
+Phase A Status: 6 von 7 Aufgaben erledigt und einzeln verifiziert (A.7 zurueckgestellt,
+niedrige Prioritaet). Naechster Schritt: Phase B (Struktur) gemaess REWORK_PLAN_DE.md,
+oder Review der bisherigen Phase-A-Aenderungen durch den Nutzer.

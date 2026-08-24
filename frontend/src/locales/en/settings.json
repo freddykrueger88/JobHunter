@@ -2,5 +2,108 @@
   "title": "Settings",
   "theme": "Theme",
   "language": "Language",
-  "ai": "AI Settings"
+  "ai": "AI Settings",
+  "autosaveNote": "Changes are saved automatically",
+
+  "appearanceTitle": "Appearance",
+  "colorBlindTitle": "Color Blindness Filter",
+  "cognitionTitle": "ADHD & Cognition",
+  "jobSearchTitle": "Job Search",
+  "remindersTitle": "Reminders",
+  "dataTitle": "Data",
+
+  "themes": {
+    "dark":      { "label": "Dark",       "sublabel": "Dark & classic" },
+    "light":     { "label": "Light",      "sublabel": "Clean & crisp" },
+    "boys":      { "label": "Ocean",      "sublabel": "Deep navy blue" },
+    "girls":     { "label": "Rose",       "sublabel": "Warm pink" },
+    "sakura":    { "label": "Sakura",     "sublabel": "Cherry blossom & Japan" },
+    "dyslexic":  { "label": "Reading Mode", "sublabel": "Optimized for dyslexia" }
+  },
+  "themeSelectAriaLabel": "Select {{label}} theme",
+  "themeMockupOpenLabel": "Open",
+
+  "colorBlindModes": {
+    "none":          { "label": "No filter",       "desc": "Default" },
+    "deuteranopia":  { "label": "Deuteranopia",     "desc": "Green weakness (~6% of men)" },
+    "protanopia":    { "label": "Protanopia",       "desc": "Red weakness (~2% of men)" },
+    "tritanopia":    { "label": "Tritanopia",       "desc": "Blue-yellow weakness" },
+    "achromatopsia": { "label": "Achromatopsia",    "desc": "Complete color blindness" }
+  },
+
+  "adhdModeLabel": "ADHD Mode",
+  "adhdModeDesc": "Enables focus mode + reduced motion",
+  "focusModeLabel": "Focus Mode",
+  "focusModeDesc": "Navigation is hidden, only the active area is visible",
+  "reduceMotionLabel": "Disable animations",
+  "reduceMotionDesc": "Turn off all transitions and animations (incl. Sakura)",
+
+  "densityLabel": "Information Density",
+  "density": {
+    "normal":  { "label": "Normal",  "desc": "Comfortable spacing" },
+    "compact": { "label": "Compact", "desc": "Slightly less spacing" },
+    "minimal": { "label": "Minimal", "desc": "Maximum density" }
+  },
+
+  "languageDe": "🇩🇪 Deutsch",
+  "languageEn": "🇬🇧 English",
+
+  "aiModelLabel": "AI Model",
+  "aiModelAriaLabel": "AI Model",
+  "aiModelDefaultOption": "mistral (default)",
+  "toneLabel": "Writing Tone",
+  "tones": {
+    "formell": "Formal",
+    "direkt": "Direct",
+    "modern": "Modern",
+    "kreativ": "Creative"
+  },
+
+  "locationLabel": "Default Location",
+  "locationPlaceholder": "e.g. Bremen, Hamburg …",
+  "locationAriaLabel": "Default Location",
+  "radiusLabel": "Search radius: {{km}} km",
+  "radiusMin": "5 km",
+  "radiusMax": "100 km",
+  "radiusAriaLabel": "Search radius",
+  "hideAusbildungLabel": "Hide apprenticeships",
+  "hideAusbildungDesc": "Apprenticeship listings will not be shown in search results",
+
+  "apiKeysHeading": "🔑 API Access",
+  "apiKeysIntro": "Bundesagentur für Arbeit, Stepstone and EURES work <strong>without registration</strong>. For more results, you can optionally add a free Adzuna key.",
+  "adzunaSectionLabel": "Adzuna (optional, free)",
+  "appIdLabel": "App ID",
+  "appIdPlaceholder": "Your Adzuna App ID",
+  "apiKeyLabel": "API Key",
+  "apiKeyPlaceholder": "Your Adzuna API Key",
+  "registerLink": "Register",
+  "adzunaKeyStored": "✅ Adzuna key stored",
+  "showKeyAriaLabel": "Show key",
+  "hideKeyAriaLabel": "Hide key",
+  "saveKeysPending": "Saving…",
+  "saveKeysSaved": "Keys saved ✅",
+  "saveKeysError": "Error – try again",
+  "saveKeysIdle": "Save keys",
+
+  "linkedinHeading": "⚠️ LinkedIn – no official API key",
+  "linkedinBody": "LinkedIn has closed its job API for third parties. JobHunter searches LinkedIn jobs directly via public search – no key required.",
+  "linkedinOpenLink": "Open LinkedIn Jobs directly",
+
+  "arbeitsagenturHeading": "✅ Bundesagentur für Arbeit – active automatically",
+  "arbeitsagenturBody": "The official German employment agency job board is fully free and requires no registration. No input required.",
+
+  "reminderLeadTimeLabel": "Default lead time: {{days}} days",
+  "reminderLeadTimeMin": "1 day",
+  "reminderLeadTimeMax": "30 days",
+  "reminderLeadTimeAriaLabel": "Reminder lead time",
+
+  "exportButton": "Export data",
+  "importButton": "Import data",
+  "importing": "⏳ Importing…",
+  "importSuccess": "✅ Imported: {{jobs}} jobs, {{reminders}} reminders, {{history}} history entries",
+  "importError": "❌ Error: {{message}}",
+
+  "saveToastPending": "Saving…",
+  "saveToastSaved": "Saved",
+  "saveToastError": "❌ Error while saving"
 }

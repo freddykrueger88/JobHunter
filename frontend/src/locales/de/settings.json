@@ -2,5 +2,108 @@
   "title": "Einstellungen",
   "theme": "Design",
   "language": "Sprache",
-  "ai": "KI-Einstellungen"
+  "ai": "KI-Einstellungen",
+  "autosaveNote": "Änderungen werden automatisch gespeichert",
+
+  "appearanceTitle": "Erscheinungsbild",
+  "colorBlindTitle": "Farbenblindheits-Filter",
+  "cognitionTitle": "ADHS & Kognition",
+  "jobSearchTitle": "Stellensuche",
+  "remindersTitle": "Erinnerungen",
+  "dataTitle": "Daten",
+
+  "themes": {
+    "dark":      { "label": "Dark",       "sublabel": "Dunkel & klassisch" },
+    "light":     { "label": "Hell",       "sublabel": "Sauber & klar" },
+    "boys":      { "label": "Ocean",      "sublabel": "Tiefes Marineblau" },
+    "girls":     { "label": "Rose",       "sublabel": "Warmes Rosa" },
+    "sakura":    { "label": "Sakura",     "sublabel": "Kirschblüte & Japan" },
+    "dyslexic":  { "label": "Lese-Modus", "sublabel": "Legasthenie-optimiert" }
+  },
+  "themeSelectAriaLabel": "Theme {{label}} auswählen",
+  "themeMockupOpenLabel": "Öffnen",
+
+  "colorBlindModes": {
+    "none":          { "label": "Kein Filter",   "desc": "Standard" },
+    "deuteranopia":  { "label": "Deuteranopie",  "desc": "Grün-Schwäche (~6% Männer)" },
+    "protanopia":    { "label": "Protanopie",    "desc": "Rot-Schwäche (~2% Männer)" },
+    "tritanopia":    { "label": "Tritanopie",    "desc": "Blau-Gelb-Schwäche" },
+    "achromatopsia": { "label": "Achromatopsie", "desc": "Vollständige Farbenblindheit" }
+  },
+
+  "adhdModeLabel": "ADHS-Modus",
+  "adhdModeDesc": "Aktiviert Fokus-Modus + reduzierte Bewegung",
+  "focusModeLabel": "Fokus-Modus",
+  "focusModeDesc": "Navigation wird ausgeblendet, nur aktiver Bereich sichtbar",
+  "reduceMotionLabel": "Animationen deaktivieren",
+  "reduceMotionDesc": "Alle Transitions und Animationen ausschalten (inkl. Sakura)",
+
+  "densityLabel": "Informationsdichte",
+  "density": {
+    "normal":  { "label": "Normal",  "desc": "Komfortabler Abstand" },
+    "compact": { "label": "Kompakt", "desc": "Etwas weniger Abstand" },
+    "minimal": { "label": "Minimal", "desc": "Maximale Dichte" }
+  },
+
+  "languageDe": "🇩🇪 Deutsch",
+  "languageEn": "🇬🇧 English",
+
+  "aiModelLabel": "KI-Modell",
+  "aiModelAriaLabel": "KI-Modell",
+  "aiModelDefaultOption": "mistral (Standard)",
+  "toneLabel": "Schreibton",
+  "tones": {
+    "formell": "Formell",
+    "direkt": "Direkt",
+    "modern": "Modern",
+    "kreativ": "Kreativ"
+  },
+
+  "locationLabel": "Standard-Ort",
+  "locationPlaceholder": "z.B. Bremen, Hamburg …",
+  "locationAriaLabel": "Standard-Ort",
+  "radiusLabel": "Suchradius: {{km}} km",
+  "radiusMin": "5 km",
+  "radiusMax": "100 km",
+  "radiusAriaLabel": "Suchradius",
+  "hideAusbildungLabel": "Ausbildungsplätze ausblenden",
+  "hideAusbildungDesc": "Ausbildungsangebote werden in der Suche nicht angezeigt",
+
+  "apiKeysHeading": "🔑 API-Zugänge",
+  "apiKeysIntro": "Die Bundesagentur für Arbeit, Stepstone und EURES funktionieren <strong>ohne Registrierung</strong>. Für mehr Ergebnisse kannst du optional einen kostenlosen Adzuna-Key hinzufügen.",
+  "adzunaSectionLabel": "Adzuna (optional, kostenlos)",
+  "appIdLabel": "App ID",
+  "appIdPlaceholder": "Deine Adzuna App ID",
+  "apiKeyLabel": "API Key",
+  "apiKeyPlaceholder": "Dein Adzuna API Key",
+  "registerLink": "Registrieren",
+  "adzunaKeyStored": "✅ Adzuna-Key hinterlegt",
+  "showKeyAriaLabel": "Key anzeigen",
+  "hideKeyAriaLabel": "Key verbergen",
+  "saveKeysPending": "Speichern…",
+  "saveKeysSaved": "Keys gespeichert ✅",
+  "saveKeysError": "Fehler – erneut versuchen",
+  "saveKeysIdle": "Keys speichern",
+
+  "linkedinHeading": "⚠️ LinkedIn – kein offizieller API-Key",
+  "linkedinBody": "LinkedIn hat seine Job-API für Drittanbieter geschlossen. JobHunter sucht LinkedIn-Stellen direkt über die öffentliche Suche – kein Key erforderlich.",
+  "linkedinOpenLink": "LinkedIn Jobs direkt öffnen",
+
+  "arbeitsagenturHeading": "✅ Bundesagentur für Arbeit – automatisch aktiv",
+  "arbeitsagenturBody": "Die offizielle Jobbörse der BA ist vollständig kostenlos und ohne Registrierung nutzbar. Keine Eingabe erforderlich.",
+
+  "reminderLeadTimeLabel": "Standard-Vorlaufzeit: {{days}} Tage",
+  "reminderLeadTimeMin": "1 Tag",
+  "reminderLeadTimeMax": "30 Tage",
+  "reminderLeadTimeAriaLabel": "Erinnerungsvorlaufzeit",
+
+  "exportButton": "Daten exportieren",
+  "importButton": "Daten importieren",
+  "importing": "⏳ Importiere…",
+  "importSuccess": "✅ Importiert: {{jobs}} Stellen, {{reminders}} Erinnerungen, {{history}} Verlaufseinträge",
+  "importError": "❌ Fehler: {{message}}",
+
+  "saveToastPending": "Speichern…",
+  "saveToastSaved": "Gespeichert",
+  "saveToastError": "❌ Fehler beim Speichern"
 }

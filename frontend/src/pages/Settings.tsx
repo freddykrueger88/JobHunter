@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
@@ -22,8 +22,6 @@ const AUTOSAVE_DELAY = 1200 // ms
 const THEMES: {
   value: Theme
   emoji: string
-  label: string
-  sublabel: string
   nav: string
   navText: string
   body: string
@@ -34,60 +32,50 @@ const THEMES: {
 }[] = [
   {
     value: 'dark',
-    emoji: '🌙', label: 'Dark', sublabel: 'Dunkel & klassisch',
+    emoji: '🌙',
     nav: '#0d1117', navText: '#c9d1d9',
     body: '#161b22', card: '#21262d', cardText: '#e6edf3',
     accent: '#2563eb', accentText: '#fff',
   },
   {
     value: 'light',
-    emoji: '☀️', label: 'Hell', sublabel: 'Sauber & klar',
+    emoji: '☀️',
     nav: '#ffffff', navText: '#111827',
     body: '#f9fafb', card: '#ffffff', cardText: '#111827',
     accent: '#2563eb', accentText: '#fff',
   },
   {
     value: 'boys',
-    emoji: '🌊', label: 'Ocean', sublabel: 'Tiefes Marineblau',
+    emoji: '🌊',
     nav: '#0a1628', navText: '#cfe0f4',
     body: '#0d1b2e', card: '#112240', cardText: '#e2eaf4',
     accent: '#1d4ed8', accentText: '#fff',
   },
   {
     value: 'girls',
-    emoji: '🌺', label: 'Rose', sublabel: 'Warmes Rosa',
+    emoji: '🌺',
     nav: '#fce4ef', navText: '#3b0f24',
     body: '#fdf0f5', card: '#fff4f8', cardText: '#3b0f24',
     accent: '#be185d', accentText: '#fff',
   },
   {
     value: 'sakura',
-    emoji: '🌸', label: 'Sakura', sublabel: 'Kirschblüte & Japan',
+    emoji: '🌸',
     nav: '#f3e8dc', navText: '#1c0a10',
     body: '#fef6f8', card: '#fdeef2', cardText: '#1c0a10',
     accent: '#c0392b', accentText: '#fff',
   },
   {
     value: 'dyslexic',
-    emoji: '📖', label: 'Lese-Modus', sublabel: 'Legasthenie-optimiert',
+    emoji: '📖',
     nav: '#f7f6e7', navText: '#1a1a1a',
     body: '#fffef5', card: '#fffef0', cardText: '#1a1a1a',
     accent: '#7c6f1e', accentText: '#fff',
   },
 ]
 
-const COLOR_BLIND_MODES: { value: ColorBlindMode; label: string; desc: string }[] = [
-  { value: 'none',          label: 'Kein Filter',   desc: 'Standard' },
-  { value: 'deuteranopia',  label: 'Deuteranopie',  desc: 'Grün-Schwäche (~6% Männer)' },
-  { value: 'protanopia',    label: 'Protanopie',    desc: 'Rot-Schwäche (~2% Männer)' },
-  { value: 'tritanopia',    label: 'Tritanopie',    desc: 'Blau-Gelb-Schwäche' },
-  { value: 'achromatopsia', label: 'Achromatopsie', desc: 'Vollständige Farbenblindheit' },
-]
-const DENSITY_OPTIONS: { value: Density; label: string; desc: string }[] = [
-  { value: 'normal',  label: 'Normal',   desc: 'Komfortabler Abstand' },
-  { value: 'compact', label: 'Kompakt',  desc: 'Etwas weniger Abstand' },
-  { value: 'minimal', label: 'Minimal',  desc: 'Maximale Dichte' },
-]
+const COLOR_BLIND_MODE_VALUES: ColorBlindMode[] = ['none', 'deuteranopia', 'protanopia', 'tritanopia', 'achromatopsia']
+const DENSITY_VALUES: Density[] = ['normal', 'compact', 'minimal']
 const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
   adzuna: 'https://developer.adzuna.com/',
@@ -103,12 +91,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boolean }) {
+function ThemeMockup({ opt, active }: { opt: typeof THEMES[number]; active: boolean }) {
+  const { t } = useTranslation('settings')
+  const label = t(`themes.${opt.value}.label`)
+  const sublabel = t(`themes.${opt.value}.sublabel`)
   return (
     <button
       onClick={() => {}}
       aria-pressed={active}
-      aria-label={`Theme ${opt.label} auswählen`}
+      aria-label={t('themeSelectAriaLabel', { label })}
       style={{
         background: opt.body,
         borderColor: active ? '#3b82f6' : 'transparent',
@@ -131,7 +122,7 @@ function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boo
         <div style={{ background: opt.card, borderRadius: 6, padding: '6px 8px' }} className="space-y-1.5">
           <span style={{ display: 'block', width: '70%', height: 7, background: opt.cardText, opacity: 0.85, borderRadius: 3 }} />
           <span style={{ display: 'block', width: '50%', height: 5, background: opt.cardText, opacity: 0.35, borderRadius: 3 }} />
-          <span style={{ display: 'inline-block', background: opt.accent, color: opt.accentText, borderRadius: 4, fontSize: 8, padding: '2px 7px', marginTop: 2, fontWeight: 600 }}>Öffnen</span>
+          <span style={{ display: 'inline-block', background: opt.accent, color: opt.accentText, borderRadius: 4, fontSize: 8, padding: '2px 7px', marginTop: 2, fontWeight: 600 }}>{t('themeMockupOpenLabel')}</span>
         </div>
         <div style={{ background: opt.card, borderRadius: 6, padding: '5px 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
           <span style={{ width: 10, height: 10, background: opt.accent, borderRadius: '50%', flexShrink: 0 }} />
@@ -139,8 +130,8 @@ function ThemeMockup({ t: opt, active }: { t: typeof THEMES[number]; active: boo
         </div>
       </div>
       <div style={{ background: opt.nav, borderTop: `1px solid ${opt.navText}18`, padding: '8px 12px' }}>
-        <span style={{ color: opt.navText, fontWeight: 700, fontSize: 13 }}>{opt.emoji} {opt.label}</span>
-        <span style={{ color: opt.navText, opacity: 0.6, fontSize: 11, display: 'block', marginTop: 1 }}>{opt.sublabel}</span>
+        <span style={{ color: opt.navText, fontWeight: 700, fontSize: 13 }}>{opt.emoji} {label}</span>
+        <span style={{ color: opt.navText, opacity: 0.6, fontSize: 11, display: 'block', marginTop: 1 }}>{sublabel}</span>
       </div>
     </button>
   )
@@ -177,6 +168,7 @@ function ToggleRow({ label, desc, value, onChange }: { label: string; desc?: str
 
 // ─── Auto-Save Toast ────────────────────────────────────────────────────────
 function SaveToast({ status }: { status: SaveStatus }) {
+  const { t } = useTranslation('settings')
   if (status === 'idle') return null
   return (
     <div
@@ -188,9 +180,9 @@ function SaveToast({ status }: { status: SaveStatus }) {
         status === 'error'   && 'bg-red-50 dark:bg-red-900/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700',
       )}
     >
-      {status === 'pending' && <><span className="w-3.5 h-3.5 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />Speichern…</>}
-      {status === 'saved'   && <><Check size={14} aria-hidden />Gespeichert</>}
-      {status === 'error'   && <>❌ Fehler beim Speichern</>}
+      {status === 'pending' && <><span className="w-3.5 h-3.5 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />{t('saveToastPending')}</>}
+      {status === 'saved'   && <><Check size={14} aria-hidden />{t('saveToastSaved')}</>}
+      {status === 'error'   && <>{t('saveToastError')}</>}
     </div>
   )
 }
@@ -315,11 +307,11 @@ export default function Settings() {
     try {
       const res = await axios.post('/api/export/import', form)
       const d = res.data.imported
-      setImportMsg(`✅ Importiert: ${d.jobs} Stellen, ${d.reminders} Erinnerungen, ${d.history} Verlaufseinträge`)
+      setImportMsg(t('importSuccess', { jobs: d.jobs, reminders: d.reminders, history: d.history }))
       qc.invalidateQueries()
     } catch (err) {
       const detail = axios.isAxiosError(err) ? (err.response?.data as { detail?: string } | undefined)?.detail : undefined
-      setImportMsg(`❌ Fehler: ${detail ?? (err instanceof Error ? err.message : String(err))}`)
+      setImportMsg(t('importError', { message: detail ?? (err instanceof Error ? err.message : String(err)) }))
     } finally { setImporting(false); e.target.value = '' }
   }
 
@@ -334,7 +326,7 @@ export default function Settings() {
           {link && (
             <a href={link} target="_blank" rel="noopener noreferrer"
               className="text-xs text-blue-500 hover:underline flex items-center gap-1">
-              Registrieren <ExternalLink size={11} aria-hidden />
+              {t('registerLink')} <ExternalLink size={11} aria-hidden />
             </a>
           )}
         </div>
@@ -351,7 +343,7 @@ export default function Settings() {
             type="button"
             onClick={() => setShowKeys(s => ({ ...s, [id]: !s[id] }))}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            aria-label={showKeys[id] ? 'Key verbergen' : 'Key anzeigen'}
+            aria-label={showKeys[id] ? t('hideKeyAriaLabel') : t('showKeyAriaLabel')}
           >
             {showKeys[id] ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
           </button>
@@ -370,66 +362,66 @@ export default function Settings() {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
-        <span className="text-xs text-gray-400 italic">Änderungen werden automatisch gespeichert</span>
+        <span className="text-xs text-gray-400 italic">{t('autosaveNote')}</span>
       </div>
 
       {/* ── Erscheinungsbild ── */}
-      <Section title="🎨 Erscheinungsbild">
+      <Section title={`🎨 ${t('appearanceTitle')}`}>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {THEMES.map(opt => (
             <div key={opt.value} onClick={() => setTheme(opt.value)} className="cursor-pointer">
-              <ThemeMockup t={opt} active={theme === opt.value} />
+              <ThemeMockup opt={opt} active={theme === opt.value} />
             </div>
           ))}
         </div>
       </Section>
 
       {/* ── Farbenblindheits-Filter ── */}
-      <Section title="👁️ Farbenblindheits-Filter">
+      <Section title={`👁️ ${t('colorBlindTitle')}`}>
         <div className="grid grid-cols-1 gap-2">
-          {COLOR_BLIND_MODES.map(opt => (
+          {COLOR_BLIND_MODE_VALUES.map(value => (
             <button
-              key={opt.value}
-              onClick={() => setColorBlindMode(opt.value)}
-              aria-pressed={colorBlindMode === opt.value}
+              key={value}
+              onClick={() => setColorBlindMode(value)}
+              aria-pressed={colorBlindMode === value}
               className={clsx(
                 'rounded-xl px-4 py-3 text-left border-2 transition-all flex items-center justify-between',
-                colorBlindMode === opt.value
+                colorBlindMode === value
                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400'
               )}
             >
-              <span className="font-medium text-sm">{opt.label}</span>
-              <span className="text-xs text-gray-400">{opt.desc}</span>
+              <span className="font-medium text-sm">{t(`colorBlindModes.${value}.label`)}</span>
+              <span className="text-xs text-gray-400">{t(`colorBlindModes.${value}.desc`)}</span>
             </button>
           ))}
         </div>
       </Section>
 
       {/* ── ADHS & Kognition ── */}
-      <Section title="🧠 ADHS & Kognition">
+      <Section title={`🧠 ${t('cognitionTitle')}`}>
         <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-5">
-          <ToggleRow label="ADHS-Modus" desc="Aktiviert Fokus-Modus + reduzierte Bewegung" value={adhdMode} onChange={setAdhdMode} />
-          <ToggleRow label="Fokus-Modus" desc="Navigation wird ausgeblendet, nur aktiver Bereich sichtbar" value={focusMode} onChange={setFocusMode} />
-          <ToggleRow label="Animationen deaktivieren" desc="Alle Transitions und Animationen ausschalten (inkl. Sakura)" value={reduceMotion} onChange={setReduceMotion} />
+          <ToggleRow label={t('adhdModeLabel')} desc={t('adhdModeDesc')} value={adhdMode} onChange={setAdhdMode} />
+          <ToggleRow label={t('focusModeLabel')} desc={t('focusModeDesc')} value={focusMode} onChange={setFocusMode} />
+          <ToggleRow label={t('reduceMotionLabel')} desc={t('reduceMotionDesc')} value={reduceMotion} onChange={setReduceMotion} />
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-3">Informationsdichte</p>
+          <p className="text-sm text-gray-500 mb-3">{t('densityLabel')}</p>
           <div className="flex gap-3">
-            {DENSITY_OPTIONS.map(opt => (
+            {DENSITY_VALUES.map(value => (
               <button
-                key={opt.value}
-                onClick={() => setDensity(opt.value)}
-                aria-pressed={density === opt.value}
+                key={value}
+                onClick={() => setDensity(value)}
+                aria-pressed={density === value}
                 className={clsx(
                   'flex-1 rounded-xl border-2 transition-all text-left px-3 py-3',
-                  density === opt.value
+                  density === value
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400'
                 )}
               >
-                <div className="text-sm font-semibold mb-1">{opt.label}</div>
-                <div className="text-xs text-gray-400 leading-snug">{opt.desc}</div>
+                <div className="text-sm font-semibold mb-1">{t(`density.${value}.label`)}</div>
+                <div className="text-xs text-gray-400 leading-snug">{t(`density.${value}.desc`)}</div>
               </button>
             ))}
           </div>
@@ -444,7 +436,7 @@ export default function Settings() {
               aria-pressed={i18n.language === lang}
               className={clsx('px-6 py-2 rounded-lg font-medium border-2 transition-all',
                 i18n.language === lang ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-            >{lang === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}</button>
+            >{lang === 'de' ? t('languageDe') : t('languageEn')}</button>
           ))}
         </div>
       </Section>
@@ -453,23 +445,23 @@ export default function Settings() {
       <Section title={`🤖 ${t('ai')}`}>
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
+            <label className="text-sm text-gray-500 block mb-1">{t('aiModelLabel')}</label>
             <select value={aiModel} onChange={e => setAiModel(e.target.value)}
-              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label="KI-Modell">
+              className="rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" aria-label={t('aiModelAriaLabel')}>
               {models.length > 0
                 ? models.map(m => <option key={m} value={m}>{m}</option>)
-                : <option value="mistral">mistral (Standard)</option>
+                : <option value="mistral">{t('aiModelDefaultOption')}</option>
               }
             </select>
           </div>
           <div>
-            <label className="text-sm text-gray-500 block mb-1">Schreibton</label>
+            <label className="text-sm text-gray-500 block mb-1">{t('toneLabel')}</label>
             <div className="flex flex-wrap gap-2">
               {TONES.map(tone => (
                 <button key={tone} onClick={() => setAiTone(tone)} aria-pressed={aiTone === tone}
-                  className={clsx('px-4 py-1.5 rounded-full text-sm font-medium border-2 transition-all capitalize',
+                  className={clsx('px-4 py-1.5 rounded-full text-sm font-medium border-2 transition-all',
                     aiTone === tone ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-800 hover:border-gray-400')}
-                >{tone}</button>
+                >{t(`tones.${tone}`)}</button>
               ))}
             </div>
           </div>
@@ -477,29 +469,29 @@ export default function Settings() {
       </Section>
 
       {/* ── Stellensuche ── */}
-      <Section title="🔍 Stellensuche">
+      <Section title={`🔍 ${t('jobSearchTitle')}`}>
         <div className="space-y-4 mb-5">
           <div>
-            <label className="text-sm text-gray-500 block mb-1">Standard-Ort</label>
+            <label className="text-sm text-gray-500 block mb-1">{t('locationLabel')}</label>
             <input
               value={defaultLocation}
               onChange={e => setDefaultLocation(e.target.value)}
-              placeholder="z.B. Bremen, Hamburg …"
+              placeholder={t('locationPlaceholder')}
               className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-              aria-label="Standard-Ort"
+              aria-label={t('locationAriaLabel')}
             />
           </div>
           <div>
-            <label className="text-sm text-gray-500 block mb-1">Suchradius: {defaultRadius} km</label>
+            <label className="text-sm text-gray-500 block mb-1">{t('radiusLabel', { km: defaultRadius })}</label>
             <input type="range" min={5} max={100} step={5} value={defaultRadius}
               onChange={e => setDefaultRadius(Number(e.target.value))}
-              className="w-full accent-blue-600" aria-label="Suchradius"
+              className="w-full accent-blue-600" aria-label={t('radiusAriaLabel')}
             />
-            <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>5 km</span><span>100 km</span></div>
+            <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{t('radiusMin')}</span><span>{t('radiusMax')}</span></div>
           </div>
           <ToggleRow
-            label="Ausbildungsplätze ausblenden"
-            desc="Ausbildungsangebote werden in der Suche nicht angezeigt"
+            label={t('hideAusbildungLabel')}
+            desc={t('hideAusbildungDesc')}
             value={hideAusbildung}
             onChange={setHideAusbildung}
           />
@@ -508,20 +500,19 @@ export default function Settings() {
         {/* API-Key Bereich */}
         <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4 space-y-4">
           <div>
-            <p className="text-sm font-medium mb-0.5">🔑 API-Zugänge</p>
+            <p className="text-sm font-medium mb-0.5">{t('apiKeysHeading')}</p>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Die Bundesagentur für Arbeit, Stepstone und EURES funktionieren <strong>ohne Registrierung</strong>.
-              Für mehr Ergebnisse kannst du optional einen kostenlosen Adzuna-Key hinzufügen.
+              <Trans i18nKey="settings:apiKeysIntro" components={{ strong: <strong /> }} />
             </p>
           </div>
 
           {/* Adzuna */}
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Adzuna (optional, kostenlos)</p>
-            <ApiKeyInput id="adzuna_app_id" label="App ID" placeholder="Deine Adzuna App ID" link={API_LINKS.adzuna} />
-            <ApiKeyInput id="adzuna_api_key" label="API Key" placeholder="Dein Adzuna API Key" />
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('adzunaSectionLabel')}</p>
+            <ApiKeyInput id="adzuna_app_id" label={t('appIdLabel')} placeholder={t('appIdPlaceholder')} link={API_LINKS.adzuna} />
+            <ApiKeyInput id="adzuna_api_key" label={t('apiKeyLabel')} placeholder={t('apiKeyPlaceholder')} />
             {remote?.has_adzuna_key && keys.adzuna_app_id === '' && keys.adzuna_api_key === '' && keysSaveStatus === 'idle' && (
-              <p className="text-xs text-green-600 dark:text-green-400">✅ Adzuna-Key hinterlegt</p>
+              <p className="text-xs text-green-600 dark:text-green-400">{t('adzunaKeyStored')}</p>
             )}
             {showKeysButton && (
               <button
@@ -539,65 +530,63 @@ export default function Settings() {
                 {keysSaveStatus === 'saved'   && <Check size={12} aria-hidden />}
                 {keysSaveStatus === 'error'   && <AlertCircle size={12} aria-hidden />}
                 {keysSaveStatus === 'idle'    && <Save size={12} aria-hidden />}
-                {keysSaveStatus === 'pending' && 'Speichern…'}
-                {keysSaveStatus === 'saved'   && 'Keys gespeichert ✅'}
-                {keysSaveStatus === 'error'   && 'Fehler – erneut versuchen'}
-                {keysSaveStatus === 'idle'    && 'Keys speichern'}
+                {keysSaveStatus === 'pending' && t('saveKeysPending')}
+                {keysSaveStatus === 'saved'   && t('saveKeysSaved')}
+                {keysSaveStatus === 'error'   && t('saveKeysError')}
+                {keysSaveStatus === 'idle'    && t('saveKeysIdle')}
               </button>
             )}
           </div>
 
           {/* LinkedIn */}
           <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 px-3 py-2.5">
-            <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 mb-1">⚠️ LinkedIn – kein offizieller API-Key</p>
+            <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 mb-1">{t('linkedinHeading')}</p>
             <p className="text-xs text-yellow-600 dark:text-yellow-300 leading-relaxed">
-              LinkedIn hat seine Job-API für Drittanbieter geschlossen. JobHunter sucht LinkedIn-Stellen
-              direkt über die öffentliche Suche – kein Key erforderlich.
+              {t('linkedinBody')}
             </p>
             <a href={API_LINKS.linkedin} target="_blank" rel="noopener noreferrer"
               className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-1.5">
-              LinkedIn Jobs direkt öffnen <ExternalLink size={11} aria-hidden />
+              {t('linkedinOpenLink')} <ExternalLink size={11} aria-hidden />
             </a>
           </div>
 
           {/* Bundesagentur Info */}
           <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-2.5">
-            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">✅ Bundesagentur für Arbeit – automatisch aktiv</p>
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">{t('arbeitsagenturHeading')}</p>
             <p className="text-xs text-green-600 dark:text-green-300 leading-relaxed">
-              Die offizielle Jobbörse der BA ist vollständig kostenlos und ohne Registrierung nutzbar.
-              Keine Eingabe erforderlich.
+              {t('arbeitsagenturBody')}
             </p>
           </div>
         </div>
       </Section>
 
       {/* ── Erinnerungen ── */}
-      <Section title="⏰ Erinnerungen">
+      <Section title={`⏰ ${t('remindersTitle')}`}>
         <div>
-          <label className="text-sm text-gray-500 block mb-1">Standard-Vorlaufzeit: {reminderDays} Tage</label>
+          <label className="text-sm text-gray-500 block mb-1">{t('reminderLeadTimeLabel', { days: reminderDays })}</label>
           <input type="range" min={1} max={30} step={1} value={reminderDays}
             onChange={e => setReminderDays(Number(e.target.value))}
-            className="w-full accent-blue-600" aria-label="Erinnerungsvorlaufzeit"
+            className="w-full accent-blue-600" aria-label={t('reminderLeadTimeAriaLabel')}
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>1 Tag</span><span>30 Tage</span></div>
+          <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{t('reminderLeadTimeMin')}</span><span>{t('reminderLeadTimeMax')}</span></div>
         </div>
       </Section>
 
       {/* ── Daten ── */}
-      <Section title="💾 Daten">
+      <Section title={`💾 ${t('dataTitle')}`}>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
-            <Download size={15} aria-hidden /> Daten exportieren
+            <Download size={15} aria-hidden /> {t('exportButton')}
           </button>
           <label className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-            <Upload size={15} aria-hidden /> Daten importieren
+            <Upload size={15} aria-hidden /> {t('importButton')}
             <input type="file" accept=".zip" onChange={handleImport} className="sr-only" />
           </label>
         </div>
-        {importing && <p className="text-sm text-gray-500 mt-2">⏳ Importiere…</p>}
+        {importing && <p className="text-sm text-gray-500 mt-2">{t('importing')}</p>}
         {importMsg && <p className="text-sm mt-2">{importMsg}</p>}
       </Section>
     </div>

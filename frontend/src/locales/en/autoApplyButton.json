@@ -1,0 +1,15 @@
+{
+  "downloadTitle": "Download application package as ZIP",
+  "button": "1-Click Package",
+  "dialogAriaLabel": "Application Package Preview",
+  "heading": "Application Package",
+  "close": "Close",
+  "filesIntro": "The following files will be downloaded as a .zip:",
+  "notPresent": "(not available)",
+  "filename": "Filename:",
+  "creatingZip": "Creating ZIP...",
+  "download": "Download",
+  "errorZip": "Error creating the ZIP package.",
+  "fallbackJobTitle": "Job",
+  "fallbackCompany": "Company"
+}

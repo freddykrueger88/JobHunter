@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import { Package, Download, FileText, FileJson, X, Loader2 } from 'lucide-react'
 
@@ -12,11 +13,14 @@ interface Props {
 
 export default function AutoApplyButton({
   applicationId,
-  jobTitle = 'Stelle',
-  company = 'Firma',
+  jobTitle,
+  company,
   hasCoverLetter = false,
   hasCV = false,
 }: Props) {
+  const { t } = useTranslation(['autoApplyButton', 'common'])
+  jobTitle = jobTitle ?? t('fallbackJobTitle')
+  company = company ?? t('fallbackCompany')
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -37,7 +41,7 @@ export default function AutoApplyButton({
       URL.revokeObjectURL(url)
       setShowModal(false)
     } catch {
-      alert('Fehler beim Erstellen des ZIP-Pakets.')
+      alert(t('errorZip'))
     } finally {
       setLoading(false)
     }
@@ -48,10 +52,10 @@ export default function AutoApplyButton({
       <button
         onClick={() => setShowModal(true)}
         className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
-        title="Bewerbungspaket als ZIP herunterladen"
+        title={t('downloadTitle')}
       >
         <Package size={16} aria-hidden />
-        1-Klick-Paket
+        {t('button')}
       </button>
 
       {showModal && (
@@ -64,26 +68,26 @@ export default function AutoApplyButton({
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Bewerbungspaket Vorschau"
+            aria-label={t('dialogAriaLabel')}
             className="fixed inset-0 flex items-center justify-center z-50 p-4"
           >
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <Package size={20} className="text-green-600" aria-hidden />
-                  Bewerbungspaket
+                  {t('heading')}
                 </h2>
                 <button
                   onClick={() => setShowModal(false)}
                   className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Schließen"
+                  aria-label={t('close')}
                 >
                   <X size={18} aria-hidden />
                 </button>
               </div>
 
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Folgende Dateien werden als <strong>.zip</strong> heruntergeladen:
+                {t('filesIntro')}
               </p>
 
               <ul className="space-y-2 mb-6">
@@ -94,7 +98,7 @@ export default function AutoApplyButton({
                 }`}>
                   <FileText size={16} aria-hidden />
                   Anschreiben_{company.replace(/[^\w]/g, '_')}.pdf
-                  {!hasCoverLetter && <span className="text-xs ml-auto">(nicht vorhanden)</span>}
+                  {!hasCoverLetter && <span className="text-xs ml-auto">{t('notPresent')}</span>}
                 </li>
                 <li className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
                   <FileJson size={16} aria-hidden />
@@ -107,7 +111,7 @@ export default function AutoApplyButton({
               </ul>
 
               <p className="text-xs text-gray-400 mb-5">
-                Dateiname: <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">
+                {t('filename')} <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">
                   Bewerbung_{company.replace(/[^\w]/g, '_')}_{jobTitle.replace(/[^\w]/g, '_')}_{new Date().toISOString().slice(0, 10).replace(/-/g, '')}.zip
                 </code>
               </p>
@@ -117,7 +121,7 @@ export default function AutoApplyButton({
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Abbrechen
+                  {t('common:cancel')}
                 </button>
                 <button
                   onClick={handleDownload}
@@ -125,9 +129,9 @@ export default function AutoApplyButton({
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {loading ? (
-                    <><Loader2 size={16} className="animate-spin" aria-hidden /> Erstelle ZIP...</>
+                    <><Loader2 size={16} className="animate-spin" aria-hidden /> {t('creatingZip')}</>
                   ) : (
-                    <><Download size={16} aria-hidden /> Download</>  
+                    <><Download size={16} aria-hidden /> {t('download')}</>
                   )}
                 </button>
               </div>

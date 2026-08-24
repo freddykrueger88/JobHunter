@@ -2,6 +2,7 @@
  * ATS-Score-Panel: Zeigt Keyword-Match, Ampel und Verbesserungsvorschlaege.
  */
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import clsx from 'clsx'
 import { ShieldCheck, AlertTriangle, XCircle, ChevronDown, ChevronUp } from 'lucide-react'
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function AtsScorePanel({ applicationId, cvText, jobDescription }: Props) {
+  const { t } = useTranslation('atsScorePanel')
   const [result, setResult] = useState<AtsResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -44,24 +46,24 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
   }
 
   const ampelConfig = {
-    gruen: { color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20', Icon: ShieldCheck, label: 'Gut' },
-    gelb:  { color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20', Icon: AlertTriangle, label: 'Verbesserbar' },
-    rot:   { color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-900/20', Icon: XCircle, label: 'Kritisch' },
+    gruen: { color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20', Icon: ShieldCheck, label: t('ampel.gruen') },
+    gelb:  { color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20', Icon: AlertTriangle, label: t('ampel.gelb') },
+    rot:   { color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-900/20', Icon: XCircle, label: t('ampel.rot') },
   }
 
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800">
         <div>
-          <p className="font-semibold text-sm">ATS-Score-Checker</p>
-          <p className="text-xs text-gray-400">Keyword-Abgleich CV vs. Stelle</p>
+          <p className="font-semibold text-sm">{t('title')}</p>
+          <p className="text-xs text-gray-400">{t('subtitle')}</p>
         </div>
         <button
           onClick={run}
           disabled={loading}
           className="px-4 py-1.5 rounded-xl text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Analysiere…' : 'Analysieren'}
+          {loading ? t('analyzing') : t('analyze')}
         </button>
       </div>
 
@@ -74,7 +76,7 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
                 <Icon size={28} className={color} aria-hidden />
                 <div>
                   <p className={clsx('text-2xl font-bold', color)}>{result.score}<span className="text-base font-normal">/100</span></p>
-                  <p className="text-xs text-gray-500">{label} – {result.matched_keywords.length}/{result.matched_keywords.length + result.missing_keywords.length} Keywords
+                  <p className="text-xs text-gray-500">{t('keywordScore', { label, matched: result.matched_keywords.length, total: result.matched_keywords.length + result.missing_keywords.length })}
                   </p>
                 </div>
               </>
@@ -90,7 +92,7 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
                 aria-expanded={expanded}
               >
                 {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                {result.suggestions.length} fehlende Keywords
+                {t('missingKeywords', { count: result.suggestions.length })}
               </button>
               {expanded && (
                 <ul className="mt-2 space-y-1">
@@ -108,7 +110,7 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
           {/* KI-Vorschlaege */}
           {result.ki_vorschlaege && (
             <div className="text-xs space-y-1">
-              <p className="font-medium text-gray-500">KI-Verbesserungen:</p>
+              <p className="font-medium text-gray-500">{t('aiImprovements')}</p>
               {result.ki_vorschlaege.map((v, i) => (
                 <p key={i} className="text-gray-600 dark:text-gray-300">• {v}</p>
               ))}
@@ -118,7 +120,7 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
           {/* Format-Warnungen */}
           {result.format_warnings.length > 0 && (
             <div className="text-xs">
-              <p className="font-medium text-red-500 mb-1">Formatierungs-Warnungen:</p>
+              <p className="font-medium text-red-500 mb-1">{t('formatWarnings')}</p>
               {result.format_warnings.map((w, i) => (
                 <p key={i} className="text-red-400">⚠️ {w.meldung}</p>
               ))}

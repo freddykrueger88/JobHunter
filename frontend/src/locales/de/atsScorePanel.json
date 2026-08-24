@@ -1,0 +1,16 @@
+{
+  "title": "ATS-Score-Checker",
+  "subtitle": "Keyword-Abgleich CV vs. Stelle",
+  "analyzing": "Analysiere…",
+  "analyze": "Analysieren",
+  "ampel": {
+    "gruen": "Gut",
+    "gelb": "Verbesserbar",
+    "rot": "Kritisch"
+  },
+  "keywordScore": "{{label}} – {{matched}}/{{total}} Keywords",
+  "missingKeywords_one": "{{count}} fehlendes Keyword",
+  "missingKeywords_other": "{{count}} fehlende Keywords",
+  "aiImprovements": "KI-Verbesserungen:",
+  "formatWarnings": "Formatierungs-Warnungen:"
+}

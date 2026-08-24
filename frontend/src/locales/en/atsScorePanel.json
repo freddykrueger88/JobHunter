@@ -1,0 +1,16 @@
+{
+  "title": "ATS Score Checker",
+  "subtitle": "Keyword match: CV vs. job posting",
+  "analyzing": "Analyzing…",
+  "analyze": "Analyze",
+  "ampel": {
+    "gruen": "Good",
+    "gelb": "Needs improvement",
+    "rot": "Critical"
+  },
+  "keywordScore": "{{label}} – {{matched}}/{{total}} keywords",
+  "missingKeywords_one": "{{count}} missing keyword",
+  "missingKeywords_other": "{{count}} missing keywords",
+  "aiImprovements": "AI Improvements:",
+  "formatWarnings": "Formatting Warnings:"
+}

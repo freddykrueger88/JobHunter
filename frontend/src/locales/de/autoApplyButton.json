@@ -1,0 +1,15 @@
+{
+  "downloadTitle": "Bewerbungspaket als ZIP herunterladen",
+  "button": "1-Klick-Paket",
+  "dialogAriaLabel": "Bewerbungspaket Vorschau",
+  "heading": "Bewerbungspaket",
+  "close": "Schließen",
+  "filesIntro": "Folgende Dateien werden als .zip heruntergeladen:",
+  "notPresent": "(nicht vorhanden)",
+  "filename": "Dateiname:",
+  "creatingZip": "Erstelle ZIP...",
+  "download": "Download",
+  "errorZip": "Fehler beim Erstellen des ZIP-Pakets.",
+  "fallbackJobTitle": "Stelle",
+  "fallbackCompany": "Firma"
+}

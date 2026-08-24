@@ -1,5 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import type { TFunction } from 'i18next'
+import i18n from '../i18n'
+import { showError } from './errorToast'
 
 /**
  * Zentraler API-Client - loest den in REPOSITORY_AUDIT_DE.md Abschnitt 1.2
@@ -18,14 +20,15 @@ export const api = axios.create({
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ detail?: string }>) => {
-    const detail = error.response?.data?.detail
-    const message = detail || error.message || 'Unbekannter Fehler'
-    // Einheitlicher Log-Punkt fuer alle API-Fehler. UI-seitige, uebersetzte
-    // Fehleranzeige folgt in Rework-Plan Phase D (Produktqualitaet) -
-    // hier bewusst nur die zentrale Stelle geschaffen, an der das spaeter
-    // andockt (z.B. Toast-Komponente statt console.error).
+  (error: AxiosError) => {
+    // Rework-Plan Phase D.1: einheitliche, uebersetzte Fehleranzeige fuer
+    // jeden Aufruf ueber diesen Client statt eines stillen Fehlschlags
+    // (Audit-Befund REPOSITORY_AUDIT_DE.md 1.2). i18n.t direkt statt des
+    // React-Hooks, da der Interceptor ausserhalb jedes Komponenten-Baums
+    // laeuft.
+    const message = getApiErrorMessage(error, i18n.t)
     console.error(`[API-Fehler] ${error.config?.method?.toUpperCase()} ${error.config?.url}: ${message}`)
+    showError(message)
     return Promise.reject(error)
   },
 )

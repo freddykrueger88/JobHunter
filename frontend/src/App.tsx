@@ -6,6 +6,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import TopNav from './components/TopNav'
 import ShortcutOverlay from './components/ShortcutOverlay'
 import UndoToast from './components/UndoToast'
+import ErrorToastContainer from './components/ErrorToastContainer'
 import SakuraPetals from './components/SakuraPetals'
 import Dashboard from './pages/Dashboard'
 import Jobs from './pages/Jobs'
@@ -48,6 +49,7 @@ function AppInner() {
 
       <ShortcutOverlay isOpen={shortcutOpen} onClose={() => setShortcutOpen(false)} />
       <UndoToast state={undoState} onUndo={undo} onDismiss={dismiss} />
+      <ErrorToastContainer />
       <SakuraPetals />
     </div>
   )

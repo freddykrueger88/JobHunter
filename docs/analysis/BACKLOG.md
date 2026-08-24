@@ -108,5 +108,29 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [ ] A.7 Punktuelle docs/*.md Korrekturen - zurueckgestellt (niedrige Prioritaet, kein Blocker)
 
 Phase A Status: 6 von 7 Aufgaben erledigt und einzeln verifiziert (A.7 zurueckgestellt,
-niedrige Prioritaet). Naechster Schritt: Phase B (Struktur) gemaess REWORK_PLAN_DE.md,
-oder Review der bisherigen Phase-A-Aenderungen durch den Nutzer.
+niedrige Prioritaet).
+
+## Phase B - Umsetzung (2026-08-24, Fortsetzung)
+- [x] B.1 Toten Code entfernt (backend/models.py, Top-Level-/alembic/), verifiziert
+      per pytest + alembic current
+- [!] B.2 Endpunkt-Schicht vereinheitlichen (api/ -> routers/) - ZURUECKGESTELLT:
+      betrifft main.py, das Nutzer-eigene, uncommittete Arbeit enthaelt. Nicht ohne
+      Ruecksprache angefasst.
+- [!] B.3 Produktentscheidung User/Auth (vervollstaendigen vs. entfernen) - ZURUECKGESTELLT:
+      echte Produktentscheidung, kann nicht autonom getroffen werden.
+- [x] B.4 Zentraler Frontend-API-Client frontend/src/lib/api.ts eingefuehrt,
+      Dashboard.tsx als erste Datei migriert (Proof of Concept), verifiziert per
+      npm run build + echtem HTTP-Request
+- [x] B.5 Namenskollision CompanyDossier aufgeloest (pages/CompanyDossier.tsx ->
+      CompanyDossierPage.tsx). Nebenbefund: components/CompanyDossier.tsx wird
+      nirgends importiert - totes, unverdrahtetes Fragment, aehnlich Auth-Muster,
+      absichtlich nicht geloescht (Produktentscheidung)
+- [ ] B.6 Backend-Schema-Schicht ausbauen (pro Domaene) - noch offen
+- [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
+
+Phase B Status: 4 von 7 Aufgaben erledigt (B.2/B.3 bewusst zurueckgestellt -
+Produktentscheidung/main.py-Konflikt -, B.6 noch offen).
+
+Naechster Schritt: B.6 (Schema-Schicht) oder Review durch den Nutzer, insbesondere
+zu den zurueckgestellten Punkten B.2/B.3 sowie den in Phase A neu gefundenen
+main.py-abhaengigen Themen (company.py/jobs.py/search_profiles.py Registrierung).

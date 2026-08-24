@@ -3,6 +3,7 @@
  * Unterstuetzt Drag & Drop, Klick-Upload und Kamera (Mobile).
  */
 import { useState, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Camera, Upload, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import axios from 'axios'
 import clsx from 'clsx'
@@ -22,6 +23,7 @@ interface Props {
 type State = 'idle' | 'dragging' | 'uploading' | 'success' | 'error'
 
 export default function ImageJobUpload({ onJobCreated }: Props) {
+  const { t } = useTranslation('imageJobUpload')
   const [state, setState] = useState<State>('idle')
   const [preview, setPreview] = useState<string | null>(null)
   const [result, setResult] = useState<{ job: ParsedJob; ocr_text: string } | null>(null)
@@ -30,7 +32,7 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
 
   const upload = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setError('Nur Bilder erlaubt (JPEG, PNG, WEBP)')
+      setError(t('errorImagesOnly'))
       setState('error')
       return
     }
@@ -49,10 +51,10 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
       setState('success')
       onJobCreated(data.job)
     } catch (err: any) {
-      setError(err.response?.data?.detail ?? 'Upload fehlgeschlagen')
+      setError(err.response?.data?.detail ?? t('errorUploadFailed'))
       setState('error')
     }
-  }, [onJobCreated])
+  }, [onJobCreated, t])
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -78,7 +80,7 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
         onClick={() => inputRef.current?.click()}
         role="button"
         tabIndex={0}
-        aria-label="Bild einer Stellenanzeige hochladen"
+        aria-label={t('uploadAriaLabel')}
         onKeyDown={e => e.key === 'Enter' && inputRef.current?.click()}
         className={clsx(
           'relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all',
@@ -103,35 +105,35 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
               <Upload size={28} className="text-gray-400" aria-hidden />
               <Camera size={28} className="text-gray-400" aria-hidden />
             </div>
-            <p className="font-medium text-gray-700 dark:text-gray-300">Foto hier ablegen oder klicken</p>
-            <p className="text-sm text-gray-400">JPEG, PNG oder WEBP · max. 10 MB</p>
-            <p className="text-xs text-gray-400">Auf dem Handy wird automatisch die Kamera geöffnet</p>
+            <p className="font-medium text-gray-700 dark:text-gray-300">{t('dropHere')}</p>
+            <p className="text-sm text-gray-400">{t('fileTypes')}</p>
+            <p className="text-xs text-gray-400">{t('cameraHint')}</p>
           </div>
         )}
 
         {state === 'uploading' && (
           <div className="flex flex-col items-center gap-3">
-            {preview && <img src={preview} alt="Vorschau" className="h-24 w-auto rounded-lg object-cover" />}
+            {preview && <img src={preview} alt={t('previewAlt')} className="h-24 w-auto rounded-lg object-cover" />}
             <Loader2 size={24} className="animate-spin text-blue-500" aria-hidden />
-            <p className="text-sm text-gray-500">Bild wird analysiert…</p>
+            <p className="text-sm text-gray-500">{t('analyzing')}</p>
           </div>
         )}
 
         {state === 'success' && result && (
           <div className="text-left space-y-2">
             <div className="flex items-center gap-2 text-green-600 font-medium mb-3">
-              <CheckCircle size={18} aria-hidden /> Stelle erkannt!
+              <CheckCircle size={18} aria-hidden /> {t('jobDetected')}
             </div>
-            <p><span className="text-gray-400 text-xs">Titel</span><br /><strong>{result.job.titel || '–'}</strong></p>
-            <p><span className="text-gray-400 text-xs">Firma</span><br />{result.job.firma || '–'}</p>
-            <p><span className="text-gray-400 text-xs">Ort</span><br />{result.job.ort || '–'}</p>
+            <p><span className="text-gray-400 text-xs">{t('titleLabel')}</span><br /><strong>{result.job.titel || '–'}</strong></p>
+            <p><span className="text-gray-400 text-xs">{t('companyLabel')}</span><br />{result.job.firma || '–'}</p>
+            <p><span className="text-gray-400 text-xs">{t('locationLabel')}</span><br />{result.job.ort || '–'}</p>
           </div>
         )}
 
         {state === 'error' && (
           <div className="flex flex-col items-center gap-2 text-red-500">
             <AlertCircle size={24} aria-hidden />
-            <p className="font-medium">Fehler</p>
+            <p className="font-medium">{t('error')}</p>
             <p className="text-sm">{error}</p>
           </div>
         )}
@@ -140,7 +142,7 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
       {(state === 'success' || state === 'error') && (
         <button onClick={reset}
           className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-          <X size={14} aria-hidden /> Neues Foto hochladen
+          <X size={14} aria-hidden /> {t('newUpload')}
         </button>
       )}
     </div>

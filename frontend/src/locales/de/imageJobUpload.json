@@ -1,0 +1,16 @@
+{
+  "errorImagesOnly": "Nur Bilder erlaubt (JPEG, PNG, WEBP)",
+  "errorUploadFailed": "Upload fehlgeschlagen",
+  "uploadAriaLabel": "Bild einer Stellenanzeige hochladen",
+  "dropHere": "Foto hier ablegen oder klicken",
+  "fileTypes": "JPEG, PNG oder WEBP · max. 10 MB",
+  "cameraHint": "Auf dem Handy wird automatisch die Kamera geöffnet",
+  "previewAlt": "Vorschau",
+  "analyzing": "Bild wird analysiert…",
+  "jobDetected": "Stelle erkannt!",
+  "titleLabel": "Titel",
+  "companyLabel": "Firma",
+  "locationLabel": "Ort",
+  "error": "Fehler",
+  "newUpload": "Neues Foto hochladen"
+}

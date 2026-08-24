@@ -1,0 +1,16 @@
+{
+  "errorImagesOnly": "Only images allowed (JPEG, PNG, WEBP)",
+  "errorUploadFailed": "Upload failed",
+  "uploadAriaLabel": "Upload an image of a job listing",
+  "dropHere": "Drop a photo here or click",
+  "fileTypes": "JPEG, PNG, or WEBP · max. 10 MB",
+  "cameraHint": "On mobile, the camera opens automatically",
+  "previewAlt": "Preview",
+  "analyzing": "Analyzing image…",
+  "jobDetected": "Job detected!",
+  "titleLabel": "Title",
+  "companyLabel": "Company",
+  "locationLabel": "Location",
+  "error": "Error",
+  "newUpload": "Upload a new photo"
+}

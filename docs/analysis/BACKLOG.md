@@ -185,3 +185,46 @@ jobs.py/jobs_image.py-Pfadkollision ab.
 Naechster Schritt (Nutzerentscheidung 2026-08-24: "nach dem Plan weiter"): Phase C
 (Internationalisierung) gemaess REWORK_PLAN_DE.md. B.2 bleibt als offener Punkt
 stehen, bis main.py fertig/committet ist.
+
+## Phase C - Internationalisierung (2026-08-24, Umsetzung)
+- [x] C.1 docs/i18n/KONZEPT.md geschrieben (Namespace-Struktur, Schluesselkonvention,
+      Persistenz, Datumsformatierung, Backend-Fehlertexte-Zielbild, CI-Check-Plan)
+- [x] C.2 i18n.ts auf automatisches Namespace-Laden umgestellt (import.meta.glob
+      statt manueller Imports - verhindert Pflegefehler bei jeder neuen Batch-Datei).
+      5 bereits uebersetzte Bereiche (nav/dashboard/jobs/settings/common) migriert.
+- [x] C.3 ALLE 38 Frontend-Dateien mit sichtbarem UI-Text uebersetzt (DE+EN), jede
+      einzeln per npm run build + ESLint verifiziert:
+      Batch 1: Kanban, CoverLetter
+      Batch 2: Reminders, History, SearchProfiles
+      Batch 3: InterviewSimulator, CompanyDossierPage
+      Batch 4: DeadlineBadge, GhostJobBadge, BadgesPanel, CalendarExportButton,
+        WeeklyGoalWidget, UndoToast, PwaInstallBanner, ShortcutOverlay,
+        ConfirmDialog, StatsChart, QualityScoreCard, AtsScorePanel,
+        AutoApplyButton, SalaryNegotiationModal, ExportImportPanel,
+        ImageJobUpload, EmailParsingSetup, JobSearchDropdown,
+        MarketAnalyzerPanel, CoachChatDrawer, FollowUpWidget
+      SakuraPetals.tsx brauchte kein i18n (rein dekorativ, aria-hidden, kein Text).
+
+      Nebenbei gefundene und behobene Bugs waehrend der Migration:
+      - lib/formatDate.ts (formatDate/formatDateTime/formatNumber/formatCurrencyEur)
+        neu eingefuehrt - ersetzt hartcodierte de-DE-Locale in Kanban, Reminders,
+        History, SearchProfiles, DeadlineBadge, SalaryNegotiationModal.
+      - KRITISCH: ExportImportPanel.tsx rief /export/... statt /api/export/...
+        auf (fehlendes Praefix aus Phase A hier uebersehen) - Nutzer haetten eine
+        kaputte "Export"-Datei heruntergeladen (Content-Type text/html statt json/
+        Datei). Gefixt und verifiziert.
+      - Mehrere neu durch t()-Nutzung entstandene Findings sofort behoben
+        (useCallback-deps in ImageJobUpload, Variablen-Shadowing von t() in
+        SalaryNegotiationModal/TopNav-Batches).
+      - Mehrere VORBESTEHENDE Lint-Findings nebenbei mitgeloest (unused clsx-Import
+        BadgesPanel, unescaped-entities InterviewSimulator).
+
+      Ergebnis: npm run lint gesamt zeigt 22 Findings (11 Fehler, 11 Warnungen) -
+      WENIGER als die urspruenglichen 26 aus Phase A, keine neuen Regressionen.
+- [ ] C.4 Backend-Fehlertexte i18n-faehig machen (Fehlercode statt Klartext) - noch offen
+- [ ] C.5 Locale-Umschaltung im UI sichtbar/erreichbar machen (Settings.tsx nutzt
+      bereits i18n.changeLanguage, UI-Element fuer Sprachwahl noch zu pruefen/ergaenzen)
+- [ ] C.6 CI-Check auf fehlende/verwaiste Uebersetzungsschluessel - noch offen
+- [ ] C.7 docs/, wiki/, README auf einheitliches Zweisprachigkeits-Schema bringen - noch offen
+
+Phase C Status: C.1-C.3 abgeschlossen (der groesste Teil), C.4-C.7 offen.

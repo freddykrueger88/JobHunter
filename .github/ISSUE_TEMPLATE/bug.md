@@ -10,9 +10,9 @@ assignees: []
 <!-- Was passiert? Was sollte stattdessen passieren? -->
 
 ## Schritte zur Reproduktion
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Erwartetes Verhalten
 <!-- Was hätte passieren sollen? -->
@@ -21,10 +21,10 @@ assignees: []
 <!-- Was passiert stattdessen? -->
 
 ## Umgebung
-- OS: 
-- Browser / Client: 
-- Docker-Version: 
-- JobHunter-Version: 
+- OS:
+- Browser / Client:
+- Docker-Version:
+- JobHunter-Version:
 
 ## Screenshots / Logs
 <!-- Optional aber hilfreich -->

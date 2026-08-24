@@ -17,8 +17,8 @@ Closes #
 
 ## Änderungen im Überblick
 <!-- Stichpunktliste der wichtigsten Änderungen -->
-- 
-- 
+-
+-
 
 ## Screenshots / Demo
 <!-- Optional: Vorher/Nachher, neues UI-Element -->

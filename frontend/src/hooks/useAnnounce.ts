@@ -1,6 +1,6 @@
 /**
  * Screenreader-Announcements über die globalen aria-live Regionen.
- * 
+ *
  * Verwendung:
  * const { announce, alert } = useAnnounce()
  * announce('12 neue Stellen geladen')   // polite (unterbricht nicht)

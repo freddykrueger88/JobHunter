@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=2000"]
+      - id: check-merge-conflict
+
+  # Rework-Plan Phase E.4 (docs/analysis/REWORK_PLAN_DE.md): mindestens
+  # Lint-Check vor Commit, jetzt moeglich, da Phase A/E die ESLint-Config
+  # etabliert und alle bisherigen Errors behoben hat (siehe git log).
+  # Kein Backend-Linter (ruff/black o.ae.), da laut Audit 1.5 aktuell
+  # keiner im Projekt konfiguriert ist - kein neuer Linter wird hier
+  # ungefragt eingefuehrt.
+  #
+  # Ueber "docker compose exec" statt direktem "npm run lint": auf dem
+  # tatsaechlichen Entwicklungshost (LXC 142) ist kein Node/npm nativ
+  # installiert, nur im laufenden frontend-Container (verifiziert - "npm"
+  # ist auf dem Host nicht im PATH). Setzt einen laufenden
+  # "docker compose up"-Stack voraus, was fuer dieses Projekt der normale
+  # Entwicklungszustand ist.
+  - repo: local
+    hooks:
+      - id: frontend-eslint
+        name: Frontend ESLint
+        entry: bash -c 'docker compose exec -T frontend npm run lint'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false

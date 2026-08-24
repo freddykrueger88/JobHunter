@@ -16,8 +16,8 @@ assignees: []
 <!-- Optional: Welche Richtlinie wird erfüllt? z.B. WCAG 2.1 AA 1.4.3 -->
 
 ## Tasks
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
 
 ## Technische Umsetzung
 <!-- Bibliotheken, CSS, ARIA, SVG-Filter etc. -->

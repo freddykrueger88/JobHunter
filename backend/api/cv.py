@@ -7,6 +7,7 @@ from backend.core.config import settings
 from backend.models.cv import CVData
 from backend.models.history import HistoryEntry
 from backend.services.cv_parser import extract_text, parse_cv_with_ai
+from backend.schemas.cv import CVUploadResponse, CVListItem, CVDetail
 
 router = APIRouter(prefix="/api/cv", tags=["Lebenslauf"])
 UPLOAD_DIR = "/app/uploads"
@@ -32,7 +33,7 @@ async def _parse_and_save(cv_id: int, filepath: str, db: AsyncSession):
         pass  # Fehler werden in der CV-Liste als fehlend sichtbar
 
 
-@router.post("/upload", status_code=201)
+@router.post("/upload", status_code=201, response_model=CVUploadResponse)
 async def upload_cv(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
@@ -61,7 +62,7 @@ async def upload_cv(
     return {"id": cv.id, "filename": cv.filename, "status": "parsing_started"}
 
 
-@router.get("/")
+@router.get("/", response_model=list[CVListItem])
 async def list_cvs(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()))
     cvs = result.scalars().all()
@@ -76,7 +77,7 @@ async def list_cvs(db: AsyncSession = Depends(get_db)):
     } for c in cvs]
 
 
-@router.get("/{cv_id}")
+@router.get("/{cv_id}", response_model=CVDetail)
 async def get_cv(cv_id: int, db: AsyncSession = Depends(get_db)):
     cv = await db.get(CVData, cv_id)
     if not cv:

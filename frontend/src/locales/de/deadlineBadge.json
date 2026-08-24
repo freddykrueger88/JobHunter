@@ -1,0 +1,6 @@
+{
+  "expired": "Abgelaufen",
+  "daysLeft": "Noch {{days}}T",
+  "titleLabel": "Bewerbungsfrist: {{date}}",
+  "ariaLabel": "Bewerbungsfrist in {{days}} Tagen"
+}

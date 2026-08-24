@@ -1,0 +1,5 @@
+{
+  "heading": "Badges",
+  "lockedTitle": "Not unlocked yet: {{description}}",
+  "lockedAriaLabel": "Locked: {{label}}"
+}

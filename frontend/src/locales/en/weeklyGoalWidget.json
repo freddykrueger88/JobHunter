@@ -1,0 +1,7 @@
+{
+  "weeklyGoal": "Weekly Goal",
+  "progressAriaLabel": "Weekly goal: {{percent}}% reached",
+  "streak_one": "{{count}} day streak",
+  "streak_other": "{{count}} day streak",
+  "lastActivity": "Last: {{date}}"
+}

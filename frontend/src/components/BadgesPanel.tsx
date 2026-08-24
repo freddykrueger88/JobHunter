@@ -3,8 +3,8 @@
  * Freigeschaltete Abzeichen werden hervorgehoben, gesperrte ausgegraut.
  */
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
-import clsx from 'clsx'
 
 interface Badge {
   key: string
@@ -14,6 +14,7 @@ interface Badge {
 }
 
 export default function BadgesPanel() {
+  const { t } = useTranslation('badgesPanel')
   const [badges, setBadges] = useState<Badge[]>([])
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function BadgesPanel() {
 
   return (
     <section aria-labelledby="badges-heading">
-      <h2 id="badges-heading" className="font-semibold text-sm text-gray-500 mb-3">Abzeichen</h2>
+      <h2 id="badges-heading" className="font-semibold text-sm text-gray-500 mb-3">{t('heading')}</h2>
       <div className="flex flex-wrap gap-2">
         {unlocked.map(b => (
           <div key={b.key}
@@ -37,9 +38,9 @@ export default function BadgesPanel() {
         ))}
         {locked.map(b => (
           <div key={b.key}
-            title={`Noch nicht freigeschaltet: ${b.beschreibung}`}
+            title={t('lockedTitle', { description: b.beschreibung })}
             className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600 select-none"
-            aria-label={`Gesperrt: ${b.label}`}>
+            aria-label={t('lockedAriaLabel', { label: b.label })}>
             🔒 {b.label.split(' ').slice(1).join(' ')}
           </div>
         ))}

@@ -1,6 +1,7 @@
 /**
  * Ghost-Job-Badge: Warnt vor veralteten oder fiktiven Stellenanzeigen.
  */
+import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
 interface GhostResult {
@@ -16,12 +17,13 @@ interface Props {
 }
 
 export default function GhostJobBadge({ result, className }: Props) {
+  const { t } = useTranslation('ghostJobBadge')
   if (!result || !result.ist_ghost_job) return null
 
   const config = {
-    hoch:    { label: '⚠️ Wahrscheinlich Ghost Job', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
-    mittel:  { label: '⚠️ Möglicherweise Ghost Job', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' },
-    niedrig: { label: 'ℹ️ Alte Anzeige', color: 'bg-gray-100 text-gray-500 dark:bg-gray-800' },
+    hoch:    { label: t('likely'),   color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+    mittel:  { label: t('possible'), color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' },
+    niedrig: { label: t('old'),      color: 'bg-gray-100 text-gray-500 dark:bg-gray-800' },
   }
 
   const { label, color } = config[result.wahrscheinlichkeit]

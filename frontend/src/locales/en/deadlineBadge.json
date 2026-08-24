@@ -1,0 +1,6 @@
+{
+  "expired": "Expired",
+  "daysLeft": "{{days}}d left",
+  "titleLabel": "Application deadline: {{date}}",
+  "ariaLabel": "Application deadline in {{days}} days"
+}

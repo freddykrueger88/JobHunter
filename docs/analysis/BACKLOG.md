@@ -73,8 +73,9 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [ ] 5.3 README.md / README.de.md aktualisieren (Status, Wiki-Links, Quick Start)
 
 ## Abschlussbericht
-- [ ] Zusammenfassung nach Vorgabe (Ist-Zustand, Entscheidung, Top-10, i18n-Status,
-      Wiki-Status, Validierung, offene Risiken)
+- [x] Zusammenfassung nach Vorgabe (Ist-Zustand, Entscheidung, Top-10, i18n-Status,
+      Wiki-Status, Validierung, offene Risiken) — erledigt 2026-08-24 als
+      docs/analysis/ABSCHLUSSBERICHT_{DE,EN}.md, nach Abschluss der Phasen 0-E
 
 ## Änderungsprotokoll
 - 2026-08-24: Backlog angelegt, gh installiert, Auth als blockiert markiert.

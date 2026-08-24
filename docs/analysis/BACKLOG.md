@@ -34,7 +34,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 0.3 BACKLOG.md angelegt — erledigt 2026-08-24
 
 ## Phase 1 – Repository-Inventur (Audit)
-- [ ] 1.1 Projektstruktur & Modulgrenzen dokumentieren
+- [x] 1.1 Projektstruktur & Modulgrenzen dokumentieren
 - [ ] 1.2 Frontend-Bestandsaufnahme (Komponenten, Routing, State, i18n-Abdeckung zählen)
 - [ ] 1.3 Backend-Bestandsaufnahme (Router, Models, Services, Auth/Secrets)
 - [ ] 1.4 Datenbank/Migrationen (Alembic-Historie, Schema)

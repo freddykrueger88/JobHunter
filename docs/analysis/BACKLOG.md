@@ -86,6 +86,13 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
   Release-Prozess dokumentiert. Dabei 2 echte Bugs gefunden+gefixt
   (Dashboard-Counter-Labels, Dashboard-Stats "soon"-Bucket). Rework-Plan
   Phasen A-E damit vollstaendig durchlaufen.
+- 2026-08-25: Abschlussbericht (DE+EN) geschrieben, frontend-Version auf
+  1.9.0 synchronisiert, Onboarding.tsx-Fund praezisiert. Auf
+  Nutzerentscheidung ("mach du das mal mit main.py") B.2 nachtraeglich
+  erledigt: 12 Router von api/ nach routers/ verschoben. Dabei
+  KRITISCHEN Bug gefunden und gefixt - backend/routers/jobs.py war seit
+  dem allerersten Commit ohne /api-Praefix gemountet, die komplette
+  Jobsuche/-liste lief seit Projektbeginn ins Leere (404).
 
 - 2026-08-24 (Fortsetzung): Phase 1 (Audit DE+EN), Phase 2 (Codequalitaet + Stack-Eignung DE+EN)
   und Phase 3 (Rework-Entscheidung, REWORK_PLAN_DE/EN.md, docs/architecture/ mit 3 ADRs) auf
@@ -122,9 +129,28 @@ niedrige Prioritaet).
 ## Phase B - Umsetzung (2026-08-24, Fortsetzung)
 - [x] B.1 Toten Code entfernt (backend/models.py, Top-Level-/alembic/), verifiziert
       per pytest + alembic current
-- [!] B.2 Endpunkt-Schicht vereinheitlichen (api/ -> routers/) - ZURUECKGESTELLT:
-      betrifft main.py, das Nutzer-eigene, uncommittete Arbeit enthaelt. Nicht ohne
-      Ruecksprache angefasst.
+- [x] B.2 Endpunkt-Schicht vereinheitlicht (2026-08-25, Nutzerentscheidung
+      "mach du das mal mit main.py"): main.py war zu diesem Zeitpunkt bereits
+      wieder sauber committet (keine uncommittete Arbeit mehr), damit war die
+      urspruengliche Blockade aufgehoben. 12 von 16 Routern von api/ nach
+      routers/ verschoben (ai, applications, company_dossier, cv, dashboard,
+      email_parsing, eures, export, history, interview, reminders, settings),
+      main.py + tests/conftest.py entsprechend angepasst. Bewusst NICHT
+      verschoben: api/calendar.py (Nutzer-eigene, weiterhin uncommittete
+      Datei), api/cover_letter_pdf.py + api/search_profiles.py (beide nicht
+      in main.py eingebunden, laut README unfertiges Feature #89 bzw. offen).
+      backend/routers/jobs.py separat verschoben, siehe kritischer Fund
+      direkt darunter.
+
+      KRITISCHER FUND waehrend der Verifikation: backend/routers/jobs.py
+      (vormals api/jobs.py) hatte seit dem allerersten Backend-Commit
+      APIRouter(prefix="/jobs", ...) statt "/api/jobs" - als einziger Router
+      ohne /api-Praefix. Das Frontend ruft seit jeher /api/jobs/* auf -
+      die komplette Jobsuche/-liste lief seit Projektbeginn ins Leere (404).
+      Gefunden ueber echte Live-Logs waehrend der Nutzer die App parallel
+      im Browser offen hatte. Gefixt (ein Wort), verifiziert per curl direkt
+      gegen das Backend UND ueber den echten Frontend-Proxy, openapi.json-
+      Abgleich, pytest weiterhin 26/26 gruen.
 - [x] B.3 Produktentscheidung User/Auth: ENTFERNEN (Nutzerentscheidung 2026-08-24).
       backend/models/user.py, backend/api/auth.py, backend/core/security.py komplett
       geloescht (nur von auth.py importiert - keine Teilausduennung noetig).
@@ -185,10 +211,14 @@ niedrige Prioritaet).
 - [x] B.7 Architekturregeln dokumentiert (docs/architecture/regeln.md)
 
 Phase B Status: 6 von 7 abgeschlossen (B.3 GELOEST: Auth entfernt; B.6 fuer alle
-erreichbaren Domaenen abgeschlossen). Nur B.2 (main.py-Konsolidierung api/->routers/)
-bleibt zurueckgestellt - main.py enthaelt weiterhin Nutzer-eigene, uncommittete Arbeit;
-davon haengen auch cover_letter_pdf.py/search_profiles.py-Registrierung und die
-jobs.py/jobs_image.py-Pfadkollision ab.
+erreichbaren Domaenen abgeschlossen). B.2 blieb zu diesem Zeitpunkt zurueckgestellt
+(main.py enthielt damals noch Nutzer-eigene, uncommittete Arbeit) - NACHTRAG
+2026-08-25: main.py war zwischenzeitlich wieder sauber committet, B.2 wurde auf
+Nutzerentscheidung ("mach du das mal mit main.py") nachtraeglich erledigt, siehe
+Eintrag oben. cover_letter_pdf.py/search_profiles.py bleiben weiterhin unregistriert
+(bewusst, siehe B.2-Eintrag), die jobs.py/jobs_image.py-Pfadkollision existierte real
+nicht (jobs_image.router war nie in main.py eingebunden) und wurde durch den
+kritischen /api-Praefix-Fix in jobs.py obsolet.
 
 Naechster Schritt (Nutzerentscheidung 2026-08-24: "nach dem Plan weiter"): Phase C
 (Internationalisierung) gemaess REWORK_PLAN_DE.md. B.2 bleibt als offener Punkt
@@ -365,7 +395,10 @@ Offene Funde aus Phase E (nicht geloest, bewusst vermerkt):
       Aufraeumarbeit. Steht weiter beim Nutzer offen.
 
 Phase E Status: ABGESCHLOSSEN (E.1-E.5 erledigt). Rework-Plan-Phasen A-E
-damit vollstaendig durchlaufen. Offen bleiben: B.2 (main.py-Konsolidierung,
-wartet auf den Nutzer), restliche B.6-Schemas (applications.py etc., haengen
-ebenfalls an main.py), C.7/Phase 5 (echtes GitHub-Wiki), D.3 (Accessibility-
-Audit, expliziter Nicht-Scope), die beiden i18n-Luecken oben.
+damit vollstaendig durchlaufen. Offen bleiben: C.7/Phase 5 (echtes
+GitHub-Wiki, braucht ein Personal Access Token vom Nutzer), D.3
+(Accessibility-Audit, expliziter Nicht-Scope), restliche B.6-Schemas
+(applications.py etc. - haengen an models/application.py, weiterhin
+Nutzer-eigene uncommittete Datei), pages/Onboarding.tsx-Entscheidung.
+B.2 nachtraeglich am 2026-08-25 erledigt (siehe Phase-B-Eintrag oben),
+dabei kritischen /api-Praefix-Bug in jobs.py gefunden und behoben.

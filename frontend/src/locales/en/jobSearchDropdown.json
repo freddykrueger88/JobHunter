@@ -1,0 +1,8 @@
+{
+  "defaultPlaceholder": "Search job…",
+  "searchAriaLabel": "Search job",
+  "noJobFound": "No job found",
+  "noJobs": "No jobs available",
+  "resultsAriaLabel": "Search results",
+  "alreadyApplied": "Already applied"
+}

@@ -15,6 +15,7 @@
  *   - Accessible (role="combobox", aria-activedescendant, aria-expanded)
  */
 import { useState, useRef, useEffect, useId } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, X, Briefcase } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -54,9 +55,11 @@ export default function JobSearchDropdown({
   appliedJobIds = new Set(),
   onSelect,
   onCancel,
-  placeholder = 'Stelle suchen…',
+  placeholder,
   loading = false,
 }: Props) {
+  const { t } = useTranslation(['jobSearchDropdown', 'common'])
+  const effectivePlaceholder = placeholder ?? t('defaultPlaceholder')
   const [query, setQuery] = useState('')
   const [activeIdx, setActiveIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -122,19 +125,19 @@ export default function JobSearchDropdown({
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={effectivePlaceholder}
           className="flex-1 text-xs bg-transparent focus:outline-none min-w-0 placeholder:text-gray-400"
           role="combobox"
           aria-expanded={filtered.length > 0}
           aria-autocomplete="list"
           aria-controls={`${uid}-list`}
           aria-activedescendant={filtered[activeIdx] ? `${uid}-opt-${filtered[activeIdx].id}` : undefined}
-          aria-label="Stelle suchen"
+          aria-label={t('searchAriaLabel')}
         />
         <button
           onClick={onCancel}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
-          aria-label="Abbrechen"
+          aria-label={t('common:cancel')}
           tabIndex={-1}
         >
           <X size={13} aria-hidden />
@@ -144,18 +147,18 @@ export default function JobSearchDropdown({
       {/* Results list */}
       {loading ? (
         <div className="mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-xs text-gray-400 text-center shadow-md">
-          Lädt…
+          {t('common:loading')}
         </div>
       ) : filtered.length === 0 ? (
         <div className="mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-xs text-gray-400 text-center shadow-md">
-          {query ? 'Keine Stelle gefunden' : 'Keine Jobs vorhanden'}
+          {query ? t('noJobFound') : t('noJobs')}
         </div>
       ) : (
         <ul
           ref={listRef}
           id={`${uid}-list`}
           role="listbox"
-          aria-label="Suchergebnisse"
+          aria-label={t('resultsAriaLabel')}
           className="mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md max-h-48 overflow-y-auto"
         >
           {filtered.map((job, idx) => {
@@ -198,7 +201,7 @@ export default function JobSearchDropdown({
                 {isApplied && (
                   <span
                     className="shrink-0 text-xs bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-full px-1.5 py-0.5 leading-none"
-                    title="Bereits beworben"
+                    title={t('alreadyApplied')}
                   >
                     ✓
                   </span>

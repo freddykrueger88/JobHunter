@@ -317,6 +317,97 @@ Container-Neustarts hinweg).
   (inkl. fehlender Migration nachgezogen) oder vollständig entfernt werden
   soll – siehe auch offene Frage aus 1.3.
 
+### 1.5 Tests/CI/Linting/Build
+
+**Diese Befunde wurden nicht nur gelesen, sondern durch tatsächliche
+Befehlsausführung in den laufenden Docker-Containern verifiziert**
+(`docker exec jobhunter-backend`/`jobhunter-frontend`, s. Kommandos unten).
+
+**Backend-Tests – aktuell komplett kaputt (verifiziert):**
+```
+docker exec jobhunter-backend sh -c "cd /app/backend && python -m pytest -q"
+→ ImportError while loading conftest '/app/backend/tests/conftest.py'.
+  tests/conftest.py:14: in <module>
+      from backend.models import Base
+  ImportError: cannot import name 'Base' from 'backend.models'
+```
+Ursache: `Base` ist in `backend/core/database.py` definiert, wird aber von
+`backend/models/__init__.py` nicht re-exportiert. `conftest.py` (genutzt von
+allen 3 Testdateien über `testpaths = tests` in `pytest.ini`) importiert
+`Base` fälschlich aus `backend.models` statt aus `backend.core.database`.
+**Konsequenz: Keine einzige der 3 Testdateien kann aktuell laufen –
+Testabdeckung ist faktisch 0 %, unabhängig vom Inhalt der Tests selbst.**
+Der Fehler betrifft ausschließlich `tests/`, nicht die Anwendung selbst
+(Laufzeitcode importiert `Base` korrekt aus `core.database`).
+*Hinweis zur Prüfmethode: `pytest`/`pytest-asyncio`/`aiosqlite` aus
+`requirements-dev.txt` wurden für diesen Test temporär und ausschließlich
+im laufenden Container installiert (nicht im Image, nicht im Git-Repo) –
+rein zur Verifikation, ohne bleibende Änderung.*
+
+Inhaltlich vorhanden ist nur `test_followup_scheduler.py` (Unit- + In-Memory-
+Integrationstests für `services/followup_scheduler.py`, Issue #64) – für ein
+Projekt mit 30 Service-Modulen, 18+3 API-Modulen und 15 Models ist das eine
+sehr dünne Abdeckung, sobald der Import-Fehler behoben ist.
+
+**Frontend-Tests – nicht vorhanden:**
+Kein Testframework in `frontend/package.json` (weder Vitest noch Jest o. ä.),
+keine `*.test.ts(x)`/`*.spec.ts(x)`-Dateien im gesamten `frontend/src`.
+0 % Testabdeckung, keine Teststrategie erkennbar.
+
+**Linting – Frontend verifiziert kaputt, Backend nicht vorhanden:**
+```
+docker exec jobhunter-frontend sh -c "cd /app && npm run lint"
+→ ESLint couldn't find a configuration file.
+```
+Es existiert **keine** `.eslintrc*`- oder `eslint.config.*`-Datei im
+gesamten `frontend/`-Verzeichnis, obwohl `eslint` als Dependency und
+`"lint": "eslint src --ext ts,tsx"` als Skript in `package.json` deklariert
+sind. Der Lint-Befehl aus dem README/package.json ist **im Ist-Zustand
+nicht ausführbar**.
+Für das Backend ist in `requirements-dev.txt` kein Linter/Formatter
+(z. B. `ruff`, `black`, `flake8`) deklariert; entsprechend gibt es keinen
+Lint-Befehl und keine Konfiguration dafür.
+
+**Build – Frontend-Produktionsbuild verifiziert kaputt:**
+```
+docker exec jobhunter-frontend sh -c "cd /app && npm run build"   # = tsc && vite build
+→ tsc gibt nur die eigene Hilfe/Versionsausgabe aus (Version 5.9.3),
+  kein Kompilierlauf.
+```
+Ursache: **Es existiert kein `tsconfig.json`** in `frontend/` – weder aktuell
+noch, laut `git log --all -- frontend/tsconfig.json`, jemals in der
+gesamten Repo-Historie. `tsc` findet ohne Konfigurationsdatei und ohne
+Datei-Argumente nichts zu kompilieren und bricht praktisch wirkungslos ab,
+`vite build` wird dadurch nie erreicht.
+
+**Erklärung, warum das bisher nicht aufgefallen ist:** `frontend/Dockerfile`
+startet den „Produktions"-Container mit
+`CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]` –
+**der tatsächlich laufende Frontend-Container ist der Vite-Dev-Server**, nicht
+ein gebauter Produktions-Bundle. Der (kaputte) `npm run build`-Pfad wird im
+gesamten aktuellen Betrieb nie durchlaufen. Das erklärt, warum die App
+trotz fehlender `tsconfig.json` sichtbar funktioniert, aber auch, dass ein
+echter Produktionsbuild derzeit gar nicht möglich ist. **Hohe Priorität für
+Phase 3/4** – betrifft sowohl Performance/Ressourcenverbrauch im
+Dauerbetrieb (Dev-Server statt optimiertem Static-Build) als auch die reine
+Möglichkeit, überhaupt jemals `npm run build` erfolgreich auszuführen.
+
+**CI/CD:** Bestätigung des Befunds aus 1.1 – kein `.github/workflows/`,
+keine automatisierte Ausführung von Tests/Lint/Build bei Pull Requests.
+Mit den drei oben genannten kaputten Befehlen wäre eine naiv eingerichtete
+CI ohnehin sofort rot; eine CI-Einführung (Phase-Empfehlung „Engineering")
+sollte daher zeitlich nach der Behebung dieser drei Fehler erfolgen, nicht
+davor.
+
+**Pre-Commit/Sonstige Qualitäts-Gates:** Keine `.pre-commit-config.yaml`
+oder vergleichbare Konfiguration im Repo gefunden.
+
+### Offene Fragen aus diesem Abschnitt
+
+Keine – alle drei Kernbefunde (Test-Import-Fehler, fehlende ESLint-Config,
+fehlende tsconfig.json) sind durch tatsächliche Befehlsausführung
+zweifelsfrei bestätigt, nicht nur vermutet.
+
 ---
 
-*Fortsetzung folgt (1.5 Tests/CI/Linting/Build, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (1.6 Security/OWASP/Datenschutz, …) gemäß `docs/analysis/BACKLOG.md`.*

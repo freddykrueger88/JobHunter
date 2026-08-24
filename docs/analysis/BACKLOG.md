@@ -38,7 +38,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 1.2 Frontend-Bestandsaufnahme (Komponenten, Routing, State, i18n-Abdeckung gezaehlt)
 - [x] 1.3 Backend-Bestandsaufnahme (Router, Models, Services, Auth/Secrets)
 - [x] 1.4 Datenbank/Migrationen (Alembic-Historie, Schema)
-- [ ] 1.5 Tests/CI/Linting/Build-Bestandsaufnahme
+- [x] 1.5 Tests/CI/Linting/Build-Bestandsaufnahme (verifiziert per echter Befehlsausfuehrung)
 - [ ] 1.6 Security/OWASP/Datenschutz-Sichtung
 - [ ] 1.7 Architekturdiagramm (Mermaid) auf Basis realer Struktur
 - [ ] 1.8 docs/analysis/REPOSITORY_AUDIT_DE.md schreiben

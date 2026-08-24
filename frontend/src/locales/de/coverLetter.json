@@ -1,0 +1,20 @@
+{
+  "heading": "Anschreiben generieren",
+  "tones": {
+    "formell": "👔 Formell",
+    "direkt": "⚡ Direkt",
+    "modern": "✨ Modern",
+    "kreativ": "🎨 Kreativ"
+  },
+  "toneLabel": "KI-Ton",
+  "templateLabel": "Vorlage (optional) – Platzhalter wie {{placeholder}} werden ersetzt",
+  "templatePlaceholder": "Vorlage hier einfügen oder leer lassen für automatische Erstellung...",
+  "templateAriaLabel": "Anschreiben-Vorlage",
+  "generating": "KI generiert...",
+  "generate": "Anschreiben erstellen",
+  "resultLabel": "Generiertes Anschreiben",
+  "copied": "Kopiert!",
+  "copy": "Kopieren",
+  "download": "Download",
+  "resultAriaLabel": "Generiertes Anschreiben (bearbeitbar)"
+}

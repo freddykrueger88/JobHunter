@@ -1,0 +1,20 @@
+{
+  "heading": "Generate Cover Letter",
+  "tones": {
+    "formell": "👔 Formal",
+    "direkt": "⚡ Direct",
+    "modern": "✨ Modern",
+    "kreativ": "🎨 Creative"
+  },
+  "toneLabel": "AI Tone",
+  "templateLabel": "Template (optional) – placeholders like {{placeholder}} will be replaced",
+  "templatePlaceholder": "Paste a template here, or leave empty for automatic generation...",
+  "templateAriaLabel": "Cover letter template",
+  "generating": "AI is generating...",
+  "generate": "Generate Cover Letter",
+  "resultLabel": "Generated Cover Letter",
+  "copied": "Copied!",
+  "copy": "Copy",
+  "download": "Download",
+  "resultAriaLabel": "Generated cover letter (editable)"
+}

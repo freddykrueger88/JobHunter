@@ -14,7 +14,7 @@ const statConfig = [
 ]
 
 export default function Dashboard() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['dashboard', 'common'])
   const qc = useQueryClient()
   const { data, isLoading } = useQuery({
     queryKey: ['stats'],
@@ -29,7 +29,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">{t('dashboard.title')}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
       {/* Fällige Erinnerungen */}
       {data?.due_reminders?.length > 0 && (
@@ -78,7 +78,7 @@ export default function Dashboard() {
       {/* Letzte Aktivitäten */}
       <h2 className="text-lg font-semibold mb-3">Letzte Aktivitäten</h2>
       <ul className="space-y-2">
-        {isLoading && <li className="text-gray-400">{t('common.loading')}</li>}
+        {isLoading && <li className="text-gray-400">{t('common:loading')}</li>}
         {data?.recent_activity?.map((entry: any) => (
           <li key={entry.id} className="flex items-start gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm">
             <span className="text-gray-400 text-xs whitespace-nowrap mt-0.5">

@@ -25,7 +25,7 @@ const portalBadgeColor: Record<string, string> = {
 }
 
 export default function Jobs() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['jobs', 'common'])
   const qc = useQueryClient()
   const [keywords, setKeywords] = useState('')
   const [location, setLocation] = useState('')
@@ -54,7 +54,7 @@ export default function Jobs() {
     <div className="flex gap-6">
       {/* Linke Spalte: Suche + Liste */}
       <div className="flex-1 min-w-0">
-        <h1 className="text-2xl font-bold mb-4">{t('jobs.title')}</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('title')}</h1>
 
         {/* Suchmaske */}
         <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 mb-4 space-y-3">
@@ -104,13 +104,13 @@ export default function Jobs() {
               {searchMutation.isPending
                 ? <Loader2 size={16} className="animate-spin" aria-hidden />
                 : <Search size={16} aria-hidden />}
-              {t('jobs.search')}
+              {t('search')}
             </button>
           </div>
         </div>
 
         {/* Ergebnisliste */}
-        {loadingJobs && <p className="text-gray-400 text-sm">{t('common.loading')}</p>}
+        {loadingJobs && <p className="text-gray-400 text-sm">{t('common:loading')}</p>}
         <ul className="space-y-2">
           {jobs.map(job => (
             <li

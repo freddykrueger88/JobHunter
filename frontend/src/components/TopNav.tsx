@@ -15,7 +15,7 @@ const navItems = [
 ]
 
 export default function TopNav() {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation('nav')
   const [coachOpen, setCoachOpen] = useState(false)
 
   return (
@@ -42,10 +42,10 @@ export default function TopNav() {
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                   )
                 }
-                aria-label={t(`nav.${key}`, key)}
+                aria-label={t(key, key)}
               >
                 <Icon size={16} aria-hidden="true" />
-                <span className="hidden sm:inline">{t(`nav.${key}`, key)}</span>
+                <span className="hidden sm:inline">{t(key, key)}</span>
               </NavLink>
             </li>
           ))}

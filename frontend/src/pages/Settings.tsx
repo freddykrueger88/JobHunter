@@ -196,7 +196,7 @@ function SaveToast({ status }: { status: SaveStatus }) {
 }
 
 export default function Settings() {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation('settings')
   const { theme, setTheme, colorBlindMode, setColorBlindMode } = useTheme()
   const { focusMode, setFocusMode, density, setDensity, reduceMotion, setReduceMotion, adhdMode, setAdhdMode } = useA11y()
   const qc = useQueryClient()
@@ -368,7 +368,7 @@ export default function Settings() {
       <SaveToast status={saveStatus} />
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
         <span className="text-xs text-gray-400 italic">Änderungen werden automatisch gespeichert</span>
       </div>
 
@@ -436,7 +436,7 @@ export default function Settings() {
       </Section>
 
       {/* ── Sprache ── */}
-      <Section title={`🌍 ${t('settings.language')}`}>
+      <Section title={`🌍 ${t('language')}`}>
         <div className="flex gap-3">
           {['de', 'en'].map(lang => (
             <button key={lang} onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
@@ -449,7 +449,7 @@ export default function Settings() {
       </Section>
 
       {/* ── KI ── */}
-      <Section title={`🤖 ${t('settings.ai')}`}>
+      <Section title={`🤖 ${t('ai')}`}>
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>

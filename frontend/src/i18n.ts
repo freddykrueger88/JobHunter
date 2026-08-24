@@ -1,41 +1,43 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
+// Namespace-Struktur statt Inline-Objekt, siehe docs/i18n/KONZEPT.md
+// (Rework-Plan Phase C.2) und ADR-0003. Jede Datei hier ist ein
+// eigenständiger i18next-Namespace, geladen unter demselben Schlüssel
+// wie ihr Dateiname.
+import deCommon from './locales/de/common.json'
+import deNav from './locales/de/nav.json'
+import deDashboard from './locales/de/dashboard.json'
+import deJobs from './locales/de/jobs.json'
+import deSettings from './locales/de/settings.json'
+
+import enCommon from './locales/en/common.json'
+import enNav from './locales/en/nav.json'
+import enDashboard from './locales/en/dashboard.json'
+import enJobs from './locales/en/jobs.json'
+import enSettings from './locales/en/settings.json'
+
 const resources = {
   de: {
-    translation: {
-      nav: {
-        dashboard: 'Dashboard', jobs: 'Stellensuche', kanban: 'Bewerbungen',
-        reminders: 'Erinnerungen', history: 'Verlauf', settings: 'Einstellungen',
-      },
-      dashboard: {
-        title: 'Dashboard', applied: 'Beworben', rejected: 'Absagen',
-        accepted: 'Angenommen', interview: 'Interview', open: 'Interessant',
-      },
-      jobs: { title: 'Stellensuche', search: 'Suchen', hide: 'Ausblenden' },
-      settings: { title: 'Einstellungen', theme: 'Design', language: 'Sprache', ai: 'KI-Einstellungen' },
-      common: { save: 'Speichern', cancel: 'Abbrechen', delete: 'Löschen', loading: 'Lädt...' },
-    },
+    common: deCommon,
+    nav: deNav,
+    dashboard: deDashboard,
+    jobs: deJobs,
+    settings: deSettings,
   },
   en: {
-    translation: {
-      nav: {
-        dashboard: 'Dashboard', jobs: 'Job Search', kanban: 'Applications',
-        reminders: 'Reminders', history: 'History', settings: 'Settings',
-      },
-      dashboard: {
-        title: 'Dashboard', applied: 'Applied', rejected: 'Rejected',
-        accepted: 'Accepted', interview: 'Interview', open: 'Interesting',
-      },
-      jobs: { title: 'Job Search', search: 'Search', hide: 'Hide' },
-      settings: { title: 'Settings', theme: 'Theme', language: 'Language', ai: 'AI Settings' },
-      common: { save: 'Save', cancel: 'Cancel', delete: 'Delete', loading: 'Loading...' },
-    },
+    common: enCommon,
+    nav: enNav,
+    dashboard: enDashboard,
+    jobs: enJobs,
+    settings: enSettings,
   },
 }
 
 i18n.use(initReactI18next).init({
   resources,
+  ns: Object.keys(resources.de),
+  defaultNS: 'common',
   lng: localStorage.getItem('lang') || 'de',
   fallbackLng: 'de',
   interpolation: { escapeValue: false },

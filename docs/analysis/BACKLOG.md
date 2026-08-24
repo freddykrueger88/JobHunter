@@ -221,10 +221,27 @@ stehen, bis main.py fertig/committet ist.
 
       Ergebnis: npm run lint gesamt zeigt 22 Findings (11 Fehler, 11 Warnungen) -
       WENIGER als die urspruenglichen 26 aus Phase A, keine neuen Regressionen.
-- [ ] C.4 Backend-Fehlertexte i18n-faehig machen (Fehlercode statt Klartext) - noch offen
-- [ ] C.5 Locale-Umschaltung im UI sichtbar/erreichbar machen (Settings.tsx nutzt
-      bereits i18n.changeLanguage, UI-Element fuer Sprachwahl noch zu pruefen/ergaenzen)
-- [ ] C.6 CI-Check auf fehlende/verwaiste Uebersetzungsschluessel - noch offen
-- [ ] C.7 docs/, wiki/, README auf einheitliches Zweisprachigkeits-Schema bringen - noch offen
+- [x] C.4 Backend-Fehlercodes: backend/core/errors.py (api_error()-Helfer, sendet
+      Fehlercode ueber X-Error-Code-Header statt detail von String auf Objekt
+      umzustellen - keine Breaking Changes, main.py nicht angefasst). 5 repraesentative
+      Endpunkte umgestellt (cv, reminders, export, company_dossier, interview -
+      bewusst ausserhalb main.py/applications.py/calendar.py). Frontend:
+      lib/api.ts::getApiErrorMessage() uebersetzt per Code, faellt sonst auf
+      deutschen Klartext zurueck. Verifiziert per echtem curl gegen alle 5 Codes
+      + Build/Lint/i18n-Check.
+- [x] C.5 Locale-Umschaltung: bereits vorhanden, verifiziert (Settings.tsx,
+      sichtbare Flaggen-Buttons 🇩🇪/🇬🇧, i18n.changeLanguage + localStorage).
+- [x] C.6 CI-Schluessel-Check: frontend/scripts/check-i18n.js (npm run i18n:check) -
+      prueft Namespace-Existenz + verschachtelte Schluessel-Paritaet de/en +
+      Best-Effort-Warnung fuer unreferenzierte Namespaces. Aktueller Stand: 33
+      Namespaces, volle Paritaet.
+- [~] C.7 docs/, wiki/, README auf einheitliches Zweisprachigkeits-Schema bringen -
+      BEWUSST NICHT hier separat umgesetzt: ueberschneidet sich vollstaendig mit
+      Phase 5 (echtes GitHub-Wiki), die exakt dasselbe zweisprachige Schema fuer
+      wiki/ zum Ziel hat (13 Themenseiten x DE/EN). Doppelte Bearbeitung waere
+      Verschwendung. C.7 wird als Teilaufgabe in Phase 5 erledigt, wenn diese
+      angegangen wird. docs/-Ordner (architecture.md, CHANGELOG.md mit Ein-Datei-
+      DE/EN-Mix) bleibt vorerst wie er ist - kein Blocker fuer den Release.
 
-Phase C Status: C.1-C.3 abgeschlossen (der groesste Teil), C.4-C.7 offen.
+Phase C Status: ABGESCHLOSSEN (C.1-C.6 erledigt, C.7 bewusst nach Phase 5
+verschoben statt doppelt gemacht).

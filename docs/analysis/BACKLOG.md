@@ -349,10 +349,20 @@ Offene Funde aus Phase E (nicht geloest, bewusst vermerkt):
       (~60 neue Schluessel DE+EN, Trans-Komponente fuer den API-Keys-Intro-
       Text mit <strong>-Markup). Verifiziert: Build/Lint/i18n-Check/Tests
       gruen, echter curl-Abruf ueber den laufenden Dev-Server bestaetigt.
-- frontend/package.json-Version nicht synchron zu README/CHANGELOG (siehe
-  E.5).
-- pages/Onboarding.tsx weiterhin toter, ungerouteter Code (aus D.2) -
-  Entscheidung (loeschen/behalten) steht noch aus.
+- [x] frontend/package.json-Version auf 1.9.0 synchronisiert (2026-08-25,
+      Nutzerentscheidung "mach alles selbststaendig") - war zuvor 0.4.0,
+      README-Badge und backend/main.py zeigten bereits 1.9.0.
+- [!] pages/Onboarding.tsx: bei genauerer Pruefung (2026-08-25) kein
+      simples totes Fragment, sondern laut CHANGELOG.md als "shipped"
+      dokumentiertes Feature (v1.3, #50, "5-Schritt-Wizard"). Git-Historie
+      zeigt aber: NIE in App.tsx/main.tsx eingebunden - seit v1.3 fuer
+      keinen Nutzer je erreichbar. Loeschen waere keine Regression (hat
+      nie funktioniert), Wiedereinbauen waere aber eine echte
+      Produktentscheidung (Trigger-Logik: Erstbesuch? eigene Route? o.ae.)
+      - bewusst NICHT einseitig entschieden trotz "mach alles
+      selbststaendig", da beide Optionen (loeschen vs. neues Verhalten
+      schaffen) eine Richtungsentscheidung sind, keine mechanische
+      Aufraeumarbeit. Steht weiter beim Nutzer offen.
 
 Phase E Status: ABGESCHLOSSEN (E.1-E.5 erledigt). Rework-Plan-Phasen A-E
 damit vollstaendig durchlaufen. Offen bleiben: B.2 (main.py-Konsolidierung,

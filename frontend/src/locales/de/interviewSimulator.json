@@ -1,0 +1,26 @@
+{
+  "title": "Interview-Simulator",
+  "subtitle": "KI stellt dir typische Fragen für deine Stelle und bewertet deine Antworten.",
+  "jobIdLabel": "Job-ID eingeben",
+  "jobIdPlaceholder": "z.B. 42",
+  "start": "Starten",
+  "jobIdHint": "Die Job-ID findest du in der Stellenliste (z.B. /jobs?id=42).",
+  "errorNotFound": "Job nicht gefunden oder KI nicht erreichbar.",
+  "aiUnreachable": "KI nicht erreichbar",
+  "categories": {
+    "fachlich": "Fachlich",
+    "soft_skill": "Soft Skill",
+    "situativ": "Situativ",
+    "allgemein": "Allgemein",
+    "fehler": "Fehler"
+  },
+  "completed": "Gespräch abgeschlossen!",
+  "averageScore": "Durchschnittsscore",
+  "noAnswer": "(keine Antwort)",
+  "newInterview": "Neues Gespräch",
+  "questionProgress": "Frage {{current}} von {{total}}",
+  "answerPlaceholder": "Deine Antwort...",
+  "aiFeedback": "KI-Feedback",
+  "finish": "Abschließen",
+  "nextQuestion": "Nächste Frage"
+}

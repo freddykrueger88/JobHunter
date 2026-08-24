@@ -1,0 +1,26 @@
+{
+  "title": "Interview Simulator",
+  "subtitle": "AI asks you typical questions for your job and evaluates your answers.",
+  "jobIdLabel": "Enter Job ID",
+  "jobIdPlaceholder": "e.g. 42",
+  "start": "Start",
+  "jobIdHint": "You can find the Job ID in the job list (e.g. /jobs?id=42).",
+  "errorNotFound": "Job not found or AI unreachable.",
+  "aiUnreachable": "AI unreachable",
+  "categories": {
+    "fachlich": "Technical",
+    "soft_skill": "Soft Skill",
+    "situativ": "Situational",
+    "allgemein": "General",
+    "fehler": "Error"
+  },
+  "completed": "Interview completed!",
+  "averageScore": "Average Score",
+  "noAnswer": "(no answer)",
+  "newInterview": "New Interview",
+  "questionProgress": "Question {{current}} of {{total}}",
+  "answerPlaceholder": "Your answer...",
+  "aiFeedback": "AI Feedback",
+  "finish": "Finish",
+  "nextQuestion": "Next Question"
+}

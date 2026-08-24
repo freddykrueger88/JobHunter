@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import { Mic, ThumbsUp, AlertCircle, ChevronRight, RotateCcw, CheckSquare, Search } from 'lucide-react'
 import clsx from 'clsx'
@@ -14,15 +15,16 @@ interface Evaluation {
   tip: string
 }
 
-const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
-  fachlich: { label: 'Fachlich', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
-  soft_skill: { label: 'Soft Skill', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' },
-  situativ: { label: 'Situativ', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300' },
-  allgemein: { label: 'Allgemein', color: 'bg-gray-100 text-gray-600' },
-  fehler: { label: 'Fehler', color: 'bg-red-100 text-red-600' },
+const CATEGORY_COLORS: Record<string, string> = {
+  fachlich: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  soft_skill: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  situativ: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  allgemein: 'bg-gray-100 text-gray-600',
+  fehler: 'bg-red-100 text-red-600',
 }
 
 export default function InterviewSimulator() {
+  const { t } = useTranslation('interviewSimulator')
   const [jobId, setJobId] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
   const [jobTitle, setJobTitle] = useState('')
@@ -45,7 +47,7 @@ export default function InterviewSimulator() {
       setEvaluations({})
       setPhase('quiz')
     } catch {
-      alert('Job nicht gefunden oder KI nicht erreichbar.')
+      alert(t('errorNotFound'))
     } finally {
       setLoading(false)
     }
@@ -63,7 +65,7 @@ export default function InterviewSimulator() {
       })
       setEvaluations(prev => ({ ...prev, [currentIndex]: data }))
     } catch {
-      setEvaluations(prev => ({ ...prev, [currentIndex]: { score: 0, feedback: 'KI nicht erreichbar', tip: '' } }))
+      setEvaluations(prev => ({ ...prev, [currentIndex]: { score: 0, feedback: t('aiUnreachable'), tip: '' } }))
     } finally {
       setEvalLoading(false)
     }
@@ -80,18 +82,18 @@ export default function InterviewSimulator() {
       <div className="max-w-lg mx-auto py-12">
         <div className="text-center mb-8">
           <Mic size={40} className="mx-auto text-blue-500 mb-3" aria-hidden />
-          <h1 className="text-2xl font-bold mb-2">Interview-Simulator</h1>
-          <p className="text-gray-500 dark:text-gray-400">KI stellt dir typische Fragen für deine Stelle und bewertet deine Antworten.</p>
+          <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
+          <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
-          <label className="block text-sm font-medium mb-2" htmlFor="job-id-input">Job-ID eingeben</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="job-id-input">{t('jobIdLabel')}</label>
           <div className="flex gap-2">
             <input
               id="job-id-input"
               type="number"
               value={jobId}
               onChange={e => setJobId(e.target.value)}
-              placeholder="z.B. 42"
+              placeholder={t('jobIdPlaceholder')}
               className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm"
               onKeyDown={e => e.key === 'Enter' && loadQuestions()}
             />
@@ -101,10 +103,10 @@ export default function InterviewSimulator() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
             >
               {loading ? <span className="animate-spin">&#9696;</span> : <Search size={16} aria-hidden />}
-              Starten
+              {t('start')}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-3">Die Job-ID findest du in der Stellenliste (z.B. /jobs?id=42).</p>
+          <p className="text-xs text-gray-400 mt-3">{t('jobIdHint')}</p>
         </div>
       </div>
     )
@@ -115,25 +117,25 @@ export default function InterviewSimulator() {
       <div className="max-w-2xl mx-auto py-8">
         <div className="text-center mb-6">
           <CheckSquare size={36} className="mx-auto text-green-500 mb-2" aria-hidden />
-          <h2 className="text-xl font-bold">Gespräch abgeschlossen!</h2>
+          <h2 className="text-xl font-bold">{t('completed')}</h2>
           <p className="text-gray-400">{jobTitle}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md mb-6">
           <div className="text-center">
             <div className="text-5xl font-bold text-blue-600 mb-1">{avgScore()}<span className="text-2xl text-gray-400">/10</span></div>
-            <p className="text-gray-500">Durchschnittsscore</p>
+            <p className="text-gray-500">{t('averageScore')}</p>
           </div>
         </div>
         <div className="space-y-4">
           {questions.map((q, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
-                <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 mt-0.5', CATEGORY_LABELS[q.category]?.color)}>
-                  {CATEGORY_LABELS[q.category]?.label || q.category}
+                <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 mt-0.5', CATEGORY_COLORS[q.category])}>
+                  {t(`categories.${q.category}`, q.category)}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium mb-1">{q.question}</p>
-                  <p className="text-xs text-gray-400 mb-2 italic">"{answers[i] || '(keine Antwort)'}“</p>
+                  <p className="text-xs text-gray-400 mb-2 italic">{`"${answers[i] || t('noAnswer')}"`}</p>
                   {evaluations[i] && (
                     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
@@ -157,7 +159,7 @@ export default function InterviewSimulator() {
             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors"
           >
             <RotateCcw size={16} aria-hidden />
-            Neues Gespräch
+            {t('newInterview')}
           </button>
         </div>
       </div>
@@ -173,7 +175,7 @@ export default function InterviewSimulator() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-bold text-lg">{jobTitle}</h2>
-          <p className="text-sm text-gray-400">Frage {currentIndex + 1} von {questions.length}</p>
+          <p className="text-sm text-gray-400">{t('questionProgress', { current: currentIndex + 1, total: questions.length })}</p>
         </div>
         <div className="flex gap-1">
           {questions.map((_, i) => (
@@ -191,15 +193,15 @@ export default function InterviewSimulator() {
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md mb-4">
         <div className="flex items-start gap-3 mb-4">
-          <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0', CATEGORY_LABELS[q.category]?.color)}>
-            {CATEGORY_LABELS[q.category]?.label}
+          <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0', CATEGORY_COLORS[q.category])}>
+            {t(`categories.${q.category}`, q.category)}
           </span>
         </div>
         <p className="text-base font-medium mb-5">{q.question}</p>
         <textarea
           value={answers[currentIndex] || ''}
           onChange={e => setAnswers(prev => ({ ...prev, [currentIndex]: e.target.value }))}
-          placeholder="Deine Antwort..."
+          placeholder={t('answerPlaceholder')}
           rows={4}
           className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
@@ -210,7 +212,7 @@ export default function InterviewSimulator() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium disabled:opacity-50 transition-colors"
           >
             {evalLoading ? <span className="animate-spin text-xs">&#9696;</span> : <ThumbsUp size={14} aria-hidden />}
-            KI-Feedback
+            {t('aiFeedback')}
           </button>
           <button
             onClick={() => {
@@ -219,7 +221,7 @@ export default function InterviewSimulator() {
             }}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors ml-auto"
           >
-            {isLast ? 'Abschließen' : 'Nächste Frage'}
+            {isLast ? t('finish') : t('nextQuestion')}
             <ChevronRight size={14} aria-hidden />
           </button>
         </div>

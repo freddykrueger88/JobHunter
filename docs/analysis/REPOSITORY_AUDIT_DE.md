@@ -253,6 +253,70 @@ geprüft.
 - Herkunft/Verschlüsselungsstatus der SMTP-Zugangsdaten in der DB noch nicht
   verifiziert (folgt in 1.6).
 
+### 1.4 Datenbank/Migrationen
+
+**Doppelter Alembic-Baum – Frage aus 1.1 jetzt geklärt:**
+Der Top-Level-Baum (`/alembic.ini`, `/alembic/versions/20260511_0001_initial.py`,
+1 Migration) ist **nachweislich tot**:
+- `backend/Dockerfile` setzt `WORKDIR /app/backend` und kopiert nur den
+  Inhalt von `backend/` in das Image (`COPY . .` nach `WORKDIR /app/backend`).
+- `docker-compose.yml` baut den Backend-Service mit `build.context: ./backend`
+  – der Repo-Root-Ordner `/alembic/` gelangt **nie** ins Image.
+- `backend/entrypoint.sh` ruft `alembic upgrade head` ohne `-c`-Flag im
+  Arbeitsverzeichnis `/app/backend` auf → es wird ausschließlich
+  `backend/alembic.ini` mit `script_location = alembic` (relativ, also
+  `backend/alembic/`) verwendet.
+
+→ Der Top-Level-Ordner `/alembic/` ist eine Altlast ohne Laufzeitwirkung und
+sollte in Phase 3 entfernt werden (Aufwand S, Risiko niedrig – rein additive
+Bereinigung, keine Laufzeitabhängigkeit).
+
+**Aktiver Migrationsverlauf** (`backend/alembic/versions/`, 4 Revisionen,
+linear, keine erkennbaren Branches):
+
+| Revision | Zweck |
+|---|---|
+| `0001_initial_schema` | Ausgangsschema |
+| `0002_add_followups_table` | Follow-up-Tracking |
+| `0003_add_color_blind_mode` | Einzelnes Settings-Feld (Barrierefreiheit) |
+| `0004_add_blocklist_badges_backup_templates` *(aktuell uncommitted, in Arbeit)* | Blocklist, Gamification-Badges, Backup-Log, Anschreiben-Vorlagen |
+
+`backend/alembic/env.py` setzt `sqlalchemy.url` korrekt zur Laufzeit aus
+`settings.DATABASE_URL` (aus `.env`) – der Platzhalter-Wert in
+`backend/alembic.ini` (`driver://user:pass@localhost/dbname`) wird dadurch
+nie tatsächlich verwendet, ist aber als Datei-Inhalt potenziell verwirrend
+für neue Mitwirkende.
+
+**Wichtiger Befund – `User`-Modell ohne Migration/Tabelle:**
+`backend/models/user.py` existiert und wird von `core/security.py` sowie
+`api/auth.py` importiert, ist aber **nicht** in `backend/models/__init__.py`
+registriert (im Gegensatz zu allen 14 anderen Modellen). Passend dazu: In
+keiner der vier Migrationen wird eine `users`-Tabelle angelegt. Da
+`backend/alembic/env.py` alle Modelle für Autogenerate ausschließlich über
+`import backend.models` (das Package, nicht die Einzeldatei) registriert,
+fehlt `User` in `target_metadata` – ein künftiger
+`alembic revision --autogenerate` würde die (nicht existierende)
+Users-Tabelle also nicht automatisch nachziehen, sondern schlicht ignorieren.
+**Praktische Konsequenz:** Der optionale Auth-Mechanismus aus Abschnitt 1.3
+(`api/auth.py`, `core/security.py`) ist damit nicht nur unregistriert im
+Router, sondern hat aller Voraussicht nach **auch keine Datenbanktabelle** –
+selbst mit `AUTH_ENABLED=true` und eingebundenem Router würde
+`/auth/register` vermutlich mit einem DB-Fehler scheitern. Dies bestätigt die
+in 1.3 offen gelassene Frage: Auth wirkt wie ein unvollständiges,
+ruhendes Feature-Fragment, nicht wie eine aktiv gepflegte Funktion.
+
+**DB-Service (`docker-compose.yml`):** `postgres:16-alpine`, **kein
+Host-Port-Mapping** (nur intern im Docker-Netz erreichbar – gute Praxis für
+ein self-hosted Tool mit sensiblen Bewerbungsdaten), Healthcheck via
+`pg_isready` vorhanden, Daten in benanntem Volume `pgdata` (persistent über
+Container-Neustarts hinweg).
+
+### Offene Fragen aus diesem Abschnitt
+
+- Produktentscheidung, ob das `User`-Modell/Auth-Feature weiterverfolgt
+  (inkl. fehlender Migration nachgezogen) oder vollständig entfernt werden
+  soll – siehe auch offene Frage aus 1.3.
+
 ---
 
-*Fortsetzung folgt (1.4 Datenbank/Migrationen, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (1.5 Tests/CI/Linting/Build, …) gemäß `docs/analysis/BACKLOG.md`.*

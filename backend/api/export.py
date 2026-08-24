@@ -16,6 +16,7 @@ from backend.models.cv import CVData
 from backend.models.history import HistoryEntry
 from backend.models.reminder import Reminder
 from backend.models.settings import UserSettings
+from backend.schemas.export import ImportResult
 
 router = APIRouter(prefix="/api/export", tags=["Export/Import"])
 EXPORT_VERSION = "1.2"
@@ -144,7 +145,7 @@ async def export_xlsx(db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/import")
+@router.post("/import", response_model=ImportResult)
 async def import_data(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),

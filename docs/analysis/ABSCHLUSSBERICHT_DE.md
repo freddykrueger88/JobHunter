@@ -42,7 +42,7 @@ Aus `REPOSITORY_AUDIT_DE.md` Abschnitt 2.1 (dort priorisiert nach Impact):
 | 5 | Path Traversal beim CV-Upload | Kritisch | ✅ Behoben (Phase A) + Regressionstest (Phase E) |
 | 6 | Schwache Default-Secrets | Hoch | ✅ Behoben (Phase A, hartes Fail statt Fallback) |
 | 7 | Tote Code-Pfade (`models.py`, Top-Level-`alembic/`) | Niedrig | ✅ Behoben (Phase B) |
-| 8 | Gespaltene Endpunkt-Schicht `api/`/`routers/` | Mittel | ⏸️ Zurückgestellt – hängt an `main.py`, das der Nutzer selbst fertigstellt |
+| 8 | Gespaltene Endpunkt-Schicht `api/`/`routers/` | Mittel | ✅ Behoben (2026-08-25, 12 von 16 Routern verschoben, Nutzerentscheidung "mach du das mal mit main.py"). Dabei kritischen Bug gefunden: `jobs.py` war seit dem allerersten Commit ohne `/api`-Präfix gemountet – die Jobsuche/-liste lief seit Projektbeginn ins Leere. Gefixt. |
 | 9 | `User`-Modell ohne Registrierung (Produktentscheidung) | Mittel | ✅ Gelöst (Nutzerentscheidung: entfernt, Phase B) |
 | 10 | Kein zentraler Frontend-API-Client | Mittel | ✅ Behoben (Phase B, erweitert um Error-Toast in Phase D) |
 
@@ -68,9 +68,12 @@ Rework-Plans.
   (cv, reminders, export, company_dossier, interview) – Frontend
   übersetzt sie automatisch, mit Klartext-Fallback für noch nicht
   migrierte Endpunkte.
-- Bekannte Lücke: `pages/Onboarding.tsx` ist toter, ungerouteter Code und
-  wurde nicht auditiert (Löschen/Behalten-Entscheidung steht beim
-  Nutzer aus).
+- Bekannte Lücke: `pages/Onboarding.tsx` ist laut `CHANGELOG.md` (v1.3,
+  #50) ein "geshipptes" Feature, war aber laut Git-Historie nie in
+  `App.tsx`/`main.tsx` eingebunden – seit v1.3 für keinen Nutzer je
+  erreichbar. Löschen (kein Funktionsverlust, da nie funktionsfähig) vs.
+  Wiedereinbauen (echte Produktentscheidung zur Trigger-Logik) steht
+  beim Nutzer aus, deshalb nicht auditiert.
 
 ## Wiki-Status
 
@@ -101,16 +104,17 @@ durchgängig grün (Stand des letzten Laufs, siehe Commit-Historie).
 
 ## Offene Risiken
 
-1. **`main.py`-Konsolidierung (B.2)** – blockiert mehrere Folgepunkte
-   (Endpunkt-Vereinheitlichung, restliche Schema-Module,
-   `cover_letter_pdf.py`/`search_profiles.py`-Einbindung). Der Nutzer
-   arbeitet an dieser Datei selbst; keine Fremdänderung ohne Rücksprache.
+1. **Restliche Schema-Module (B.6)** – `applications.py` hängt weiterhin
+   an `backend/models/application.py`, einer Nutzer-eigenen, weiterhin
+   uncommitteten Datei; keine Fremdänderung ohne Rücksprache.
+   `cover_letter_pdf.py`/`search_profiles.py` bleiben bewusst
+   unregistriert (README markiert sie als unfertig/geplant).
 2. **GitHub-Wiki (Phase 5)** – benötigt ein Personal Access Token vom
    Nutzer, dann `gh auth login` + Inhalte übertragen.
-3. **`pages/Onboarding.tsx`** – toter Code, Entscheidung steht aus.
-4. **Versions-Drift** – `frontend/package.json` (0.4.0) vs.
-   README-Badge (v1.9.0), dokumentiert in `CONTRIBUTING.md` Abschnitt 8,
-   nicht rückwirkend korrigiert.
+3. **`pages/Onboarding.tsx`** – laut Changelog geshippt, aber nie
+   eingebunden; Löschen/Wiedereinbauen-Entscheidung steht aus.
+4. ~~Versions-Drift~~ – **behoben** (2026-08-25): `frontend/package.json`
+   auf `1.9.0` synchronisiert.
 5. **Accessibility-Audit (D.3)** – laut Rework-Plan explizit außerhalb
    dieses Programms, als eigener Folge-Auftrag empfohlen.
 6. **Kein Rate-Limiting** – Audit-Befund #12, niedrige Priorität, nicht

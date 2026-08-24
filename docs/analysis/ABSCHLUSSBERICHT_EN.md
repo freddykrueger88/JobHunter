@@ -42,7 +42,7 @@ From `REPOSITORY_AUDIT_EN.md` section 2.1 (prioritized there by impact):
 | 5 | Path traversal on CV upload | Critical | ✅ Fixed (Phase A) + regression test (Phase E) |
 | 6 | Weak default secrets | High | ✅ Fixed (Phase A, hard fail instead of fallback) |
 | 7 | Dead code paths (`models.py`, top-level `alembic/`) | Low | ✅ Fixed (Phase B) |
-| 8 | Split endpoint layer `api/`/`routers/` | Medium | ⏸️ Deferred – depends on `main.py`, which the user is finishing themselves |
+| 8 | Split endpoint layer `api/`/`routers/` | Medium | ✅ Fixed (2026-08-25, 12 of 16 routers moved, user decision "handle main.py yourself"). Found a critical bug in the process: `jobs.py` had been mounted without the `/api` prefix since the very first commit – job search/listing had been dead on arrival since project inception. Fixed. |
 | 9 | `User` model without registration (product decision) | Medium | ✅ Resolved (user decision: removed, Phase B) |
 | 10 | No central frontend API client | Medium | ✅ Fixed (Phase B, extended with an error toast in Phase D) |
 
@@ -66,8 +66,12 @@ rework plan.
   (cv, reminders, export, company_dossier, interview) – the frontend
   translates them automatically, with a plain-text fallback for
   endpoints not yet migrated.
-- Known gap: `pages/Onboarding.tsx` is dead, unrouted code and was not
-  audited (the delete-or-keep decision is pending with the user).
+- Known gap: `pages/Onboarding.tsx` is documented as a "shipped" feature
+  in `CHANGELOG.md` (v1.3, #50), but git history shows it was never
+  wired into `App.tsx`/`main.tsx` – unreachable for any user since v1.3.
+  Deleting it (no functional loss, since it never worked) vs. wiring it
+  up (a real product decision about trigger logic) is pending with the
+  user, so it was not audited further.
 
 ## Wiki Status
 
@@ -98,17 +102,17 @@ consistently green (as of the last run, see commit history).
 
 ## Open Risks
 
-1. **`main.py` consolidation (B.2)** – blocks several follow-on items
-   (endpoint unification, remaining schema modules,
-   `cover_letter_pdf.py`/`search_profiles.py` registration). The user is
-   working on this file themselves; no third-party changes without
-   coordination.
+1. **Remaining schema modules (B.6)** – `applications.py` still depends
+   on `backend/models/application.py`, a file the user is actively
+   editing; no third-party changes without coordination.
+   `cover_letter_pdf.py`/`search_profiles.py` remain deliberately
+   unregistered (README marks them as unfinished/planned).
 2. **GitHub Wiki (Phase 5)** – needs a Personal Access Token from the
    user, then `gh auth login` + content migration.
-3. **`pages/Onboarding.tsx`** – dead code, decision pending.
-4. **Version drift** – `frontend/package.json` (0.4.0) vs. the README
-   badge (v1.9.0), documented in `CONTRIBUTING.md` section 8, not
-   retroactively corrected.
+3. **`pages/Onboarding.tsx`** – shipped per changelog, but never wired
+   up; delete-or-rewire decision pending.
+4. ~~Version drift~~ – **fixed** (2026-08-25): `frontend/package.json`
+   synced to `1.9.0`.
 5. **Accessibility audit (D.3)** – explicitly outside this program per
    the rework plan, recommended as a dedicated follow-up.
 6. **No rate limiting** – audit finding #12, low priority, not addressed

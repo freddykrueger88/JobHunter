@@ -10,6 +10,7 @@ from backend.models.cover_letter import CoverLetter
 from backend.models.application import Application
 from backend.models.history import HistoryEntry
 from backend.services.ai_service import generate_cover_letter, coach_chat, list_ollama_models
+from backend.schemas.ai import ModelsResponse, ChatResponse, CoverLetterResponse
 import json
 
 router = APIRouter(prefix="/api/ai", tags=["KI"])
@@ -37,13 +38,13 @@ class CoachChatRequest(BaseModel):
     cover_letter_snippet: str | None = None
 
 
-@router.get("/models")
+@router.get("/models", response_model=ModelsResponse)
 async def get_models():
     models = await list_ollama_models()
     return {"models": models or ["mistral", "llama3", "phi3"]}
 
 
-@router.post("/chat")
+@router.post("/chat", response_model=ChatResponse)
 async def api_coach_chat(
     data: CoachChatRequest,
     db: AsyncSession = Depends(get_db),
@@ -65,7 +66,7 @@ async def api_coach_chat(
     return {"reply": reply, "model": model}
 
 
-@router.post("/generate-cover-letter")
+@router.post("/generate-cover-letter", response_model=CoverLetterResponse)
 async def api_generate_cover_letter(
     data: CoverLetterRequest,
     db: AsyncSession = Depends(get_db),

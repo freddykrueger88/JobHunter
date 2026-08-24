@@ -495,6 +495,82 @@ angelegt, Detailprüfung der EN-Vollständigkeit folgt bei Bedarf in Phase 4).
 - Keine offenen Fragen – der Path-Traversal-Fund ist eindeutig im Code
   nachvollziehbar, keine Annahme nötig.
 
+### 1.7 Architekturdiagramm
+
+Beide Diagramme bilden ausschließlich tatsächlich im Code vorgefundene
+Komponenten ab (`docker-compose.yml`, `main.py`-Router-Registrierung,
+`services/job_search/`, `services/{mail,email_parser,company_research}.py`).
+Keine geplanten/erfundenen Komponenten enthalten.
+
+**System-/Deployment-Sicht:**
+
+```mermaid
+flowchart LR
+    Browser["Browser (Nutzer)"]
+
+    subgraph Docker["Docker Compose (jobhunter-net)"]
+        FE["frontend\nVite **Dev-Server** in \"Produktion\"\n:3000"]
+        BE["backend\nFastAPI + SQLAlchemy async\n:8000"]
+        DB[("db\nPostgreSQL 16-alpine\nnur intern, kein Host-Port")]
+        OL["ollama\nLokale KI-Inferenz\n:11434 (Modelle z.B. mistral)"]
+    end
+
+    Ext1["Jobbörsen-APIs/-Scraper\nBundesagentur, Adzuna,\nStepStone, LinkedIn, EURES"]
+    Ext2["Wikipedia API\n(Firmen-Dossier)"]
+    Ext3["IMAP-Server\n(E-Mail-Parsing, Nutzer-Konto)"]
+    Ext4["SMTP-Server\n(Erinnerungs-/Vorlagen-Mails)"]
+
+    Browser -- "HTTP :3000" --> FE
+    FE -- "REST/JSON :8000" --> BE
+    BE -- "SQL (asyncpg) :5432 intern" --> DB
+    BE -- "HTTP :11434 intern" --> OL
+    BE -- "HTTPS" --> Ext1
+    BE -- "HTTPS" --> Ext2
+    BE -- "IMAP" --> Ext3
+    BE -- "SMTP" --> Ext4
+```
+
+**Backend-Modulsicht** (durchgezogen = aktiv genutzt, gestrichelt = toter Code
+laut Abschnitt 1.3/1.4):
+
+```mermaid
+flowchart TD
+    Main["main.py"]
+    ApiPkg["api/ (18 Module)"]
+    RoutersPkg["routers/ (3 Module:\nblocklist, followups, jobs_image)"]
+    Services["services/ (30 Module +\njob_search/-Unterpaket)"]
+    Schemas["schemas/ (3 Module:\napplication, job, settings)"]
+    ModelsPkg["models/ (Package, 14 registrierte\nModelle inkl. Base aus core.database)"]
+    Core["core/ (config, database,\nsecurity, crypto)"]
+    AlembicActive["backend/alembic/\n(0001-0004, AKTIV)"]
+    DBNode[("PostgreSQL")]
+
+    ModelsOld["backend/models.py\n(TOTER CODE, vom Package ueberschattet)"]
+    AlembicOld["/alembic/ (Top-Level)\n(TOTER CODE, nie im Docker-Build-Context)"]
+    AuthApi["api/auth.py\n(nicht in main.py eingebunden)"]
+    CLPdfApi["api/cover_letter_pdf.py\n(nicht eingebunden, Feature #89 geplant)"]
+
+    Main -->|"app.include_router()\nfuer 16 von 18 Modulen"| ApiPkg
+    Main -->|"app.include_router()"| RoutersPkg
+    ApiPkg --> Services
+    RoutersPkg --> Services
+    ApiPkg -.->|"nicht registriert"| AuthApi
+    ApiPkg -.->|"nicht registriert"| CLPdfApi
+    ApiPkg --> Schemas
+    Services --> ModelsPkg
+    ModelsPkg --> Core
+    Core --> DBNode
+    AlembicActive --> DBNode
+
+    ModelsOld -.->|"kein Import mehr"| ModelsPkg
+    AlembicOld -.->|"kein Build-Context-Bezug"| DBNode
+```
+
+### Offene Fragen aus diesem Abschnitt
+
+Keine – Diagramme fassen ausschließlich bereits verifizierte Befunde aus
+1.1–1.6 zusammen.
+
 ---
 
-*Fortsetzung folgt (1.7 Architekturdiagramm, …) gemäß `docs/analysis/BACKLOG.md`.*
+*Fortsetzung folgt (1.8/1.9 Dokument-Fertigstellung DE/EN, …) gemäß `docs/analysis/BACKLOG.md`.*

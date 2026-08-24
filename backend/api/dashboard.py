@@ -6,11 +6,12 @@ from backend.models.application import Application
 from backend.models.history import HistoryEntry
 from backend.models.reminder import Reminder
 from datetime import datetime, timezone
+from backend.schemas.dashboard import DashboardStats
 
 router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
 
 
-@router.get("/stats")
+@router.get("/stats", response_model=DashboardStats)
 async def get_stats(db: AsyncSession = Depends(get_db)):
     statuses = ["interessant", "beworben", "interview", "angenommen", "absage"]
     counts = {}

@@ -39,14 +39,19 @@ async def upload_cv(
     db: AsyncSession = Depends(get_db),
 ):
     allowed = [".pdf", ".docx", ".doc"]
-    ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in allowed:
+    # Nur den Dateinamen ohne Pfadanteile uebernehmen - schuetzt vor
+    # Path Traversal ueber einen praeparierten Client-Dateinamen
+    # (z.B. "../../app/irgendwas.pdf"), siehe
+    # docs/analysis/REPOSITORY_AUDIT_DE.md Abschnitt 1.6.
+    safe_filename = os.path.basename(file.filename)
+    ext = os.path.splitext(safe_filename)[1].lower()
+    if not safe_filename or ext not in allowed:
         raise HTTPException(status_code=400, detail=f"Nur {allowed} erlaubt")
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    dest = os.path.join(UPLOAD_DIR, file.filename)
+    dest = os.path.join(UPLOAD_DIR, safe_filename)
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
-    cv = CVData(filename=file.filename)
+    cv = CVData(filename=safe_filename)
     db.add(cv)
     await db.commit()
     await db.refresh(cv)
@@ -89,7 +94,7 @@ async def delete_cv(cv_id: int, db: AsyncSession = Depends(get_db)):
     cv = await db.get(CVData, cv_id)
     if not cv:
         raise HTTPException(status_code=404, detail="CV nicht gefunden")
-    filepath = os.path.join(UPLOAD_DIR, cv.filename)
+    filepath = os.path.join(UPLOAD_DIR, os.path.basename(cv.filename))
     if os.path.exists(filepath):
         os.remove(filepath)
     await db.delete(cv)

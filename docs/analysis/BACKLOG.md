@@ -54,7 +54,7 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 3.2 docs/analysis/REWORK_PLAN_DE.md geschrieben (5 Phasen)
 - [x] 3.3 docs/analysis/REWORK_PLAN_EN.md geschrieben (inhaltsgleich)
 - [x] 3.4 docs/architecture/ (Diagramme + 3 ADRs) angelegt
-- [ ] >>> CHECKPOINT: Nutzer prüft Audit + Rework-Plan, bevor Code/i18n/Wiki angefasst wird <<<
+- [x] >>> CHECKPOINT: Nutzer hat am 2026-08-24 explizit angewiesen, Phase 2+3 komplett durchzuarbeiten, ohne zwischendurch zu pruefen. Review von Audit+Rework-Plan steht inhaltlich aber noch aus, bevor Phase 4 (Code-Aenderungen) beginnt. <<<
 
 ## Phase 4 – Internationalisierung (Umsetzung)
 - [ ] 4.1 docs/i18n/KONZEPT.md (Locale-Strategie, Schlüsselschema, Persistenz, Fallbacks)
@@ -76,3 +76,10 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 
 ## Änderungsprotokoll
 - 2026-08-24: Backlog angelegt, gh installiert, Auth als blockiert markiert.
+
+- 2026-08-24 (Fortsetzung): Phase 1 (Audit DE+EN), Phase 2 (Codequalitaet + Stack-Eignung DE+EN)
+  und Phase 3 (Rework-Entscheidung, REWORK_PLAN_DE/EN.md, docs/architecture/ mit 3 ADRs) auf
+  ausdruecklichen Nutzerwunsch komplett und ohne Zwischen-Nachfragen abgearbeitet. Naechster
+  Schritt: inhaltliches Review durch den Nutzer, danach Start Phase 4 (i18n-Umsetzung) gemaess
+  REWORK_PLAN_DE.md Phase A-E. Laufende uncommittete Arbeitsdateien des Nutzers weiterhin
+  unveraendert (verifiziert: git status zeigt dieselben 10 Dateien wie bei Sessionbeginn).

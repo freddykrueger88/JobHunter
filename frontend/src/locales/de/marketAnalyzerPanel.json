@@ -1,0 +1,32 @@
+{
+  "title": "Marktlage-Analyse",
+  "subtitle": "Wettbewerb · Timing · Strategie",
+  "analyzing": "Analysiere…",
+  "analyze": "Analysieren",
+  "competition": {
+    "niedrig": "Geringer Wettbewerb",
+    "mittel": "Mittlerer Wettbewerb",
+    "hoch": "Hoher Wettbewerb"
+  },
+  "companyType": {
+    "startup": "🚀 Startup",
+    "kmu": "🏢 KMU",
+    "konzern": "🏭 Konzern",
+    "behoerde": "🏛️ Behörde",
+    "unbekannt": "❓ Unbekannt"
+  },
+  "timing": {
+    "sofort": "Sofort",
+    "1 Woche": "In 1 Woche",
+    "2 Wochen": "In 2 Wochen"
+  },
+  "companyTypeLabel": "Unternehmenstyp",
+  "optimalTimingLabel": "Optimaler Zeitpunkt",
+  "urgent": "⚡ Dringend gesucht",
+  "teamGrowing": "📈 Team wächst",
+  "replacement": "🔄 Nachbesetzung",
+  "recommendedStrategy": "Empfohlene Strategie",
+  "opportunitiesAndRisks": "Chancen & Risiken",
+  "opportunities": "Chancen",
+  "risks": "Risiken"
+}

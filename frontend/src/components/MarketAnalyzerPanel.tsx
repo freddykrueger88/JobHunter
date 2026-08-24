@@ -3,6 +3,7 @@
  * und empfiehlt eine Bewerbungsstrategie.
  */
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import clsx from 'clsx'
 import {
@@ -44,32 +45,9 @@ interface Props {
 }
 
 const wettbewerbConfig = {
-  niedrig: {
-    Icon: TrendingDown,
-    color: 'text-green-600',
-    bg: 'bg-green-50 dark:bg-green-900/20',
-    label: 'Geringer Wettbewerb',
-  },
-  mittel: {
-    Icon: Minus,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-    label: 'Mittlerer Wettbewerb',
-  },
-  hoch: {
-    Icon: TrendingUp,
-    color: 'text-red-600',
-    bg: 'bg-red-50 dark:bg-red-900/20',
-    label: 'Hoher Wettbewerb',
-  },
-}
-
-const unternehmensTypLabel: Record<string, string> = {
-  startup: '🚀 Startup',
-  kmu: '🏢 KMU',
-  konzern: '🏭 Konzern',
-  behoerde: '🏛️ Behörde',
-  unbekannt: '❓ Unbekannt',
+  niedrig: { Icon: TrendingDown, color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20' },
+  mittel: { Icon: Minus, color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+  hoch: { Icon: TrendingUp, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-900/20' },
 }
 
 export default function MarketAnalyzerPanel({
@@ -78,6 +56,7 @@ export default function MarketAnalyzerPanel({
   firma,
   jobDescription,
 }: Props) {
+  const { t } = useTranslation('marketAnalyzerPanel')
   const [result, setResult] = useState<MarketResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -107,15 +86,15 @@ export default function MarketAnalyzerPanel({
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800">
         <div>
-          <p className="font-semibold text-sm">Marktlage-Analyse</p>
-          <p className="text-xs text-gray-400">Wettbewerb · Timing · Strategie</p>
+          <p className="font-semibold text-sm">{t('title')}</p>
+          <p className="text-xs text-gray-400">{t('subtitle')}</p>
         </div>
         <button
           onClick={run}
           disabled={loading}
           className="px-4 py-1.5 rounded-xl text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Analysiere…' : 'Analysieren'}
+          {loading ? t('analyzing') : t('analyze')}
         </button>
       </div>
 
@@ -126,7 +105,7 @@ export default function MarketAnalyzerPanel({
           <div className="flex items-center gap-3">
             <cfg.Icon size={28} className={cfg.color} aria-hidden />
             <div>
-              <p className={clsx('text-lg font-bold', cfg.color)}>{cfg.label}</p>
+              <p className={clsx('text-lg font-bold', cfg.color)}>{t(`competition.${result.wettbewerb}`)}</p>
               <p className="text-xs text-gray-500">{result.wettbewerb_begruendung}</p>
             </div>
           </div>
@@ -136,18 +115,18 @@ export default function MarketAnalyzerPanel({
             <div className="rounded-xl bg-white/60 dark:bg-gray-700/40 p-3">
               <div className="flex items-center gap-1.5 mb-1">
                 <Briefcase size={14} className="text-gray-400" aria-hidden />
-                <p className="text-xs font-medium text-gray-500">Unternehmenstyp</p>
+                <p className="text-xs font-medium text-gray-500">{t('companyTypeLabel')}</p>
               </div>
               <p className="text-sm font-semibold">
-                {unternehmensTypLabel[result.unternehmenstyp] ?? result.unternehmenstyp}
+                {t(`companyType.${result.unternehmenstyp}`, result.unternehmenstyp)}
               </p>
             </div>
             <div className="rounded-xl bg-white/60 dark:bg-gray-700/40 p-3">
               <div className="flex items-center gap-1.5 mb-1">
                 <Clock size={14} className="text-gray-400" aria-hidden />
-                <p className="text-xs font-medium text-gray-500">Optimaler Zeitpunkt</p>
+                <p className="text-xs font-medium text-gray-500">{t('optimalTimingLabel')}</p>
               </div>
-              <p className="text-sm font-semibold">{result.optimaler_zeitpunkt}</p>
+              <p className="text-sm font-semibold">{t(`timing.${result.optimaler_zeitpunkt}`, result.optimaler_zeitpunkt)}</p>
               <p className="text-xs text-gray-400 mt-0.5">{result.zeitpunkt_begruendung}</p>
             </div>
           </div>
@@ -156,24 +135,24 @@ export default function MarketAnalyzerPanel({
           <div className="flex flex-wrap gap-2">
             {result.heuristik.dringlichkeit && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
-                ⚡ Dringend gesucht
+                {t('urgent')}
               </span>
             )}
             {result.heuristik.team_wachstum && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                📈 Team wächst
+                {t('teamGrowing')}
               </span>
             )}
             {result.heuristik.fluktuation && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-                🔄 Nachbesetzung
+                {t('replacement')}
               </span>
             )}
           </div>
 
           {/* Strategie */}
           <div className="rounded-xl bg-white/60 dark:bg-gray-700/40 p-3">
-            <p className="text-xs font-medium text-gray-500 mb-1">Empfohlene Strategie</p>
+            <p className="text-xs font-medium text-gray-500 mb-1">{t('recommendedStrategy')}</p>
             <p className="text-sm font-semibold">{result.strategie}</p>
             <p className="text-xs text-gray-400 mt-0.5">{result.strategie_begruendung}</p>
           </div>
@@ -186,14 +165,14 @@ export default function MarketAnalyzerPanel({
               aria-expanded={expanded}
             >
               {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              Chancen & Risiken
+              {t('opportunitiesAndRisks')}
             </button>
 
             {expanded && (
               <div className="mt-2 grid grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs font-medium text-green-600 mb-1 flex items-center gap-1">
-                    <Lightbulb size={12} aria-hidden /> Chancen
+                    <Lightbulb size={12} aria-hidden /> {t('opportunities')}
                   </p>
                   <ul className="space-y-1">
                     {result.chancen.map((c, i) => (
@@ -203,7 +182,7 @@ export default function MarketAnalyzerPanel({
                 </div>
                 <div>
                   <p className="text-xs font-medium text-red-500 mb-1 flex items-center gap-1">
-                    <AlertTriangle size={12} aria-hidden /> Risiken
+                    <AlertTriangle size={12} aria-hidden /> {t('risks')}
                   </p>
                   <ul className="space-y-1">
                     {result.risiken.map((r, i) => (

@@ -1,0 +1,32 @@
+{
+  "title": "Market Analysis",
+  "subtitle": "Competition · Timing · Strategy",
+  "analyzing": "Analyzing…",
+  "analyze": "Analyze",
+  "competition": {
+    "niedrig": "Low competition",
+    "mittel": "Medium competition",
+    "hoch": "High competition"
+  },
+  "companyType": {
+    "startup": "🚀 Startup",
+    "kmu": "🏢 SME",
+    "konzern": "🏭 Corporation",
+    "behoerde": "🏛️ Public authority",
+    "unbekannt": "❓ Unknown"
+  },
+  "timing": {
+    "sofort": "Immediately",
+    "1 Woche": "In 1 week",
+    "2 Wochen": "In 2 weeks"
+  },
+  "companyTypeLabel": "Company Type",
+  "optimalTimingLabel": "Optimal Timing",
+  "urgent": "⚡ Urgently needed",
+  "teamGrowing": "📈 Team growing",
+  "replacement": "🔄 Replacement hire",
+  "recommendedStrategy": "Recommended Strategy",
+  "opportunitiesAndRisks": "Opportunities & Risks",
+  "opportunities": "Opportunities",
+  "risks": "Risks"
+}

@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Rework-Plan Phase E.3 (docs/analysis/REWORK_PLAN_DE.md): woechentlicher
+  # Rhythmus, kein Auto-Merge (Produktentscheidung, hier bewusst nicht
+  # vorausgesetzt - siehe Rework-Plan).
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "backend"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"

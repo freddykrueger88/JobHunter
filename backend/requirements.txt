@@ -12,7 +12,7 @@ alembic==1.13.1
 cryptography==42.0.8
 
 # HTTP-Client
-httpx==0.27.0
+httpx==0.28.1
 
 # CV-Parsing
 pdfminer.six==20231228

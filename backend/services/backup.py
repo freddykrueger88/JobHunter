@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.models import (
     Job, Application, Reminder, SearchProfile,
-    UserSettings, CoverLetterTemplate, BackupLog
+    UserSettings, TextSnippet, BackupLog
 )
 
 MAX_BACKUPS = 7

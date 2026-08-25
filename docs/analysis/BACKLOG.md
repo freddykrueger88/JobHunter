@@ -467,7 +467,13 @@ uncommittete Dateien auf Einbindungsstatus geprueft.
       lokal main danach 0/0 divergent, verifiziert per git fetch +
       rev-list.
 
-## Phase G - GitHub-Issues konsolidiert (2026-08-25, Nutzeranfrage)
+## Phase G - GitHub-Issues konsolidiert (2026-08-25, Nutzeranfrage, ERLEDIGT)
+
+Alle 20 betroffenen Issues (#62,#63,#65,#68,#71,#75,#76,#77,#78,#79,#80,
+#81,#82,#83,#84,#88,#66,#67,#73,#74) wurden verifiziert per gh issue
+close geschlossen. Nur #89 bleibt offen (aktiv in Arbeit, PR #91
+schliesst es automatisch beim Merge). Verifiziert per gh issue list
+--state open: nur noch #89 offen.
 
 Auf Nutzerwunsch: alle offenen GitHub-Issues gegen den echten Code geprueft,
 bereits gebaute als erledigt geschlossen, reine Ideen ins Backlog uebernommen

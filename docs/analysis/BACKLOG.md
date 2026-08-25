@@ -466,3 +466,110 @@ uncommittete Dateien auf Einbindungsstatus geprueft.
       102 Commits gepusht (101 + der F.2-Fix-Commit), origin/main und
       lokal main danach 0/0 divergent, verifiziert per git fetch +
       rev-list.
+
+## Phase G - GitHub-Issues konsolidiert (2026-08-25, Nutzeranfrage)
+
+Auf Nutzerwunsch: alle offenen GitHub-Issues gegen den echten Code geprueft,
+bereits gebaute als erledigt geschlossen, reine Ideen ins Backlog uebernommen
+und die Issues geschlossen (GitHub-Issues sind ab jetzt nicht mehr die
+Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
+
+### G.1 - Bereits vollstaendig gebaut, Issue schliesst als erledigt (Code verifiziert)
+- [x] #62 Bewerbungscoach-Chat - backend/routers/ai.py::coach_chat, Frontend
+      CoachChatDrawer.tsx, laut Roadmap-Tabelle "v1.9 Fertig"
+- [x] #63 Auto-Apply-Vorbereitung - backend/services/auto_apply.py
+      (build_application_zip), verdrahtet in routers/applications.py +
+      frontend/src/components/AutoApplyButton.tsx (in Kanban.tsx eingebunden)
+- [x] #65 Erweiterte Import/Export-Funktionen - JSON/CSV/XLSX, laut Roadmap
+      "v1.9 Fertig"
+- [x] #68 E-Mail-Parsing (IMAP, Absagen/Einladungen/Follow-ups) - laut
+      Roadmap "v1.9 Fertig"
+- [x] #71 Firmen-Dossier (Wikipedia-Panel) - laut Roadmap "v1.9 Fertig"
+- [x] #77 Kalender-Export (.ics + Feed) - laut Roadmap "v1.9 Fertig"
+
+### G.2 - In aktiver Umsetzung, Issue bleibt bewusst offen
+- #89 Anschreiben-Vorlage (DOCX-Upload) - laeuft ueber PR #91 (siehe
+      Backlog Phase F.2), PR schliesst das Issue automatisch beim Merge,
+      deshalb NICHT vorzeitig manuell geschlossen.
+
+### G.3 - Reine Ideen, ins Backlog uebernommen, Issue geschlossen mit
+      Verweis auf dieses Dokument (kein Code, keine Prioritaet gegenueber
+      der eigentlichen Roadmap - alles v2.0+/"irgendwann", nichts davon
+      ist aktuell in Arbeit)
+- [ ] G.3.1 (#88) Erweiterte Job-Filter - Benefit-Whitelist (Filter nach
+      gewuenschten Benefits) + Keyword-Blacklist (unerwuenschte Begriffe
+      ausblenden) bei der Stellensuche
+- [ ] G.3.2 (#84) Firmen-Blacklist - Firmen dauerhaft markieren/ausblenden,
+      mit Grund+Datum, ex-/importierbar
+- [ ] G.3.3 (#83) Erfolgs-Timeline - Bewerbungsprozess pro Stelle als
+      Zeitstrahl (Beworben -> Antwort -> Gespraech -> Entscheidung),
+      Vergleich mit Durchschnittswerten
+- [ ] G.3.4 (#82) Slack/Discord/ntfy-Benachrichtigungen per Webhook bei
+      neuen passenden Stellen/Statusaenderungen
+- [ ] G.3.5 (#81) Burnout-Fruehwarner - Warnung bei zu vielen Bewerbungen
+      ohne Erfolg in kurzer Zeit (Schwellenwert konfigurierbar)
+- [ ] G.3.6 (#80) Bewerbungs-Tagebuch - freies Tagesnotiz-Textfeld,
+      durchsuchbar, PDF-exportierbar
+- [ ] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)
+      fuer Bewerbungsaktivitaet
+- [ ] G.3.8 (#78) Ruecklaufquoten-Tracker - welche Portale/Wochentage/
+      Anschreiben-Laengen zu Antworten fuehren, mit Empfehlungen
+- [ ] G.3.9 (#76) Branchen-Radar - regionale Jobmarkt-Trends aus den
+      integrierten Portalen aggregiert
+- [ ] G.3.10 (#75) Persoenlichkeits-Matching - KI schaetzt Firmenkultur
+      aus Stellenbeschreibung ein, Abgleich mit kurzem Nutzer-Fragebogen
+      beim Setup (5 Fragen) - UEBERSCHNEIDUNG mit dem vom Nutzer
+      gewuenschten KI-Hintergrundprofil (siehe Phase H), beim Bauen des
+      Profil-Fragebogens mitdenken statt zweimal zu bauen
+- [ ] G.3.11 (#74) Bewerbungs-Timing-KI - optimaler Wochentag/Uhrzeit
+      zum Absenden basierend auf Erfolgsquoten
+- [ ] G.3.12 (#73) Absagen-Analyse - Muster in erhaltenen Absagen
+      erkennen, konkrete Empfehlungen ableiten
+- [ ] G.3.13 (#67) Kommunale Jobportale (Staedte/Gemeinden/Behoerden/
+      Unis) durchsuchen - TEIL der grossen EU-Jobboersen-Vision des
+      Nutzers (siehe Phase I), nicht separat umsetzen
+- [ ] G.3.14 (#66) EU-Jobportale, Fokus Skandinavien (Finn.no etc.) -
+      TEIL der grossen EU-Jobboersen-Vision des Nutzers (siehe Phase I),
+      nicht separat umsetzen
+
+## Phase H - Neues Feature: KI-Hintergrundprofil (2026-08-25, Nutzervision)
+
+Nutzerwunsch: die lokale KI kennt den Bewerber aktuell nur ueber die
+automatisch aus dem CV extrahierte cv_summary (siehe
+backend/services/ai_service.py::generate_cover_letter). Ein echtes
+strukturiertes Profil (Kernkompetenzen, Wunschrolle, Soft Skills, Werte)
+existiert nicht (UserSettings hat nur Theme/KI-Modell/Suchpraeferenzen/
+API-Keys, siehe backend/models/settings.py). Soll als Fragebogen beim
+Onboarding/in den Einstellungen erfasst und in den Anschreiben-Prompt
+eingespeist werden. Ueberschneidet sich mit G.3.10 (#75) - ein
+gemeinsames Datenmodell fuer beides nutzen statt zwei parallele Profile.
+- [ ] H.1 Datenmodell entwerfen (neues UserProfile-Modell oder Erweiterung
+      von UserSettings) + Migration
+- [ ] H.2 Fragebogen-UI (Onboarding.tsx eignet sich als natuerlicher Ort
+      dafuer, siehe Phase F.3-Entscheidung/Backlog-Alteintrag zu
+      Onboarding.tsx - beides zusammen denken statt zweimal zu bauen)
+- [ ] H.3 generate_cover_letter() um Profildaten im Prompt erweitern
+- [ ] H.4 Persoenlichkeits-Matching (#75/G.3.10) auf demselben Profil
+      aufbauen statt eigenem Fragebogen
+
+## Phase I - Grosses Vorhaben: EU-weite Jobboersen bis Kommunalebene (2026-08-25, Nutzervision)
+
+Nutzerwunsch: alle europaeischen Jobboersen anbinden, von national bis
+zur kleinsten Kommune, EU-weit. Aktuell integriert: Bundesagentur,
+Adzuna, StepStone, LinkedIn, EURES (EU-weit, aber nur grosse
+Zentralportale). Umfasst automatisch G.3.13 (#67, Kommunalportale) und
+G.3.14 (#66, Skandinavien/EU-Portale) - nicht als Einzel-Issues
+umsetzen, sondern hier gebuendelt planen. Sehr grosser Umfang
+(potenziell hunderte Portale/APIs, jedes Land/jede Region unterschiedliche
+Struktur) - eigener mehrstufiger Umsetzungsplan noetig, nicht in einem
+Rutsch machbar. Noch nicht begonnen: erster Schritt waere eine
+Bestandsaufnahme, welche Laender/Portale ueberhaupt eine nutzbare API
+oder zumindest strukturiert scrapebare Seite haben, priorisiert nach
+Marktgroesse/Nutzerbedarf.
+- [ ] I.1 Bestandsaufnahme: pro EU-Land verfuegbare Jobportale +
+      technische Anbindungsmoeglichkeit (API vs. Scraping vs. gar nicht
+      moeglich)
+- [ ] I.2 Priorisierung (welche Laender/Portale zuerst)
+- [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
+      Portal komplett eigenen Code braucht)
+- [ ] I.4 Rollout Land fuer Land

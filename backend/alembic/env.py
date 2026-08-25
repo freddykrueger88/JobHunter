@@ -23,6 +23,12 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def do_run_migrations(connection) -> None:
+    context.configure(connection=connection, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
+
+
 async def run_async_migrations() -> None:
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
@@ -30,11 +36,8 @@ async def run_async_migrations() -> None:
         poolclass=pool.NullPool,
     )
     async with connectable.connect() as connection:
-        await connection.run_sync(
-            lambda conn: context.configure(conn, target_metadata=target_metadata)
-        )
-        async with context.begin_transaction():
-            await connection.run_sync(lambda _: context.run_migrations())
+        await connection.run_sync(do_run_migrations)
+    await connectable.dispose()
 
 
 def run_migrations_online() -> None:

@@ -1,5 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 import { ThemeProvider } from './context/ThemeContext'
 import { AccessibilityProvider, useA11y } from './context/AccessibilityContext'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
@@ -26,6 +28,7 @@ const SearchProfiles = lazy(() => import('./pages/SearchProfiles'))
 const InterviewSimulator = lazy(() => import('./pages/InterviewSimulator'))
 const CompanyDossierPage = lazy(() => import('./pages/CompanyDossierPage'))
 const Templates = lazy(() => import('./pages/Templates'))
+const Onboarding = lazy(() => import('./pages/Onboarding'))
 
 function RouteFallback() {
   const { t } = useTranslation('common')
@@ -40,11 +43,21 @@ function AppInner() {
   const [shortcutOpen, setShortcutOpen] = useState(false)
   const { focusMode, setFocusMode } = useA11y()
   const { state: undoState, undo, dismiss } = useUndoToast()
+  const location = useLocation()
 
   useKeyboardShortcuts(
     () => setShortcutOpen(true),
     () => setFocusMode(!focusMode),
   )
+
+  // Onboarding-Wizard beim allerersten Start: Settings einmalig laden und bei
+  // onboarding_done === false auf /onboarding umleiten (ausser man ist schon dort).
+  const { data: settings } = useQuery<{ onboarding_done: boolean }>({
+    queryKey: ['settings'],
+    queryFn: () => axios.get('/api/settings/').then(r => r.data),
+    staleTime: Infinity,
+  })
+  const needsOnboarding = !!settings && !settings.onboarding_done && location.pathname !== '/onboarding'
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -52,18 +65,23 @@ function AppInner() {
 
       <main id="main-content" className="container mx-auto px-4 py-6">
         <Suspense fallback={<RouteFallback />}>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/kanban" element={<Kanban />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/reminders" element={<Reminders />} />
-            <Route path="/search-profiles" element={<SearchProfiles />} />
-            <Route path="/interview-simulator" element={<InterviewSimulator />} />
-            <Route path="/company-dossier" element={<CompanyDossierPage />} />
-            <Route path="/templates" element={<Templates />} />
-          </Routes>
+          {needsOnboarding ? (
+            <Navigate to="/onboarding" replace />
+          ) : (
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/kanban" element={<Kanban />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/reminders" element={<Reminders />} />
+              <Route path="/search-profiles" element={<SearchProfiles />} />
+              <Route path="/interview-simulator" element={<InterviewSimulator />} />
+              <Route path="/company-dossier" element={<CompanyDossierPage />} />
+              <Route path="/templates" element={<Templates />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+            </Routes>
+          )}
         </Suspense>
       </main>
 

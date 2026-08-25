@@ -10,6 +10,7 @@ class SettingsRead(BaseModel):
     default_radius_km: int
     hide_ausbildung: bool
     reminder_default_days: int
+    onboarding_done: bool
     # API-Keys werden NICHT im Klartext zurückgegeben
     has_adzuna_key: bool
     has_linkedin_key: bool
@@ -28,6 +29,7 @@ class SettingsUpdate(BaseModel):
     hide_ausbildung: bool | None = None
     reminder_default_days: int | None = None
     color_blind_mode: str | None = None
+    onboarding_done: bool | None = None
     # API-Keys im Klartext – werden beim Speichern verschlüsselt
     adzuna_app_id: str | None = None
     adzuna_api_key: str | None = None

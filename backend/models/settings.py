@@ -22,6 +22,8 @@ class UserSettings(Base):
     hide_ausbildung: Mapped[bool] = mapped_column(Boolean, default=True)
     # Erinnerungen
     reminder_default_days: Mapped[int] = mapped_column(default=7)
+    # Onboarding-Wizard beim ersten Start bereits durchlaufen?
+    onboarding_done: Mapped[bool] = mapped_column(Boolean, default=False)
     # API-Keys (Fernet-verschlüsselt)
     adzuna_app_id_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     adzuna_api_key_enc: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -32,6 +32,7 @@ async def get_settings(db: AsyncSession = Depends(get_db)):
         default_radius_km=s.default_radius_km,
         hide_ausbildung=s.hide_ausbildung,
         reminder_default_days=s.reminder_default_days,
+        onboarding_done=s.onboarding_done,
         has_adzuna_key=bool(s.adzuna_api_key_enc),
         has_linkedin_key=bool(s.linkedin_api_key_enc),
         has_arbeitsagentur_key=bool(s.arbeitsagentur_client_id_enc),
@@ -44,7 +45,7 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
     simple_fields = [
         "theme", "language", "ai_model", "ai_tone", "default_location",
         "default_radius_km", "hide_ausbildung", "reminder_default_days",
-        "color_blind_mode",
+        "color_blind_mode", "onboarding_done",
     ]
     for field in simple_fields:
         value = getattr(data, field)
@@ -67,6 +68,7 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
         theme=s.theme, language=s.language, ai_model=s.ai_model, ai_tone=s.ai_tone,
         default_location=s.default_location, default_radius_km=s.default_radius_km,
         hide_ausbildung=s.hide_ausbildung, reminder_default_days=s.reminder_default_days,
+        onboarding_done=s.onboarding_done,
         has_adzuna_key=bool(s.adzuna_api_key_enc),
         has_linkedin_key=bool(s.linkedin_api_key_enc),
         has_arbeitsagentur_key=bool(s.arbeitsagentur_client_id_enc),

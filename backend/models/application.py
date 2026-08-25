@@ -21,3 +21,4 @@ class Application(Base):
     job: Mapped["Job"] = relationship(back_populates="applications")
     cover_letters: Mapped[list["CoverLetter"]] = relationship(back_populates="application", cascade="all, delete-orphan")
     reminders: Mapped[list["Reminder"]] = relationship(back_populates="application", cascade="all, delete-orphan")
+    followups: Mapped[list["FollowUp"]] = relationship(back_populates="application", cascade="all, delete-orphan")

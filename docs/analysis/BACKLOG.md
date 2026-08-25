@@ -416,7 +416,28 @@ uncommittete Dateien auf Einbindungsstatus geprueft.
       blockiert (GitHub-Mutationen wie PR schliessen/kommentieren sind
       generell gesperrt) - Nutzer muss das selbst auf GitHub erledigen
       oder eine Bash-Permission-Regel dafuer freischalten. Erledigt 2026-08-25: Nutzer hat PR #90 selbst auf GitHub geschlossen.
-- [ ] F.2 PR #91 (DOCX-Anschreiben-Vorlagen, schliesst #89) - ECHTE
+- [x] F.2 PR #91 (DOCX-Anschreiben-Vorlagen, schliesst #89) - GEMERGED
+      2026-08-25 (Commit d7795df). Kollisionen geloest wie unten
+      beschrieben, zusaetzlich beim eigentlichen Merge gefunden/geloest:
+      main.py mit der seit PR-Erstellung (2026-06-02) komplett
+      restrukturierten Router-Landschaft (Phase B.2) zusammengefuehrt;
+      auth/search_profiles/cover_letter_pdf bewusst NICHT mit uebernommen
+      (identischer Grund wie PR #90-Ablehnung); KRITISCHER Fund: Router
+      hatte keinen /api-Praefix (gleiches Muster wie der jobs.py-Bug),
+      gefixt; placeholders-Spalte von Postgres-ARRAY auf JSON umgestellt
+      (ARRAY liess die SQLite-Testsuite abstuerzen); Migration auf 0006
+      verschoben, kollidierende Index-/Constraint-/Sequenz-Namen der
+      bereits umbenannten text_snippets-Tabelle per ALTER korrigiert;
+      2 ESLint-Errors in Templates.tsx gefixt; .abacus.donotdelete
+      (Abacus.AI-Plattformartefakt, unbedenklich laut Recherche) bewusst
+      nicht uebernommen. Verifiziert: alembic upgrade head, pytest
+      26/26, npm run build/lint (0 Errors)/i18n:check, alle gruen.
+      Bekannte offene Luecke: Templates.tsx nutzt noch kein i18n
+      (komplett hartcodiertes Deutsch, PR ist aelter als Phase C) -
+      neuer Punkt F.6.
+- [ ] F.6 Templates.tsx i18n-Migration nachholen (analog den 38
+      Dateien aus Phase C.3) - noch nicht begonnen.
+- [ ] F.2-ALT (nur zur Historie, ECHTE
       KOLLISION mit lokaler uncommitteter Arbeit gefunden, gemeinsam mit
       Nutzer zu klaeren:
       - Modell-/Tabellennamenskollision: lokal uncommittet

@@ -3,6 +3,7 @@ from backend.models.application import Application
 from backend.models.settings import UserSettings
 from backend.models.cv import CVData
 from backend.models.cover_letter import CoverLetter
+from backend.models.cover_letter_template import CoverLetterTemplate
 from backend.models.reminder import Reminder
 from backend.models.history import HistoryEntry
 from backend.models.search_profile import SearchProfile
@@ -19,6 +20,7 @@ __all__ = [
     "UserSettings",
     "CVData",
     "CoverLetter",
+    "CoverLetterTemplate",
     "Reminder",
     "HistoryEntry",
     "SearchProfile",

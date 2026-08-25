@@ -83,9 +83,11 @@ async def generate_cover_letter(
     tone: str,
     model: str,
     template_text: str | None = None,
+    profile_summary: str | None = None,
 ) -> str:
     tone_instruction = TONE_PROMPTS.get(tone, TONE_PROMPTS["formell"])
     contact_line = f"An: {contact_person}" if contact_person else "Kein Ansprechpartner bekannt"
+    profile_block = f"\n\n{profile_summary}" if profile_summary else ""
 
     if template_text:
         prompt = f"""Du bist ein Experte f\u00fcr Bewerbungsschreiben.
@@ -104,7 +106,7 @@ Stelleninformationen:
 - Stellenbeschreibung: {(job_description or 'Keine Beschreibung')[:1000]}
 
 Bewerber-Profil:
-{cv_summary}
+{cv_summary}{profile_block}
 """
     else:
         prompt = f"""Du bist ein Experte f\u00fcr Bewerbungsschreiben.
@@ -120,7 +122,7 @@ Stelleninformationen:
 - Stellenbeschreibung: {(job_description or 'Keine Beschreibung')[:1000]}
 
 Bewerber-Profil:
-{cv_summary}
+{cv_summary}{profile_block}
 
 Struktur: Datum, Empf\u00e4nger, Betreff, Anrede, 3 Abs\u00e4tze (Einleitung/Hauptteil/Schluss), Gru\u00df.
 """

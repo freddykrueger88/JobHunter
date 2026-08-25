@@ -4,7 +4,7 @@ from backend.api import calendar
 from backend.routers import (
     ai, applications, blocklist, company_dossier, cover_letter_templates,
     cv, dashboard, email_parsing, eures, export, followups, history,
-    interview, jobs, reminders, settings,
+    interview, jobs, profile, reminders, settings,
 )
 
 app = FastAPI(
@@ -38,6 +38,7 @@ app.include_router(calendar.router)
 app.include_router(company_dossier.router)
 app.include_router(email_parsing.router)
 app.include_router(cover_letter_templates.router)
+app.include_router(profile.router)
 
 
 @app.get("/health", tags=["System"])

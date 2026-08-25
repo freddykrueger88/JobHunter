@@ -6,6 +6,7 @@ from backend.core.database import get_db
 from backend.models.job import Job
 from backend.models.cv import CVData
 from backend.models.settings import UserSettings
+from backend.services.profile_service import build_profile_summary
 from backend.models.cover_letter import CoverLetter
 from backend.models.application import Application
 from backend.models.history import HistoryEntry
@@ -99,6 +100,8 @@ async def api_generate_cover_letter(
     model = s.ai_model if s else "mistral"
     tone = data.tone or (s.ai_tone if s else "formell")
 
+    profile_summary = await build_profile_summary(db)
+
     text = await generate_cover_letter(
         job_title=job.title,
         company=job.company,
@@ -108,6 +111,7 @@ async def api_generate_cover_letter(
         tone=tone,
         model=model,
         template_text=data.template_text,
+        profile_summary=profile_summary,
     )
 
     cl = CoverLetter(

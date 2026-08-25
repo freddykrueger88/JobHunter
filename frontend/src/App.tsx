@@ -29,6 +29,7 @@ const InterviewSimulator = lazy(() => import('./pages/InterviewSimulator'))
 const CompanyDossierPage = lazy(() => import('./pages/CompanyDossierPage'))
 const Templates = lazy(() => import('./pages/Templates'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
+const Profile = lazy(() => import('./pages/Profile'))
 
 function RouteFallback() {
   const { t } = useTranslation('common')
@@ -80,6 +81,7 @@ function AppInner() {
               <Route path="/company-dossier" element={<CompanyDossierPage />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           )}
         </Suspense>

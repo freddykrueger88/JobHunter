@@ -1,0 +1,25 @@
+{
+  "title": "Mein Profil",
+  "subtitle": "Hintergrundinfos für bessere KI-Anschreiben – wird bei jeder Anschreiben-Generierung mitgeschickt (bleibt lokal, keine Cloud).",
+  "ueberMich": "Über mich",
+  "ueberMichPlaceholder": "Kurz und frei formuliert: wer bist du, was zeichnet dich aus?",
+  "wunschrolle": "Wunschrolle",
+  "wunschrollePlaceholder": "z.B. Senior Backend-Entwickler",
+  "erfahrungsjahre": "Berufserfahrung (Jahre)",
+  "kernkompetenzen": "Kernkompetenzen",
+  "kernkompetenzenPlaceholder": "z.B. Python, FastAPI, Teamführung, Projektmanagement",
+  "softSkills": "Stärken / Soft Skills",
+  "softSkillsPlaceholder": "z.B. kommunikativ, lösungsorientiert, arbeitet gerne im Team",
+  "werte": "Was dir im Job wichtig ist",
+  "wertePlaceholder": "z.B. Homeoffice-Möglichkeit, flache Hierarchien, Weiterbildung",
+  "arbeitsstil": "Bevorzugtes Arbeitsumfeld",
+  "arbeitsstilOptions": {
+    "egal": "Egal",
+    "startup": "Startup",
+    "mittelstand": "Mittelstand",
+    "konzern": "Konzern",
+    "behoerde": "Behörde / öffentlicher Dienst"
+  },
+  "saved": "Gespeichert",
+  "saveError": "Speichern fehlgeschlagen"
+}

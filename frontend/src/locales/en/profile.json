@@ -1,0 +1,25 @@
+{
+  "title": "My Profile",
+  "subtitle": "Background info for better AI cover letters – sent along with every cover-letter generation (stays local, no cloud).",
+  "ueberMich": "About me",
+  "ueberMichPlaceholder": "Brief, free-form: who are you, what stands out about you?",
+  "wunschrolle": "Desired role",
+  "wunschrollePlaceholder": "e.g. Senior Backend Developer",
+  "erfahrungsjahre": "Years of experience",
+  "kernkompetenzen": "Core skills",
+  "kernkompetenzenPlaceholder": "e.g. Python, FastAPI, team leadership, project management",
+  "softSkills": "Strengths / soft skills",
+  "softSkillsPlaceholder": "e.g. communicative, solution-oriented, team player",
+  "werte": "What matters to you in a job",
+  "wertePlaceholder": "e.g. remote-work option, flat hierarchies, further training",
+  "arbeitsstil": "Preferred work environment",
+  "arbeitsstilOptions": {
+    "egal": "No preference",
+    "startup": "Startup",
+    "mittelstand": "Mid-size company",
+    "konzern": "Corporation",
+    "behoerde": "Public sector"
+  },
+  "saved": "Saved",
+  "saveError": "Failed to save"
+}

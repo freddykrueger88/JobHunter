@@ -22,6 +22,7 @@ from backend.models.cover_letter_template import CoverLetterTemplate
 from backend.models.job import Job
 from backend.models.cv import CVData
 from backend.models.history import HistoryEntry
+from backend.services.profile_service import build_profile_summary
 from backend.services.docx_template_service import (
     extract_placeholders,
     fill_template,
@@ -247,6 +248,7 @@ async def generate_from_template(
             cv_summary = "\n".join(parts)
 
     # KI-Text generieren (für {{ANSCHREIBEN_TEXT}})
+    profile_summary = await build_profile_summary(db)
     ai_text = await generate_cover_letter_text(
         job_title=job.title,
         company=job.company,
@@ -255,6 +257,7 @@ async def generate_from_template(
         cv_summary=cv_summary,
         tone=request.tone,
         model=request.model,
+        profile_summary=profile_summary,
     )
 
     # Job-Dict bauen

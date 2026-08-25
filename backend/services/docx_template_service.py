@@ -201,6 +201,7 @@ async def generate_cover_letter_text(
     cv_summary: str | None,
     tone: str = "formell",
     model: str = "mistral",
+    profile_summary: str | None = None,
 ) -> str:
     """Generiert den Anschreiben-Fließtext via Ollama.
 
@@ -232,6 +233,7 @@ Stelleninformationen:
 
 Bewerber-Profil:
 {cv_summary or 'Kein CV vorhanden – schreibe einen allgemeinen Text.'}
+{(chr(10) + chr(10) + profile_summary) if profile_summary else ''}
 """
 
     try:

@@ -409,13 +409,13 @@ Auf Nutzeranweisung 2026-08-25: PR #90 komplett verwerfen, PR #91 gemeinsam
 mit dem Nutzer angehen, Wiki (Phase 5) zurueckgestellt (niedrige Prioritaet),
 uncommittete Dateien auf Einbindungsstatus geprueft.
 
-- [ ] F.1 PR #90 ("Nicht aktivierte Router einbinden") schliessen -
+- [x] F.1 PR #90 ("Nicht aktivierte Router einbinden") schliessen -
       reaktiviert den auth-Router, der in Phase B.3 bewusst per
       Nutzerentscheidung komplett entfernt wurde (kein Login-System
       vorgesehen). Schliessen per gh CLI wurde vom Auto-Mode-Classifier
       blockiert (GitHub-Mutationen wie PR schliessen/kommentieren sind
       generell gesperrt) - Nutzer muss das selbst auf GitHub erledigen
-      oder eine Bash-Permission-Regel dafuer freischalten.
+      oder eine Bash-Permission-Regel dafuer freischalten. Erledigt 2026-08-25: Nutzer hat PR #90 selbst auf GitHub geschlossen.
 - [ ] F.2 PR #91 (DOCX-Anschreiben-Vorlagen, schliesst #89) - ECHTE
       KOLLISION mit lokaler uncommitteter Arbeit gefunden, gemeinsam mit
       Nutzer zu klaeren:
@@ -460,9 +460,9 @@ uncommittete Dateien auf Einbindungsstatus geprueft.
       Einordnung: alles konsistent mit "laufende Feature-Arbeit des
       Nutzers, unterschiedlich weit fortgeschritten" - keine der Dateien
       wurde veraendert, nur gelesen.
-- [ ] F.5 Push nach origin/main: 101 lokale Commits, Fast-Forward moeglich
-      (0 Commits nur auf origin-Seite, .env nie getrackt). Erster Versuch
-      von GitHub abgelehnt: gh-Token hatte keinen workflow-Scope (noetig
-      wegen neuer .github/workflows/ci.yml aus Phase E). gh auth refresh
-      -s workflow laeuft, wartet auf Nutzerbestaetigung im Browser
-      (Device-Code-Flow). Push erfolgt automatisch sobald bestaetigt.
+- [x] F.5 Push nach origin/main: erledigt 2026-08-25. workflow-Scope
+      per gh auth refresh nachtraeglich erteilt (Nutzer musste den
+      Device-Code zweimal bestaetigen, erster Code war abgelaufen).
+      102 Commits gepusht (101 + der F.2-Fix-Commit), origin/main und
+      lokal main danach 0/0 divergent, verifiziert per git fetch +
+      rev-list.

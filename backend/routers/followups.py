@@ -19,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.database import get_db
+from backend.core.database import get_db
 from backend.models import Application, FollowUp
 from backend.services.followup_scheduler import (
     AmpelStatus,
@@ -96,8 +96,8 @@ def _enrich(fw: FollowUp) -> FollowUpResponse:
     firma: Optional[str] = None
     stelle: Optional[str] = None
     if fw.application and fw.application.job:
-        firma = fw.application.job.firma
-        stelle = fw.application.job.titel
+        firma = fw.application.job.company
+        stelle = fw.application.job.title
     return FollowUpResponse(
         id=fw.id,
         application_id=fw.application_id,
@@ -209,7 +209,7 @@ async def get_vorlage(
     if not fw:
         raise HTTPException(404, "Wiedervorlage nicht gefunden")
 
-    firma = fw.application.job.firma if fw.application and fw.application.job else "Ihrer Firma"
-    stelle = fw.application.job.titel if fw.application and fw.application.job else "der ausgeschriebenen Stelle"
+    firma = fw.application.job.company if fw.application and fw.application.job else "Ihrer Firma"
+    stelle = fw.application.job.title if fw.application and fw.application.job else "der ausgeschriebenen Stelle"
 
     return {"vorlage": generiere_nachfass_vorlage(stelle=stelle, firma=firma)}

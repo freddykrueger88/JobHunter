@@ -1,7 +1,7 @@
 """Endpoint fuer Foto-Upload von Stellenanzeigen."""
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.database import get_db
+from backend.core.database import get_db
 from backend.services.ocr import extract_text_from_image, parse_job_from_text
 from backend.services.ai_client import get_ai_client
 from backend.models import Job

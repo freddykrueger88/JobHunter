@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from pydantic import BaseModel
 from typing import Optional
-from backend.database import get_db
+from backend.core.database import get_db
 from backend.models import Blocklist
 
 router = APIRouter(prefix='/api/blocklist', tags=['blocklist'])

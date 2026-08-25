@@ -394,6 +394,16 @@ Offene Funde aus Phase E (nicht geloest, bewusst vermerkt):
       schaffen) eine Richtungsentscheidung sind, keine mechanische
       Aufraeumarbeit. Steht weiter beim Nutzer offen.
 
+      NACHTRAG 2026-08-25 (Commit e2208c2): Nutzer hat Entscheidungshoheit
+      explizit an Claude delegiert ("setze das um wie du denkst").
+      Entschieden: einbinden statt loeschen (Wizard war fertig gebaut).
+      settings.onboarding_done im Backend nachgezogen (Modell+Schema+
+      Router+Migration 0007), Redirect-Logik in App.tsx. Verifiziert
+      End-to-End per curl (GET/PATCH), pytest, Build/Lint/i18n-Check.
+      onboarding_done bewusst auf false belassen, damit der Nutzer den
+      Wizard einmal echt sieht. Bekannte Luecke wie F.6: kein i18n in
+      Onboarding.tsx (gleicher Grund, vor Phase C entstanden).
+
 Phase E Status: ABGESCHLOSSEN (E.1-E.5 erledigt). Rework-Plan-Phasen A-E
 damit vollstaendig durchlaufen. Offen bleiben: C.7/Phase 5 (echtes
 GitHub-Wiki, braucht ein Personal Access Token vom Nutzer), D.3

@@ -579,3 +579,31 @@ Marktgroesse/Nutzerbedarf.
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)
 - [ ] I.4 Rollout Land fuer Land
+
+## Phase J - Aufklaerung "uncommittete Nutzerdateien" (2026-08-25)
+
+Nutzer stellte klar: "ich arbeite an keinen Daten" - die bisher als
+"laufende Nutzerarbeit, nicht anfassen" behandelten uncommitteten
+Aenderungen (siehe Leitplanken oben, Stand 2026-08-24) waren eine
+FALSCHE ANNAHME der vorherigen Session. Pruefung ergab: es waren liegen
+gebliebene, korrekte Bugfixes (vermutlich Ueberbleibsel aus einer
+frueheren Bearbeitung von PR #90/artverwandter Arbeit), keine
+Nutzer-WIP. Alle geprueft und als korrekt befunden, jetzt committed
+(4 Commits: e4242f0 backend.database-Importfix in 4 Dateien +
+firma/titel->company/title in followups.py, 46d525a neue Modelle
+Blocklist/UserBadge/BackupLog/FollowUp + Application.followups-Relation,
+6031d2a Docker-Volume-Mount + entrypoint.sh +x, bb7b38a Alembic
+env.py-Cleanup). Verifiziert: pytest 26/26 gruen, Backend-Health/Docs OK,
+git status clean, gepusht nach origin/main.
+
+Lehre fuer kuenftige Sessions: der Nutzer schreibt selbst keinen Code
+(siehe [[jobhunter-project]] Delegations-Hinweis) - uncommittete
+Aenderungen im Repo sind deshalb NIE automatisch "laufende Handarbeit
+des Nutzers", sondern koennten liegen gebliebene Artefakte aus fruaheren
+KI-Sessions/Tools (Perplexity, Abacus.AI - siehe .abacus.donotdelete in
+PR-Diffs) sein. Bei uncommitteten Aenderungen immer erst den Inhalt
+pruefen (git diff) und den Nutzer fragen statt automatisch zu blockieren.
+
+WICHTIG: damit ist die urspruengliche Merge-Blockade fuer PR #91
+(Phase F.2) aufgehoben - die 4 kollidierenden Dateien sind jetzt clean
+committed, kein Working-Tree-Konflikt mehr zu erwarten.

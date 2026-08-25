@@ -402,3 +402,67 @@ GitHub-Wiki, braucht ein Personal Access Token vom Nutzer), D.3
 Nutzer-eigene uncommittete Datei), pages/Onboarding.tsx-Entscheidung.
 B.2 nachtraeglich am 2026-08-25 erledigt (siehe Phase-B-Eintrag oben),
 dabei kritischen /api-Praefix-Bug in jobs.py gefunden und behoben.
+
+## Phase F - PR-Review & Uncommittete Dateien (2026-08-25, Nutzeranfrage)
+
+Auf Nutzeranweisung 2026-08-25: PR #90 komplett verwerfen, PR #91 gemeinsam
+mit dem Nutzer angehen, Wiki (Phase 5) zurueckgestellt (niedrige Prioritaet),
+uncommittete Dateien auf Einbindungsstatus geprueft.
+
+- [ ] F.1 PR #90 ("Nicht aktivierte Router einbinden") schliessen -
+      reaktiviert den auth-Router, der in Phase B.3 bewusst per
+      Nutzerentscheidung komplett entfernt wurde (kein Login-System
+      vorgesehen). Schliessen per gh CLI wurde vom Auto-Mode-Classifier
+      blockiert (GitHub-Mutationen wie PR schliessen/kommentieren sind
+      generell gesperrt) - Nutzer muss das selbst auf GitHub erledigen
+      oder eine Bash-Permission-Regel dafuer freischalten.
+- [ ] F.2 PR #91 (DOCX-Anschreiben-Vorlagen, schliesst #89) - ECHTE
+      KOLLISION mit lokaler uncommitteter Arbeit gefunden, gemeinsam mit
+      Nutzer zu klaeren:
+      - Modell-/Tabellennamenskollision: lokal uncommittet
+        backend/models/cover_letter_template.py definiert
+        CoverLetterTemplate/Tabelle cover_letter_templates mit Feldern
+        name/category/body/is_custom/sprache/erstellt_am (einfaches
+        Text-Vorlagen-Modell). PR #91 definiert eine GLEICHNAMIGE Klasse
+        CoverLetterTemplate/Tabelle cover_letter_templates mit KOMPLETT
+        ANDEREN Feldern (name/filename/file_path/placeholders-Array/
+        is_active/created_at, DOCX-Datei-basiert). Zwei unterschiedliche
+        Features mit identischem Modell-/Tabellennamen - nicht
+        automatisch mergebar, braucht Umbenennung einer der beiden Seiten.
+      - Alembic-Revision-Kollision: lokal uncommittet
+        0004_add_blocklist_badges_backup_templates.py hat
+        revision="0004"/down_revision="0003". PR #91s
+        0004_add_cover_letter_templates.py hat EXAKT DIESELBE
+        revision="0004"/down_revision="0003" - harter Alembic-Konflikt,
+        eine der beiden Migrationen braucht eine neue Revisions-ID
+        (z.B. 0005) mit angepasster down_revision-Kette.
+- [x] F.3 Onboarding.tsx-Fund praezisiert (Antwort an Nutzer, keine Aenderung):
+      5-Schritt-Wizard (Sprache/Ort & Beruf/KI pruefen/Theme/Abschluss),
+      liest/schreibt settings.onboarding_done. Bestaetigt per grep: an
+      keiner Stelle in App.tsx/main.tsx/components/ referenziert - real
+      toter Code trotz CHANGELOG-Eintrag "shipped" (v1.3, #50).
+      Entscheidung (loeschen vs. einbinden) weiterhin offen beim Nutzer.
+- [x] F.4 Uncommittete Dateien auf Einbindungsstatus geprueft (nur
+      gelesen, nichts geaendert):
+      - backend/routers/blocklist.py: Router IST in main.py eingebunden
+        (Zeile 36), Prefix /api/blocklist korrekt gesetzt - funktionsfaehig.
+      - backend/routers/followups.py: Router IST in main.py eingebunden
+        (Zeile 35), Prefix /api/followups korrekt gesetzt - funktionsfaehig.
+      - backend/routers/jobs_image.py: Router-Datei existiert (Prefix
+        /api/jobs korrekt gesetzt), ist aber NICHT in main.py eingebunden
+        (kein include_router(jobs_image.router)) - aktuell toter Code,
+        noch nicht aktiviert.
+      - backend/models/backup_log.py, user_badge.py: Modelle + Tabellen
+        in Migration 0004 vorhanden, aber KEIN zugehoeriger Router
+        gefunden (weder unter backend/routers/ noch backend/api/) -
+        Backend-Teil fuer Backup-Log/Badges ist erst zur Haelfte gebaut
+        (Datenschicht ja, API-Schicht noch nicht).
+      Einordnung: alles konsistent mit "laufende Feature-Arbeit des
+      Nutzers, unterschiedlich weit fortgeschritten" - keine der Dateien
+      wurde veraendert, nur gelesen.
+- [ ] F.5 Push nach origin/main: 101 lokale Commits, Fast-Forward moeglich
+      (0 Commits nur auf origin-Seite, .env nie getrackt). Erster Versuch
+      von GitHub abgelehnt: gh-Token hatte keinen workflow-Scope (noetig
+      wegen neuer .github/workflows/ci.yml aus Phase E). gh auth refresh
+      -s workflow laeuft, wartet auf Nutzerbestaetigung im Browser
+      (Device-Code-Flow). Push erfolgt automatisch sobald bestaetigt.

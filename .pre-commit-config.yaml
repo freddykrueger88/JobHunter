@@ -30,3 +30,13 @@ repos:
         language: system
         files: ^frontend/.*\.(ts|tsx)$
         pass_filenames: false
+
+  # Security: gitleaks scannt jeden Commit auf versehentlich committete
+  # Secrets (API-Keys, Tokens, Passwoerter). Installiert und einmalig
+  # gegen die komplette Historie geprueft am 2026-08-25 (0 Funde, siehe
+  # docs/analysis/BACKLOG.md Phase K) - dieser Hook verhindert, dass in
+  # Zukunft etwas durchrutscht.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks

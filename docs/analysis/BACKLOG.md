@@ -644,3 +644,59 @@ pruefen (git diff) und den Nutzer fragen statt automatisch zu blockieren.
 WICHTIG: damit ist die urspruengliche Merge-Blockade fuer PR #91
 (Phase F.2) aufgehoben - die 4 kollidierenden Dateien sind jetzt clean
 committed, kein Working-Tree-Konflikt mehr zu erwarten.
+
+## Phase K - Security-Scan (2026-08-25, Nutzeranfrage)
+
+Nutzerfrage: "hast du schon einen Security-Check gemacht?" - Antwort:
+NEIN, bisher nur was aus der alten Phase A bereits committed war
+(Path-Traversal-Fix in cv.py, harte Secret-Validierung in config.py,
+siehe REPOSITORY_AUDIT_{DE,EN}.md). Kein dedizierter, aktueller
+Security-Durchlauf in dieser Session bisher.
+
+- [x] K.1 gitleaks installiert (v8.30.1, /usr/local/bin/gitleaks im
+      LXC 142, NICHT im PATH per Default - vollen Pfad nutzen oder
+      PATH ergaenzen)
+- [x] K.2 Komplette Git-Historie gescannt (`gitleaks git .`, 219
+      Commits): 0 Funde. Keine jemals committeten Secrets/API-Keys/
+      Tokens.
+- [x] K.3 Arbeitsverzeichnis gescannt (`gitleaks dir .`): 3 Funde, alle
+      in `.env` (DB_PASSWORD/SECRET_KEY/ENCRYPTION_KEY) - erwartet und
+      unbedenklich, `.env` ist seit jeher in .gitignore und war nie
+      getrackt (separat verifiziert per `git log --all -- .env`).
+      Kuenftige dir-Scans werden diese 3 IMMER melden - kein neuer Fund,
+      nicht jedes Mal erneut nachschauen muessen.
+- [x] K.4 gitleaks als pre-commit-Hook eingerichtet
+      (.pre-commit-config.yaml, repo gitleaks/gitleaks v8.30.1) -
+      verhindert kuenftig automatisch, dass beim Commit versehentlich
+      ein Secret reinrutscht.
+
+- [ ] K.5 UMFASSENDERER Security-Check noch OFFEN, nicht in diesem
+      Schritt gemacht (nur Secrets/gitleaks war der konkrete Auftrag).
+      Sollte mindestens folgendes abdecken, wenn angegangen:
+      - Alle Backend-Endpoints auf fehlende/fehlerhafte Authorisierung
+        pruefen (Erinnerung: es gibt bewusst KEIN Auth-System mehr,
+        Phase B.3 - Frage ist eher: ist das Backend so konfiguriert,
+        dass es NUR im lokalen Netz/localhost erreichbar ist, nicht
+        versehentlich offen ins Internet exponiert?)
+      - CORS-Konfiguration (main.py: aktuell hart auf
+        http://localhost:3000 gesetzt - pruefen ob das fuer den echten
+        Deployment-Fall des Nutzers passt)
+      - Docker-Compose: exponierte Ports, ob Postgres/Ollama versehentlich
+        auf 0.0.0.0 statt nur intern lauschen
+      - SSH-Zugriff auf LXC 142 selbst / Proxmox-Host (liegt ausserhalb
+        des Repos, aber Nutzer erwaehnte \"SSH\" explizit in der Anfrage)
+      - Dependency-Scan (Dependabot laeuft zwar, aber die 13 offenen
+        PRs #92-#104 sind noch nicht durchgesehen/gemerged - siehe
+        Session-Handoff-Notiz)
+      - [x] Datei-Uploads (CV, DOCX-Vorlagen) auf Path-Traversal
+        geprueft: cv.py hatte den A.5-Fix bereits. GEFUNDEN+GEFIXT
+        (2026-08-25): cover_letter_templates.py-Upload aus PR #91 kam
+        NACH dem A.5-Fix dazu und hatte ihn nicht - dest wurde direkt
+        aus file.filename gebaut, kein os.path.basename(). Gefixt nach
+        demselben Muster wie cv.py, Regressionstest ergaenzt
+        (tests/test_cover_letter_templates_upload.py, DOCX in-memory
+        gebaut mit python-docx statt externer Datei, da docs/ nicht in
+        den Backend-Container gemountet ist). Verifiziert: 28/28 Tests
+        gruen (vorher 26).
+      Umfang gross genug fuer einen eigenen Arbeitsschritt, nicht
+      nebenbei miterledigt.

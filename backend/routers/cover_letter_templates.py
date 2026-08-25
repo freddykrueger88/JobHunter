@@ -83,9 +83,13 @@ async def upload_template(
 
     os.makedirs(TEMPLATE_DIR, exist_ok=True)
 
+    # Path-Traversal-Schutz (gleiches Muster wie routers/cv.py, siehe
+    # docs/analysis/REPOSITORY_AUDIT_DE.md Abschnitt 1.6 / Backlog Phase K.5)
+    safe_filename = os.path.basename(file.filename)
+
     # Eindeutiger Dateiname
-    template_name = name or os.path.splitext(file.filename)[0]
-    dest = os.path.join(TEMPLATE_DIR, file.filename)
+    template_name = name or os.path.splitext(safe_filename)[0]
+    dest = os.path.join(TEMPLATE_DIR, safe_filename)
 
     # Falls Dateiname existiert, Suffix anhängen
     counter = 1

@@ -60,12 +60,14 @@ async def client(db: AsyncSession, tmp_path, monkeypatch):  # type: ignore[overr
     """
     from backend.main import app
     import backend.routers.cv as cv_module
+    import backend.routers.cover_letter_templates as templates_module
 
     async def _override_get_db():
         yield db
 
     app.dependency_overrides[get_db] = _override_get_db
     monkeypatch.setattr(cv_module, "UPLOAD_DIR", str(tmp_path))
+    monkeypatch.setattr(templates_module, "TEMPLATE_DIR", str(tmp_path))
 
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:

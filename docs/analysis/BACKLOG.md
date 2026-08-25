@@ -580,14 +580,20 @@ API-Keys, siehe backend/models/settings.py). Soll als Fragebogen beim
 Onboarding/in den Einstellungen erfasst und in den Anschreiben-Prompt
 eingespeist werden. Ueberschneidet sich mit G.3.10 (#75) - ein
 gemeinsames Datenmodell fuer beides nutzen statt zwei parallele Profile.
-- [ ] H.1 Datenmodell entwerfen (neues UserProfile-Modell oder Erweiterung
-      von UserSettings) + Migration
-- [ ] H.2 Fragebogen-UI (Onboarding.tsx eignet sich als natuerlicher Ort
-      dafuer, siehe Phase F.3-Entscheidung/Backlog-Alteintrag zu
-      Onboarding.tsx - beides zusammen denken statt zweimal zu bauen)
-- [ ] H.3 generate_cover_letter() um Profildaten im Prompt erweitern
+- [x] H.1 Datenmodell UserProfile (eigenes Modell, nicht in UserSettings
+      integriert - klarere Trennung) + Migration 0008, 2026-08-25
+      (Commit c4484ce)
+- [x] H.2 UI: eigene Seite /profile statt Onboarding-Integration (freies
+      Ausfuellen ohne Wizard-Zeitdruck passte besser zu freien
+      Textfeldern wie "Ueber mich"), eigener i18n-Namespace von Anfang
+      an
+- [x] H.3 Beide Anschreiben-Pfade (ai_service.generate_cover_letter +
+      docx_template_service.generate_cover_letter_text/PR-91-Pfad) um
+      Profildaten erweitert, ueber gemeinsamen profile_service.py
+      (kein Duplikat)
 - [ ] H.4 Persoenlichkeits-Matching (#75/G.3.10) auf demselben Profil
-      aufbauen statt eigenem Fragebogen
+      aufbauen statt eigenem Fragebogen - Datenmodell (arbeitsstil/werte)
+      ist vorbereitet, Matching-Logik selbst noch nicht gebaut
 
 ## Phase I - Grosses Vorhaben: EU-weite Jobboersen bis Kommunalebene (2026-08-25, Nutzervision)
 

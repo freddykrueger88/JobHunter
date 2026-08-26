@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2 } from 'lucide-react'
+import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X } from 'lucide-react'
 import clsx from 'clsx'
+import ImageJobUpload from '../components/ImageJobUpload'
 
 interface Job {
   id: number
@@ -32,6 +33,7 @@ export default function Jobs() {
   const [radius, setRadius] = useState(25)
   const [hideAusbildung, setHideAusbildung] = useState(true)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false)
 
   const { data: jobs = [], isLoading: loadingJobs } = useQuery<Job[]>({
     queryKey: ['jobs', hideAusbildung],
@@ -107,6 +109,27 @@ export default function Jobs() {
               {t('search')}
             </button>
           </div>
+        </div>
+
+        {/* Foto-Upload */}
+        <div className="mb-4">
+          <button
+            onClick={() => setShowPhotoUpload(s => !s)}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          >
+            {showPhotoUpload ? <X size={14} aria-hidden /> : <Camera size={14} aria-hidden />}
+            {showPhotoUpload ? 'Foto-Upload schließen' : 'Stelle per Foto erfassen'}
+          </button>
+          {showPhotoUpload && (
+            <div className="mt-3">
+              <ImageJobUpload
+                onJobCreated={() => {
+                  qc.invalidateQueries({ queryKey: ['jobs'] })
+                  setShowPhotoUpload(false)
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Ergebnisliste */}

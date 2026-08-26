@@ -25,6 +25,9 @@ lxml==5.2.2
 # Excel-Export (#65)
 openpyxl==3.1.5
 
+# OCR-Foto-Upload
+pytesseract==0.3.13
+
 # PDF-Generierung
 reportlab==4.2.2
 

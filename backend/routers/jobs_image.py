@@ -1,21 +1,31 @@
 """Endpoint fuer Foto-Upload von Stellenanzeigen."""
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from pydantic import BaseModel
 from backend.core.database import get_db
-from backend.services.ocr import extract_text_from_image, parse_job_from_text
-from backend.services.ai_client import get_ai_client
-from backend.models import Job
-from datetime import datetime
+from backend.services.ocr import extract_text_from_image, parse_job_from_text, OCR_ENGINE
+from backend.models.job import Job
+from backend.models.settings import UserSettings
+from backend.models.history import HistoryEntry
+from backend.schemas.job import JobRead
 
 router = APIRouter(prefix='/api/jobs', tags=['jobs'])
 
 ALLOWED_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 
-@router.post('/from-image')
+
+class FromImageResponse(BaseModel):
+    job: JobRead
+    ocr_text: str
+    ocr_engine: str
+    message: str
+
+
+@router.post('/from-image', response_model=FromImageResponse)
 async def create_job_from_image(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    ai=Depends(get_ai_client),
 ):
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(400, f'Nicht unterstuetzter Dateityp: {file.content_type}')
@@ -26,40 +36,37 @@ async def create_job_from_image(
         text = await extract_text_from_image(image_bytes)
     except ValueError as e:
         raise HTTPException(422, str(e))
+    except RuntimeError as e:
+        raise HTTPException(500, str(e))
 
-    parsed = await parse_job_from_text(text, ai)
+    settings_result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
+    s = settings_result.scalar_one_or_none()
+    model = s.ai_model if s else "mistral"
 
-    if not parsed.get('titel') and not parsed.get('firma'):
+    parsed = await parse_job_from_text(text, model=model)
+
+    if not parsed.get('title') and not parsed.get('company'):
         raise HTTPException(422, 'Mindestens Titel oder Firma konnten nicht erkannt werden.')
 
-    # Bewerbungsfrist parsen
-    frist = None
-    if parsed.get('bewerbungsfrist'):
-        try:
-            frist = datetime.fromisoformat(parsed['bewerbungsfrist'])
-        except ValueError:
-            pass
-
     job = Job(
-        titel=parsed.get('titel', ''),
-        firma=parsed.get('firma', ''),
-        ort=parsed.get('ort', ''),
-        beschreibung=parsed.get('beschreibung', text),
-        quelle='foto-upload',
-        gehalt_min=parsed.get('gehalt_min'),
-        gehalt_max=parsed.get('gehalt_max'),
-        bewerbungsfrist=frist,
-        ist_remote=parsed.get('ist_remote', False),
-        ist_hybrid=parsed.get('ist_hybrid', False),
-        tags=str(parsed.get('tags', [])),
+        title=parsed.get('title') or '(ohne Titel)',
+        company=parsed.get('company') or '(unbekannt)',
+        city=parsed.get('city') or None,
+        description=parsed.get('description') or text,
+        source_portal='foto-upload',
     )
     db.add(job)
+    db.add(HistoryEntry(
+        event_type="job_created",
+        description=f"Stelle '{job.title}' per Foto-Upload erkannt",
+        meta={"source": "foto-upload"},
+    ))
     await db.commit()
     await db.refresh(job)
 
     return {
         'job': job,
         'ocr_text': text,
-        'ocr_engine': 'easyocr_or_pytesseract',
+        'ocr_engine': OCR_ENGINE,
         'message': 'Stelle aus Foto angelegt. Bitte fehlende Felder ergaenzen.',
     }

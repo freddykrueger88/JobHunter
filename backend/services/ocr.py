@@ -6,7 +6,6 @@ Beide laufen vollstaendig lokal, kein Cloud-Dienst.
 from __future__ import annotations
 import io
 import json
-from pathlib import Path
 from typing import Optional
 
 try:
@@ -52,40 +51,48 @@ async def extract_text_from_image(image_bytes: bytes) -> str:
     return text.strip()
 
 
-async def parse_job_from_text(text: str, ai_client) -> dict:
-    """Laedt erkannten OCR-Text in die KI und gibt strukturiertes Job-Objekt zurueck."""
-    from backend.services.ai_prompts import detect_language, analyze_job_prompt
-    lang = detect_language(text)
-    prompt = f"""Extrahiere aus diesem Stellenanzeigen-Text ein strukturiertes Job-Objekt.
+async def parse_job_from_text(text: str, model: str = "mistral") -> dict:
+    """Laedt erkannten OCR-Text in die lokale KI (Ollama) und gibt ein
+    strukturiertes Job-Objekt zurueck - Feldnamen wie backend/models/job.py
+    (title/company/city/description), damit das Ergebnis direkt in ein
+    Job-Objekt uebernommen werden kann."""
+    import httpx
+    from backend.core.config import settings
+
+    prompt = f"""Extrahiere aus diesem Stellenanzeigen-Text die wichtigsten Angaben.
 
 Text:
 {text}
 
-Gib NUR valides JSON zurueck (keine Erklaerungen):
+Gib NUR valides JSON zurueck (keine Erklaerungen), genau dieses Format:
 {{
-  "titel": "...",
-  "firma": "...",
-  "ort": "...",
-  "beschreibung": "...",
-  "gehalt_min": null,
-  "gehalt_max": null,
-  "bewerbungsfrist": null,
-  "ist_remote": false,
-  "ist_hybrid": false,
-  "kontakt_email": null,
-  "kontakt_telefon": null,
-  "tags": []
+  "title": "Stellenbezeichnung",
+  "company": "Firmenname",
+  "city": "Ort",
+  "description": "Kurze Zusammenfassung der Stellenbeschreibung"
 }}"""
-    response = await ai_client.generate(prompt)
+
+    fallback = {'title': '', 'company': '', 'city': '', 'description': text}
+
     try:
-        start = response.index('{')
-        end = response.rindex('}') + 1
-        return json.loads(response[start:end])
-    except (ValueError, json.JSONDecodeError):
-        return {
-            'titel': '',
-            'firma': '',
-            'ort': '',
-            'beschreibung': text,
-            'tags': [],
-        }
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                f"{settings.OLLAMA_BASE_URL}/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=90,
+            )
+            r.raise_for_status()
+            response = r.json().get("response", "")
+            start = response.index('{')
+            end = response.rindex('}') + 1
+            parsed = json.loads(response[start:end])
+            if not isinstance(parsed, dict):
+                return fallback
+            return {
+                'title': parsed.get('title') or '',
+                'company': parsed.get('company') or '',
+                'city': parsed.get('city') or '',
+                'description': parsed.get('description') or text,
+            }
+    except Exception:
+        return fallback

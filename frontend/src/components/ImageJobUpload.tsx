@@ -9,11 +9,11 @@ import axios from 'axios'
 import clsx from 'clsx'
 
 interface ParsedJob {
-  titel: string
-  firma: string
-  ort: string
-  beschreibung: string
-  tags: string[]
+  id: number
+  title: string
+  company: string
+  city: string | null
+  description: string | null
 }
 
 interface Props {
@@ -125,9 +125,9 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
             <div className="flex items-center gap-2 text-green-600 font-medium mb-3">
               <CheckCircle size={18} aria-hidden /> {t('jobDetected')}
             </div>
-            <p><span className="text-gray-400 text-xs">{t('titleLabel')}</span><br /><strong>{result.job.titel || '–'}</strong></p>
-            <p><span className="text-gray-400 text-xs">{t('companyLabel')}</span><br />{result.job.firma || '–'}</p>
-            <p><span className="text-gray-400 text-xs">{t('locationLabel')}</span><br />{result.job.ort || '–'}</p>
+            <p><span className="text-gray-400 text-xs">{t('titleLabel')}</span><br /><strong>{result.job.title || '–'}</strong></p>
+            <p><span className="text-gray-400 text-xs">{t('companyLabel')}</span><br />{result.job.company || '–'}</p>
+            <p><span className="text-gray-400 text-xs">{t('locationLabel')}</span><br />{result.job.city || '–'}</p>
           </div>
         )}
 

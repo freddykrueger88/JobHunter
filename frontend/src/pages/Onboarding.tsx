@@ -4,10 +4,12 @@
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTheme, type Theme } from '../context/ThemeContext'
 import { useTranslation, Trans } from 'react-i18next'
 import axios from 'axios'
-import { CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react'
+import api from '../lib/api'
+import { CheckCircle, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react'
 import clsx from 'clsx'
 
 const STEP_IDS = ['sprache', 'ort', 'ki', 'theme', 'abschluss'] as const
@@ -19,9 +21,11 @@ export default function Onboarding() {
   const [ort, setOrt] = useState('')
   const [beruf, setBeruf] = useState('')
   const [ollamaOk, setOllamaOk] = useState<boolean | null>(null)
+  const [finishing, setFinishing] = useState(false)
   const { theme, setTheme } = useTheme()
   const { i18n } = useTranslation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const checkOllama = async () => {
     try {
@@ -33,12 +37,21 @@ export default function Onboarding() {
   }
 
   const finish = async () => {
-    await axios.patch('/api/settings/', {
-      language: lang,
-      default_location: ort || null,
-      onboarding_done: true,
-    })
-    navigate('/')
+    setFinishing(true)
+    try {
+      await api.patch('/settings/', {
+        language: lang,
+        default_location: ort || null,
+        onboarding_done: true,
+      })
+      // App.tsx haelt die settings-Query mit staleTime: Infinity vor - ohne
+      // dieses Invalidieren wuerde needsOnboarding weiterhin true liefern
+      // und sofort wieder auf /onboarding umleiten (Endlosschleife).
+      await queryClient.invalidateQueries({ queryKey: ['settings'] })
+      navigate('/')
+    } finally {
+      setFinishing(false)
+    }
   }
 
   const THEME_VALUES: Theme[] = ['dark', 'light', 'boys', 'girls', 'dyslexic']
@@ -173,9 +186,11 @@ export default function Onboarding() {
                 {t('next')} <ChevronRight size={16} />
               </button>
             ) : (
-              <button onClick={finish}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors">
-                <CheckCircle size={16} /> {t('finish')}
+              <button onClick={finish} disabled={finishing}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-medium transition-colors">
+                {finishing
+                  ? <Loader2 size={16} className="animate-spin" />
+                  : <CheckCircle size={16} />} {t('finish')}
               </button>
             )}
           </div>

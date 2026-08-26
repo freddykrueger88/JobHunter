@@ -4,6 +4,7 @@
   "exportJson": "JSON (vollständig)",
   "exportCsv": "CSV",
   "exportXlsx": "Excel (.xlsx)",
+  "exportPdf": "PDF (Übersicht)",
   "exportHint": "JSON enthält alle Daten (DSGVO Art. 20). CSV & XLSX enthalten Bewerbungen + Stellen.",
   "import": "Importieren",
   "chooseFile": "Datei wählen",

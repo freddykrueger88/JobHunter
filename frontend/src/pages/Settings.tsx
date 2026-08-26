@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Eye, EyeOff, ExternalLink, Download, Upload, Check, Save, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, ExternalLink, Check, Save, AlertCircle } from 'lucide-react'
 import clsx from 'clsx'
+import ExportImportPanel from '../components/ExportImportPanel'
 
 interface SettingsData {
   theme: string; language: string; ai_model: string; ai_tone: string
@@ -214,8 +215,6 @@ export default function Settings() {
   // keysSaveStatus: 'idle' = Button normal, 'pending' = lädt,
   // 'saved' = grün (Keys noch sichtbar), 'error' = rot
   const [keysSaveStatus, setKeysSaveStatus]   = useState<KeysSaveStatus>('idle')
-  const [importing, setImporting]             = useState(false)
-  const [importMsg, setImportMsg]             = useState('')
 
   const initialized   = useRef(false)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -298,22 +297,6 @@ export default function Settings() {
       setTimeout(() => setKeysSaveStatus('idle'), 3000)
     },
   })
-
-  const handleExport = () => { window.location.href = '/api/export/' }
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return
-    setImporting(true); setImportMsg('')
-    const form = new FormData(); form.append('file', file)
-    try {
-      const res = await axios.post('/api/export/import', form)
-      const d = res.data.imported
-      setImportMsg(t('importSuccess', { jobs: d.jobs, reminders: d.reminders, history: d.history }))
-      qc.invalidateQueries()
-    } catch (err) {
-      const detail = axios.isAxiosError(err) ? (err.response?.data as { detail?: string } | undefined)?.detail : undefined
-      setImportMsg(t('importError', { message: detail ?? (err instanceof Error ? err.message : String(err)) }))
-    } finally { setImporting(false); e.target.value = '' }
-  }
 
   // ─── API-Key Input Helper ───────────────────────────────────────────────
   function ApiKeyInput({
@@ -574,20 +557,7 @@ export default function Settings() {
 
       {/* ── Daten ── */}
       <Section title={`💾 ${t('dataTitle')}`}>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          >
-            <Download size={15} aria-hidden /> {t('exportButton')}
-          </button>
-          <label className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-            <Upload size={15} aria-hidden /> {t('importButton')}
-            <input type="file" accept=".zip" onChange={handleImport} className="sr-only" />
-          </label>
-        </div>
-        {importing && <p className="text-sm text-gray-500 mt-2">{t('importing')}</p>}
-        {importMsg && <p className="text-sm mt-2">{importMsg}</p>}
+        <ExportImportPanel />
       </Section>
     </div>
   )

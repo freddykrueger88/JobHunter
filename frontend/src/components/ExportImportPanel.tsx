@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, FileJson, FileSpreadsheet, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, FileJson, FileSpreadsheet, FileText, FileOutput, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 type ImportStatus = { state: 'idle' } | { state: 'loading' } | { state: 'success'; stats: Record<string, number>; version: string } | { state: 'error'; message: string };
 
@@ -85,6 +85,15 @@ export default function ExportImportPanel() {
           >
             <FileSpreadsheet size={16} />
             {t('exportXlsx')}
+          </button>
+
+          {/* PDF-Uebersicht */}
+          <button
+            onClick={() => triggerDownload('/api/export/pdf-overview')}
+            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+          >
+            <FileOutput size={16} />
+            {t('exportPdf')}
           </button>
         </div>
         <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">

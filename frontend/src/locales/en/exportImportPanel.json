@@ -4,6 +4,7 @@
   "exportJson": "JSON (complete)",
   "exportCsv": "CSV",
   "exportXlsx": "Excel (.xlsx)",
+  "exportPdf": "PDF (Overview)",
   "exportHint": "JSON contains all data (GDPR Art. 20). CSV & XLSX contain applications + jobs.",
   "import": "Import",
   "chooseFile": "Choose a file",

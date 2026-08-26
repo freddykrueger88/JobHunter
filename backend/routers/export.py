@@ -146,6 +146,20 @@ async def export_xlsx(db: AsyncSession = Depends(get_db)):
     )
 
 
+@router.get("/pdf-overview")
+async def export_pdf_overview(status: str | None = None, db: AsyncSession = Depends(get_db)):
+    """PDF-Druckansicht der Bewerbungsuebersicht."""
+    from backend.services.pdf_overview import generate_overview_pdf
+
+    pdf_bytes = await generate_overview_pdf(db, status=status)
+    filename = f"jobhunter_uebersicht_{datetime.now().strftime('%Y%m%d')}.pdf"
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.post("/import", response_model=ImportResult)
 async def import_data(
     file: UploadFile = File(...),

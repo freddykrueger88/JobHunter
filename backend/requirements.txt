@@ -33,4 +33,4 @@ pydantic==2.7.4
 pydantic-settings==2.3.1
 
 # Utils
-aiosmtplib==3.0.1
+aiosmtplib==5.1.2

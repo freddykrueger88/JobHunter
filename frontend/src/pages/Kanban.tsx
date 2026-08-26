@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { formatDate as formatDateIntl, formatDateTime as formatDateTimeIntl } from '../lib/formatDate'
 import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
 import AutoApplyButton from '../components/AutoApplyButton'
+import CultureMatchPanel from '../components/CultureMatchPanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
@@ -479,6 +480,9 @@ export default function Kanban() {
                     <Bot size={13} aria-hidden /> {t('detail.coach')}
                   </button>
                 </div>
+
+                {/* #75/G.3.10 - Kultur-Match (Phase H.4) */}
+                <CultureMatchPanel jobId={detailApp.job_id} />
 
                 {/* Status buttons */}
                 <div>

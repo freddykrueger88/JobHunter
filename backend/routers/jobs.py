@@ -4,9 +4,12 @@ from sqlalchemy import select
 from backend.core.database import get_db
 from backend.models.job import Job
 from backend.models.settings import UserSettings
+from backend.models.user_profile import UserProfile
 from backend.models.history import HistoryEntry
 from backend.schemas.job import JobCreate, JobRead
+from backend.schemas.culture_match import CultureMatchResult
 from backend.services.job_search.aggregator import search_all_sources
+from backend.services.culture_match import analyze_culture_match
 import re
 
 router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
@@ -141,3 +144,33 @@ async def delete_job(job_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Stelle nicht gefunden")
     await db.delete(job)
     await db.commit()
+
+
+@router.post("/{job_id}/culture-match", response_model=CultureMatchResult)
+async def culture_match(job_id: int, db: AsyncSession = Depends(get_db)):
+    """#75/G.3.10 - vergleicht die aus der Stellenbeschreibung geschaetzte
+    Unternehmenskultur mit dem KI-Hintergrundprofil (arbeitsstil/werte)."""
+    job = await db.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Stelle nicht gefunden")
+
+    profile_result = await db.execute(select(UserProfile).where(UserProfile.id == 1))
+    profile = profile_result.scalar_one_or_none()
+    if not profile or (not profile.arbeitsstil and not profile.werte):
+        raise HTTPException(
+            status_code=400,
+            detail="Profil unvollstaendig: bitte zuerst 'Bevorzugtes Arbeitsumfeld' oder "
+                   "'Werte' unter /profile ausfuellen.",
+        )
+
+    settings_result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
+    s = settings_result.scalar_one_or_none()
+    model = s.ai_model if s else "mistral"
+
+    return await analyze_culture_match(
+        job_description=job.description or "",
+        company=job.company,
+        arbeitsstil=profile.arbeitsstil,
+        werte=profile.werte,
+        model=model,
+    )

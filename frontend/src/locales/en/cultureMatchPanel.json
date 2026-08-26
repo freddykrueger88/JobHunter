@@ -1,0 +1,16 @@
+{
+  "title": "Culture Match",
+  "subtitle": "AI compares company culture with your profile",
+  "analyzing": "Analyzing…",
+  "analyze": "Analyze",
+  "detectedType": "Detected company type: {{type}}",
+  "profileIncomplete": "Please fill in \"Preferred work environment\" or \"Values\" in your profile first.",
+  "genericError": "Could not determine a culture match.",
+  "types": {
+    "startup": "Startup",
+    "mittelstand": "Mid-size company",
+    "konzern": "Large corporation",
+    "behoerde": "Public sector",
+    "unbekannt": "unknown"
+  }
+}

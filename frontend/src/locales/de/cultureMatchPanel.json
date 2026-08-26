@@ -1,0 +1,16 @@
+{
+  "title": "Kultur-Match",
+  "subtitle": "KI vergleicht Unternehmenskultur mit deinem Profil",
+  "analyzing": "Analysiere…",
+  "analyze": "Analysieren",
+  "detectedType": "Erkannter Unternehmenstyp: {{type}}",
+  "profileIncomplete": "Bitte zuerst im Profil \"Bevorzugtes Arbeitsumfeld\" oder \"Werte\" ausfüllen.",
+  "genericError": "Kultur-Match konnte nicht ermittelt werden.",
+  "types": {
+    "startup": "Startup",
+    "mittelstand": "Mittelstand",
+    "konzern": "Konzern",
+    "behoerde": "Behörde",
+    "unbekannt": "unbekannt"
+  }
+}

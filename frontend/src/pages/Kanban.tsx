@@ -9,6 +9,7 @@ import { formatDate as formatDateIntl, formatDateTime as formatDateTimeIntl } fr
 import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdown'
 import AutoApplyButton from '../components/AutoApplyButton'
 import CultureMatchPanel from '../components/CultureMatchPanel'
+import CalendarExportButton from '../components/CalendarExportButton'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
@@ -545,6 +546,11 @@ export default function Kanban() {
                     </button>
                   )}
                 </div>
+
+                {/* Kalender-Export (#77) - nur mit gesetztem Termin sinnvoll */}
+                {detailApp.interview_at && (
+                  <CalendarExportButton applicationId={detailApp.id} />
+                )}
 
                 {/* Applied date */}
                 {detailApp.applied_at && (

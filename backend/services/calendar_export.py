@@ -8,9 +8,11 @@ def _ical_datetime(dt: datetime) -> str:
     return dt.strftime('%Y%m%dT%H%M%SZ')
 
 def build_ical_event(app, job) -> str:
-    start = app.gespraechstermin or datetime.utcnow()
+    start = app.interview_at or datetime.utcnow()
     end = start + timedelta(hours=1)
-    title = f'Vorstellungsgespraech: {job.titel if job else "Stelle"} @ {job.firma if job else ""}'
+    job_title = job.title if job else "Stelle"
+    job_company = job.company if job else ""
+    title = f'Vorstellungsgespraech: {job_title} @ {job_company}'
     return (
         'BEGIN:VCALENDAR\r\n'
         'VERSION:2.0\r\n'
@@ -38,7 +40,7 @@ async def get_ical(application_id: int, db: AsyncSession) -> str:
 async def get_all_ical(db: AsyncSession) -> str:
     """Gibt alle Gespraechstermine als abonnierbaren Kalender-Feed zurueck."""
     result = await db.execute(
-        select(Application).where(Application.gespraechstermin.isnot(None))
+        select(Application).where(Application.interview_at.isnot(None))
     )
     apps = result.scalars().all()
     events = []

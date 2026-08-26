@@ -8,7 +8,7 @@ services:
     container_name: jobhunter-backend
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://jobhunter:${DB_PASSWORD}@db:5432/jobhunter
       - SECRET_KEY=${SECRET_KEY}
@@ -69,7 +69,7 @@ services:
     container_name: jobhunter-ollama
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"
     volumes:
       - ollama-data:/root/.ollama
     networks:

@@ -22,5 +22,13 @@
   "answerPlaceholder": "Your answer...",
   "aiFeedback": "AI Feedback",
   "finish": "Finish",
-  "nextQuestion": "Next Question"
+  "nextQuestion": "Next Question",
+  "modePractice": "🎤 Practice",
+  "modePrep": "📖 Preparation",
+  "prepTitle": "Interview Preparation",
+  "prepSections": {
+    "technical": "Technical",
+    "personal": "Personal",
+    "salary": "Salary"
+  }
 }

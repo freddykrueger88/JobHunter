@@ -20,7 +20,7 @@ class OllamaClient:
     def __init__(self, model: str = "mistral"):
         self.model = model
 
-    async def generate(self, prompt: str, timeout: float = 180) -> str:
+    async def generate(self, prompt: str, timeout: float = 300) -> str:
         async with httpx.AsyncClient() as client:
             r = await client.post(
                 f"{settings.OLLAMA_BASE_URL}/api/generate",

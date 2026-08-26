@@ -22,5 +22,13 @@
   "answerPlaceholder": "Deine Antwort...",
   "aiFeedback": "KI-Feedback",
   "finish": "Abschließen",
-  "nextQuestion": "Nächste Frage"
+  "nextQuestion": "Nächste Frage",
+  "modePractice": "🎤 Übung",
+  "modePrep": "📖 Vorbereitung",
+  "prepTitle": "Interview-Vorbereitung",
+  "prepSections": {
+    "technical": "Fachlich",
+    "personal": "Persönlich",
+    "salary": "Gehalt"
+  }
 }

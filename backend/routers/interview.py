@@ -7,6 +7,8 @@ from backend.core.database import get_db
 from backend.models.job import Job
 from backend.models.settings import UserSettings
 from backend.services.interview_simulator import generate_interview_questions, evaluate_answer
+from backend.services.ai_client import get_ai_client
+from backend.models.cv import CVData
 from backend.schemas.interview import InterviewQuestionsResponse, AnswerEvaluationResponse
 from backend.core.errors import api_error
 
@@ -50,3 +52,24 @@ async def evaluate_interview_answer(data: EvaluateRequest, db: AsyncSession = De
         model=model,
     )
     return {"question": data.question, "answer": data.answer, **evaluation}
+
+
+@router.post("/prep/{job_id}")
+async def get_interview_prep(
+    job_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fragen + Musterantworten zur Vorbereitung (nutzt den zuletzt
+    hochgeladenen Lebenslauf, falls vorhanden)."""
+    from backend.services.interview_prep import generate_interview_prep
+
+    job = await db.get(Job, job_id)
+    if not job:
+        raise api_error(404, "interview.job_not_found", "Job nicht gefunden")
+
+    cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+    cv = cv_result.scalar_one_or_none()
+    cv_text = cv.raw_text if cv and cv.raw_text else ""
+
+    return await generate_interview_prep(job_id, cv_text, db, ai_client)

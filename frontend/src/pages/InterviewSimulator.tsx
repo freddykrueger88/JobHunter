@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import axios from 'axios'
-import { Mic, ThumbsUp, AlertCircle, ChevronRight, RotateCcw, CheckSquare, Search } from 'lucide-react'
+import { Mic, ThumbsUp, AlertCircle, ChevronRight, RotateCcw, CheckSquare, Search, BookOpen } from 'lucide-react'
 import clsx from 'clsx'
 
 interface Question {
@@ -13,6 +13,17 @@ interface Evaluation {
   score: number
   feedback: string
   tip: string
+}
+
+interface PrepQA {
+  question: string
+  sample_answer: string
+}
+
+interface PrepData {
+  technical: PrepQA[]
+  personal: PrepQA[]
+  salary: PrepQA[]
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -33,19 +44,27 @@ export default function InterviewSimulator() {
   const [evaluations, setEvaluations] = useState<Record<number, Evaluation>>({})
   const [loading, setLoading] = useState(false)
   const [evalLoading, setEvalLoading] = useState(false)
-  const [phase, setPhase] = useState<'setup' | 'quiz' | 'results'>('setup')
+  const [phase, setPhase] = useState<'setup' | 'quiz' | 'results' | 'prep'>('setup')
+  const [mode, setMode] = useState<'practice' | 'prep'>('practice')
+  const [prepData, setPrepData] = useState<PrepData | null>(null)
 
   const loadQuestions = async () => {
     if (!jobId) return
     setLoading(true)
     try {
-      const { data } = await axios.get(`/api/interview/questions/${jobId}`)
-      setQuestions(data.questions)
-      setJobTitle(data.job_title)
-      setCurrentIndex(0)
-      setAnswers({})
-      setEvaluations({})
-      setPhase('quiz')
+      if (mode === 'prep') {
+        const { data } = await axios.post(`/api/interview/prep/${jobId}`)
+        setPrepData(data)
+        setPhase('prep')
+      } else {
+        const { data } = await axios.get(`/api/interview/questions/${jobId}`)
+        setQuestions(data.questions)
+        setJobTitle(data.job_title)
+        setCurrentIndex(0)
+        setAnswers({})
+        setEvaluations({})
+        setPhase('quiz')
+      }
     } catch {
       alert(t('errorNotFound'))
     } finally {
@@ -84,6 +103,24 @@ export default function InterviewSimulator() {
           <Mic size={40} className="mx-auto text-blue-500 mb-3" aria-hidden />
           <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
           <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
+        </div>
+        <div className="flex gap-2 mb-4 justify-center">
+          <button
+            onClick={() => setMode('practice')}
+            className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              mode === 'practice' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300')}
+            aria-pressed={mode === 'practice'}
+          >
+            <Mic size={14} className="inline mr-1" aria-hidden /> {t('modePractice')}
+          </button>
+          <button
+            onClick={() => setMode('prep')}
+            className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              mode === 'prep' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300')}
+            aria-pressed={mode === 'prep'}
+          >
+            <BookOpen size={14} className="inline mr-1" aria-hidden /> {t('modePrep')}
+          </button>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
           <label className="block text-sm font-medium mb-2" htmlFor="job-id-input">{t('jobIdLabel')}</label>
@@ -156,6 +193,46 @@ export default function InterviewSimulator() {
         <div className="flex justify-center mt-6">
           <button
             onClick={() => { setPhase('setup'); setQuestions([]); setJobId('') }}
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors"
+          >
+            <RotateCcw size={16} aria-hidden />
+            {t('newInterview')}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (phase === 'prep' && prepData) {
+    const sections: { key: keyof PrepData; label: string }[] = [
+      { key: 'technical', label: t('prepSections.technical') },
+      { key: 'personal', label: t('prepSections.personal') },
+      { key: 'salary', label: t('prepSections.salary') },
+    ]
+    return (
+      <div className="max-w-2xl mx-auto py-8 space-y-6">
+        <div className="text-center mb-2">
+          <BookOpen size={36} className="mx-auto text-blue-500 mb-2" aria-hidden />
+          <h2 className="text-xl font-bold">{t('prepTitle')}</h2>
+        </div>
+        {sections.map(({ key, label }) => (
+          (prepData[key]?.length ?? 0) > 0 && (
+            <div key={key}>
+              <h3 className="text-sm font-semibold text-gray-500 mb-2">{label}</h3>
+              <div className="space-y-3">
+                {prepData[key].map((qa, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+                    <p className="text-sm font-medium mb-1.5">{qa.question}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{qa.sample_answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={() => { setPhase('setup'); setPrepData(null); setJobId('') }}
             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors"
           >
             <RotateCcw size={16} aria-hidden />

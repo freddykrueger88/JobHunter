@@ -83,7 +83,11 @@ async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSess
     db.add(HistoryEntry(
         event_type="application_updated",
         description=f"Bewerbung {app_id} aktualisiert",
-        meta=data.model_dump(exclude_none=True),
+        # mode="json": model_dump() liefert sonst native datetime-Objekte
+        # zurueck, die beim Schreiben in die JSON-Spalte "meta" mit
+        # "Object of type datetime is not JSON serializable" crashen -
+        # betraf jedes Setzen von interview_at/applied_at ueber Kanban.
+        meta=data.model_dump(exclude_none=True, mode="json"),
     ))
     await db.commit()
     await db.refresh(app)

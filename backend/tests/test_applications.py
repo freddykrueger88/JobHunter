@@ -97,3 +97,20 @@ class TestCreateAndUpdate:
     async def test_get_nonexistent_application_returns_404(self, client: httpx.AsyncClient):
         res = await client.get("/api/applications/999999")
         assert res.status_code == 404
+
+    async def test_update_application_interview_at_datetime_field(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """Regression: HistoryEntry.meta=data.model_dump() (ohne mode="json")
+        crashte mit 'Object of type datetime is not JSON serializable',
+        sobald ein datetime-Feld (interview_at/applied_at) gepatcht wurde -
+        betraf jedes Setzen eines Interview-Termins ueber Kanban."""
+        _, app_id = await _create_job_and_application(client, db)
+
+        res = await client.patch(
+            f"/api/applications/{app_id}",
+            json={"interview_at": "2026-09-01T10:00:00"},
+        )
+
+        assert res.status_code == 200, res.text
+        assert res.json()["interview_at"] is not None

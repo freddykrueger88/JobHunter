@@ -5,20 +5,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme, type Theme } from '../context/ThemeContext'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import axios from 'axios'
 import { CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react'
 import clsx from 'clsx'
 
-const STEPS = [
-  { id: 'sprache',    label: 'Sprache' },
-  { id: 'ort',        label: 'Ort & Beruf' },
-  { id: 'ki',         label: 'KI prüfen' },
-  { id: 'theme',      label: 'Erscheinungsbild' },
-  { id: 'abschluss',  label: 'Fertig!' },
-]
+const STEP_IDS = ['sprache', 'ort', 'ki', 'theme', 'abschluss'] as const
 
 export default function Onboarding() {
+  const { t } = useTranslation('onboarding')
   const [step, setStep] = useState(0)
   const [lang, setLang] = useState('de')
   const [ort, setOrt] = useState('')
@@ -46,41 +41,35 @@ export default function Onboarding() {
     navigate('/')
   }
 
-  const THEMES: { value: Theme; label: string }[] = [
-    { value: 'dark', label: '🌙 Dark' },
-    { value: 'light', label: '☀️ Light' },
-    { value: 'boys', label: '💙 Boys' },
-    { value: 'girls', label: '🌸 Girls' },
-    { value: 'dyslexic', label: '📚 Legasthenie' },
-  ]
+  const THEME_VALUES: Theme[] = ['dark', 'light', 'boys', 'girls', 'dyslexic']
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-gray-900">
       <div className="w-full max-w-lg">
         {/* Fortschrittsbalken */}
         <div className="flex gap-1 mb-8">
-          {STEPS.map((s, i) => (
-            <div key={s.id}
+          {STEP_IDS.map((id, i) => (
+            <div key={id}
               className={clsx('h-1.5 flex-1 rounded-full transition-colors',
                 i <= step ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700')} />
           ))}
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
-          <p className="text-xs text-gray-400 mb-1">Schritt {step + 1} von {STEPS.length}</p>
+          <p className="text-xs text-gray-400 mb-1">{t('stepCounter', { current: step + 1, total: STEP_IDS.length })}</p>
 
           {/* Schritt 0: Sprache */}
           {step === 0 && (
             <>
-              <h1 className="text-2xl font-bold mb-6">Willkommen bei JobHunter 👋</h1>
-              <p className="text-gray-500 mb-6">In welcher Sprache möchtest du JobHunter nutzen?</p>
+              <h1 className="text-2xl font-bold mb-6">{t('step0.title')}</h1>
+              <p className="text-gray-500 mb-6">{t('step0.subtitle')}</p>
               <div className="flex gap-3">
                 {['de', 'en'].map(l => (
                   <button key={l} onClick={() => { setLang(l); i18n.changeLanguage(l) }}
                     className={clsx('flex-1 py-4 rounded-xl font-medium border-2 transition-all',
                       lang === l ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-700')}
                     aria-pressed={lang === l}>
-                    {l === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}
+                    {l === 'de' ? t('step0.de') : t('step0.en')}
                   </button>
                 ))}
               </div>
@@ -90,18 +79,18 @@ export default function Onboarding() {
           {/* Schritt 1: Ort & Beruf */}
           {step === 1 && (
             <>
-              <h1 className="text-2xl font-bold mb-6">Wo suchst du?</h1>
+              <h1 className="text-2xl font-bold mb-6">{t('step1.title')}</h1>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-500 block mb-1">Standard-Ort (optional)</label>
+                  <label className="text-sm text-gray-500 block mb-1">{t('step1.locationLabel')}</label>
                   <input value={ort} onChange={e => setOrt(e.target.value)}
-                    placeholder="z.B. Bremen"
+                    placeholder={t('step1.locationPlaceholder')}
                     className="w-full rounded-xl px-4 py-3 bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500 block mb-1">Gesuchte Berufsbezeichnung (optional)</label>
+                  <label className="text-sm text-gray-500 block mb-1">{t('step1.jobTitleLabel')}</label>
                   <input value={beruf} onChange={e => setBeruf(e.target.value)}
-                    placeholder="z.B. IT-Support"
+                    placeholder={t('step1.jobTitlePlaceholder')}
                     className="w-full rounded-xl px-4 py-3 bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
@@ -111,27 +100,31 @@ export default function Onboarding() {
           {/* Schritt 2: Ollama */}
           {step === 2 && (
             <>
-              <h1 className="text-2xl font-bold mb-4">KI-Verbindung prüfen</h1>
+              <h1 className="text-2xl font-bold mb-4">{t('step2.title')}</h1>
               <p className="text-gray-500 mb-6">
-                JobHunter nutzt <strong>Ollama</strong> für lokale KI-Funktionen.
-                Stelle sicher dass Ollama läuft.
+                <Trans i18nKey="onboarding:step2.description" components={{ strong: <strong /> }} />
               </p>
               {ollamaOk === null && (
                 <button onClick={checkOllama}
                   className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">
-                  Verbindung testen
+                  {t('step2.testConnection')}
                 </button>
               )}
               {ollamaOk === true && (
                 <div className="flex items-center gap-2 text-green-600 font-medium">
-                  <CheckCircle size={20} /> Ollama erreichbar – KI-Funktionen aktiv ✅
+                  <CheckCircle size={20} /> {t('step2.connected')}
                 </div>
               )}
               {ollamaOk === false && (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 text-sm">
-                  <p className="font-medium text-yellow-700 dark:text-yellow-400 mb-2">⚠️ Ollama nicht erreichbar</p>
-                  <p className="text-gray-600 dark:text-gray-400">Starte Ollama lokal: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">ollama serve</code></p>
-                  <p className="text-gray-500 mt-1">Du kannst JobHunter trotzdem nutzen – KI-Funktionen sind ohne Ollama nicht verfügbar.</p>
+                  <p className="font-medium text-yellow-700 dark:text-yellow-400 mb-2">{t('step2.notConnectedTitle')}</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    <Trans
+                      i18nKey="onboarding:step2.notConnectedHint"
+                      components={{ code: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded" /> }}
+                    />
+                  </p>
+                  <p className="text-gray-500 mt-1">{t('step2.notConnectedFallback')}</p>
                 </div>
               )}
             </>
@@ -140,14 +133,14 @@ export default function Onboarding() {
           {/* Schritt 3: Theme */}
           {step === 3 && (
             <>
-              <h1 className="text-2xl font-bold mb-6">Wie soll JobHunter aussehen?</h1>
+              <h1 className="text-2xl font-bold mb-6">{t('step3.title')}</h1>
               <div className="grid grid-cols-2 gap-3">
-                {THEMES.map(t => (
-                  <button key={t.value} onClick={() => setTheme(t.value)}
+                {THEME_VALUES.map(value => (
+                  <button key={value} onClick={() => setTheme(value)}
                     className={clsx('py-4 rounded-xl font-medium border-2 transition-all',
-                      theme === t.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-700')}
-                    aria-pressed={theme === t.value}>
-                    {t.label}
+                      theme === value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent bg-gray-100 dark:bg-gray-700')}
+                    aria-pressed={theme === value}>
+                    {t(`step3.themes.${value}`)}
                   </button>
                 ))}
               </div>
@@ -157,13 +150,13 @@ export default function Onboarding() {
           {/* Schritt 4: Abschluss */}
           {step === 4 && (
             <>
-              <h1 className="text-2xl font-bold mb-4">Alles bereit! 🎉</h1>
+              <h1 className="text-2xl font-bold mb-4">{t('step4.title')}</h1>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
-                <li>✅ Stellen suchen und verwalten</li>
-                <li>✅ Kanban-Board für Bewerbungsstatus</li>
-                <li>✅ KI-Anschreiben generieren (mit Ollama)</li>
-                <li>✅ Erinnerungen und Benachrichtigungen</li>
-                <li>✅ DSGVO-konform, lokal, ohne Cloud</li>
+                <li>{t('step4.features.jobs')}</li>
+                <li>{t('step4.features.kanban')}</li>
+                <li>{t('step4.features.ai')}</li>
+                <li>{t('step4.features.reminders')}</li>
+                <li>{t('step4.features.privacy')}</li>
               </ul>
             </>
           )}
@@ -172,17 +165,17 @@ export default function Onboarding() {
           <div className="flex justify-between mt-8">
             <button onClick={() => setStep(s => s - 1)} disabled={step === 0}
               className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-0 transition-colors">
-              <ChevronLeft size={16} /> Zurück
+              <ChevronLeft size={16} /> {t('back')}
             </button>
-            {step < STEPS.length - 1 ? (
+            {step < STEP_IDS.length - 1 ? (
               <button onClick={() => setStep(s => s + 1)}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors">
-                Weiter <ChevronRight size={16} />
+                {t('next')} <ChevronRight size={16} />
               </button>
             ) : (
               <button onClick={finish}
                 className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors">
-                <CheckCircle size={16} /> Loslegen!
+                <CheckCircle size={16} /> {t('finish')}
               </button>
             )}
           </div>

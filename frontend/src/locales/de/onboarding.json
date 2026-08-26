@@ -1,0 +1,55 @@
+{
+  "steps": {
+    "sprache": "Sprache",
+    "ort": "Ort & Beruf",
+    "ki": "KI prüfen",
+    "theme": "Erscheinungsbild",
+    "abschluss": "Fertig!"
+  },
+  "stepCounter": "Schritt {{current}} von {{total}}",
+  "back": "Zurück",
+  "next": "Weiter",
+  "finish": "Loslegen!",
+  "step0": {
+    "title": "Willkommen bei JobHunter 👋",
+    "subtitle": "In welcher Sprache möchtest du JobHunter nutzen?",
+    "de": "🇩🇪 Deutsch",
+    "en": "🇬🇧 English"
+  },
+  "step1": {
+    "title": "Wo suchst du?",
+    "locationLabel": "Standard-Ort (optional)",
+    "locationPlaceholder": "z.B. Bremen",
+    "jobTitleLabel": "Gesuchte Berufsbezeichnung (optional)",
+    "jobTitlePlaceholder": "z.B. IT-Support"
+  },
+  "step2": {
+    "title": "KI-Verbindung prüfen",
+    "description": "JobHunter nutzt <strong>Ollama</strong> für lokale KI-Funktionen. Stelle sicher dass Ollama läuft.",
+    "testConnection": "Verbindung testen",
+    "connected": "Ollama erreichbar – KI-Funktionen aktiv ✅",
+    "notConnectedTitle": "⚠️ Ollama nicht erreichbar",
+    "notConnectedHint": "Starte Ollama lokal: <code>ollama serve</code>",
+    "notConnectedFallback": "Du kannst JobHunter trotzdem nutzen – KI-Funktionen sind ohne Ollama nicht verfügbar."
+  },
+  "step3": {
+    "title": "Wie soll JobHunter aussehen?",
+    "themes": {
+      "dark": "🌙 Dark",
+      "light": "☀️ Light",
+      "boys": "💙 Boys",
+      "girls": "🌸 Girls",
+      "dyslexic": "📚 Legasthenie"
+    }
+  },
+  "step4": {
+    "title": "Alles bereit! 🎉",
+    "features": {
+      "jobs": "✅ Stellen suchen und verwalten",
+      "kanban": "✅ Kanban-Board für Bewerbungsstatus",
+      "ai": "✅ KI-Anschreiben generieren (mit Ollama)",
+      "reminders": "✅ Erinnerungen und Benachrichtigungen",
+      "privacy": "✅ DSGVO-konform, lokal, ohne Cloud"
+    }
+  }
+}

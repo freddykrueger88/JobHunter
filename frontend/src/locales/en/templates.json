@@ -1,0 +1,61 @@
+{
+  "heading": "Cover Letter Templates",
+  "subtitle": "Upload your own DOCX template with placeholders. The AI fills it in automatically for every job.",
+  "uploadSectionTitle": "Upload Template",
+  "uploading": "Uploading...",
+  "uploadError": "Upload failed: {{detail}}",
+  "uploadErrorUnknown": "Unknown error",
+  "uploadSuccess": "✓ Template uploaded successfully!",
+  "myTemplates": "My Templates ({{count}})",
+  "loadingTemplates": "Loading templates...",
+  "emptyTitle": "No templates yet.",
+  "emptySubtitle": "Upload a DOCX file with placeholders to get started.",
+  "tones": {
+    "formell": "👔 Formal",
+    "direkt": "⚡ Direct",
+    "modern": "✨ Modern",
+    "kreativ": "🎨 Creative"
+  },
+  "placeholderHint": {
+    "title": "Available Placeholders"
+  },
+  "uploadZone": {
+    "ariaLabel": "Upload DOCX template – click or drag a file here",
+    "dropHint": "Drag a DOCX file here or click to select",
+    "invalidFileType": "Only .docx files are allowed",
+    "nameLabel": "Template name",
+    "namePlaceholder": "e.g. My cover letter template",
+    "nameAriaLabel": "Template name",
+    "upload": "Upload",
+    "cancelAriaLabel": "Cancel"
+  },
+  "templateCard": {
+    "generate": "Generate",
+    "generateAriaLabel": "Generate cover letter with {{name}}",
+    "confirmDelete": "Really delete?",
+    "confirmYes": "Yes",
+    "confirmNo": "No",
+    "deleteAriaLabel": "Delete template {{name}}"
+  },
+  "generateModal": {
+    "ariaLabel": "Generate cover letter with template: {{name}}",
+    "title": "Generate Cover Letter",
+    "close": "Close",
+    "templateInfo": "Template: <strong>{{name}}</strong> ({{count}} placeholders)",
+    "jobLabel": "Job *",
+    "jobAriaLabel": "Select job",
+    "jobPlaceholder": "— Select a job —",
+    "jobOption": "{{title}} – {{company}}",
+    "cvLabel": "CV (optional)",
+    "cvAriaLabel": "Select CV",
+    "cvPlaceholder": "— No CV —",
+    "toneLabel": "AI Tone",
+    "modelLabel": "AI Model",
+    "modelAriaLabel": "AI Model",
+    "cancel": "Cancel",
+    "generating": "AI is generating...",
+    "generate": "Generate & Download DOCX",
+    "selectJobError": "Please select a job",
+    "genericError": "Error during generation"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "steps": {
+    "sprache": "Language",
+    "ort": "Location & Role",
+    "ki": "Check AI",
+    "theme": "Appearance",
+    "abschluss": "Done!"
+  },
+  "stepCounter": "Step {{current}} of {{total}}",
+  "back": "Back",
+  "next": "Next",
+  "finish": "Get started!",
+  "step0": {
+    "title": "Welcome to JobHunter 👋",
+    "subtitle": "Which language would you like to use JobHunter in?",
+    "de": "🇩🇪 Deutsch",
+    "en": "🇬🇧 English"
+  },
+  "step1": {
+    "title": "Where are you searching?",
+    "locationLabel": "Default location (optional)",
+    "locationPlaceholder": "e.g. Bremen",
+    "jobTitleLabel": "Job title you're looking for (optional)",
+    "jobTitlePlaceholder": "e.g. IT Support"
+  },
+  "step2": {
+    "title": "Check AI connection",
+    "description": "JobHunter uses <strong>Ollama</strong> for local AI features. Make sure Ollama is running.",
+    "testConnection": "Test connection",
+    "connected": "Ollama reachable – AI features active ✅",
+    "notConnectedTitle": "⚠️ Ollama not reachable",
+    "notConnectedHint": "Start Ollama locally: <code>ollama serve</code>",
+    "notConnectedFallback": "You can still use JobHunter – AI features just won't be available without Ollama."
+  },
+  "step3": {
+    "title": "How should JobHunter look?",
+    "themes": {
+      "dark": "🌙 Dark",
+      "light": "☀️ Light",
+      "boys": "💙 Boys",
+      "girls": "🌸 Girls",
+      "dyslexic": "📚 Dyslexia-friendly"
+    }
+  },
+  "step4": {
+    "title": "All set! 🎉",
+    "features": {
+      "jobs": "✅ Search and manage jobs",
+      "kanban": "✅ Kanban board for application status",
+      "ai": "✅ Generate AI cover letters (with Ollama)",
+      "reminders": "✅ Reminders and notifications",
+      "privacy": "✅ GDPR-compliant, local, no cloud"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "heading": "Anschreiben-Vorlagen",
+  "subtitle": "Lade deine eigene DOCX-Vorlage mit Platzhaltern hoch. Die KI befüllt sie automatisch für jede Stelle.",
+  "uploadSectionTitle": "Vorlage hochladen",
+  "uploading": "Wird hochgeladen...",
+  "uploadError": "Fehler beim Hochladen: {{detail}}",
+  "uploadErrorUnknown": "Unbekannter Fehler",
+  "uploadSuccess": "✓ Vorlage erfolgreich hochgeladen!",
+  "myTemplates": "Meine Vorlagen ({{count}})",
+  "loadingTemplates": "Vorlagen werden geladen...",
+  "emptyTitle": "Noch keine Vorlagen vorhanden.",
+  "emptySubtitle": "Lade eine DOCX-Datei mit Platzhaltern hoch, um loszulegen.",
+  "tones": {
+    "formell": "👔 Formell",
+    "direkt": "⚡ Direkt",
+    "modern": "✨ Modern",
+    "kreativ": "🎨 Kreativ"
+  },
+  "placeholderHint": {
+    "title": "Verfügbare Platzhalter"
+  },
+  "uploadZone": {
+    "ariaLabel": "DOCX-Vorlage hochladen – klicken oder Datei hierher ziehen",
+    "dropHint": "DOCX-Datei hierher ziehen oder klicken zum Auswählen",
+    "invalidFileType": "Nur .docx-Dateien erlaubt",
+    "nameLabel": "Vorlagenname",
+    "namePlaceholder": "z.B. Meine Bewerbungsvorlage",
+    "nameAriaLabel": "Name der Vorlage",
+    "upload": "Hochladen",
+    "cancelAriaLabel": "Abbrechen"
+  },
+  "templateCard": {
+    "generate": "Generieren",
+    "generateAriaLabel": "Anschreiben generieren mit {{name}}",
+    "confirmDelete": "Wirklich löschen?",
+    "confirmYes": "Ja",
+    "confirmNo": "Nein",
+    "deleteAriaLabel": "Vorlage {{name}} löschen"
+  },
+  "generateModal": {
+    "ariaLabel": "Anschreiben generieren mit Vorlage: {{name}}",
+    "title": "Anschreiben generieren",
+    "close": "Schließen",
+    "templateInfo": "Vorlage: <strong>{{name}}</strong> ({{count}} Platzhalter)",
+    "jobLabel": "Stelle *",
+    "jobAriaLabel": "Stelle auswählen",
+    "jobPlaceholder": "— Stelle wählen —",
+    "jobOption": "{{title}} – {{company}}",
+    "cvLabel": "Lebenslauf (optional)",
+    "cvAriaLabel": "Lebenslauf auswählen",
+    "cvPlaceholder": "— Kein CV —",
+    "toneLabel": "KI-Ton",
+    "modelLabel": "KI-Modell",
+    "modelAriaLabel": "KI-Modell",
+    "cancel": "Abbrechen",
+    "generating": "KI generiert...",
+    "generate": "DOCX generieren & herunterladen",
+    "selectJobError": "Bitte eine Stelle auswählen",
+    "genericError": "Fehler bei der Generierung"
+  }
+}

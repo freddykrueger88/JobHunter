@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation, Trans } from 'react-i18next'
 import axios from 'axios'
 import {
   FileText, Upload, Trash2, Download, Loader2, Info, Plus, X,
   Wand2, ChevronDown, ChevronUp, AlertCircle,
 } from 'lucide-react'
 import clsx from 'clsx'
+import { formatDate } from '../lib/formatDate'
 
 /* ─── Types ──────────────────────────────────────────────────── */
 
@@ -58,23 +60,19 @@ const api = {
 
 /* ─── Constants ──────────────────────────────────────────────── */
 
-const TONES = [
-  { value: 'formell', label: '👔 Formell' },
-  { value: 'direkt',  label: '⚡ Direkt' },
-  { value: 'modern',  label: '✨ Modern' },
-  { value: 'kreativ', label: '🎨 Kreativ' },
-]
+const TONE_VALUES = ['formell', 'direkt', 'modern', 'kreativ'] as const
 
 /* ─── UploadZone ─────────────────────────────────────────────── */
 
 function UploadZone({ onUpload }: { onUpload: (file: File, name: string) => void }) {
+  const { t } = useTranslation('templates')
   const [dragOver, setDragOver] = useState(false)
   const [name, setName] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleFile = (file: File) => {
     if (!file.name.toLowerCase().endsWith('.docx')) {
-      alert('Nur .docx-Dateien erlaubt')
+      alert(t('uploadZone.invalidFileType'))
       return
     }
     setSelectedFile(file)
@@ -110,14 +108,14 @@ function UploadZone({ onUpload }: { onUpload: (file: File, name: string) => void
         onClick={() => document.getElementById('template-file-input')?.click()}
         role="button"
         tabIndex={0}
-        aria-label="DOCX-Vorlage hochladen – klicken oder Datei hierher ziehen"
+        aria-label={t('uploadZone.ariaLabel')}
         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('template-file-input')?.click() }}
       >
         <Upload size={32} className="mx-auto mb-2 text-gray-400" aria-hidden />
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {selectedFile
             ? <><FileText size={14} className="inline mr-1" aria-hidden />{selectedFile.name}</>
-            : 'DOCX-Datei hierher ziehen oder klicken zum Auswählen'
+            : t('uploadZone.dropHint')
           }
         </p>
         <input
@@ -132,26 +130,26 @@ function UploadZone({ onUpload }: { onUpload: (file: File, name: string) => void
       {selectedFile && (
         <div className="flex gap-2 items-end">
           <div className="flex-1">
-            <label className="text-xs text-gray-500 block mb-1">Vorlagenname</label>
+            <label className="text-xs text-gray-500 block mb-1">{t('uploadZone.nameLabel')}</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="z.B. Meine Bewerbungsvorlage"
-              aria-label="Name der Vorlage"
+              placeholder={t('uploadZone.namePlaceholder')}
+              aria-label={t('uploadZone.nameAriaLabel')}
             />
           </div>
           <button
             onClick={handleSubmit}
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
-            <Plus size={15} aria-hidden /> Hochladen
+            <Plus size={15} aria-hidden /> {t('uploadZone.upload')}
           </button>
           <button
             onClick={() => { setSelectedFile(null); setName('') }}
             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-            aria-label="Abbrechen"
+            aria-label={t('uploadZone.cancelAriaLabel')}
           >
             <X size={18} />
           </button>
@@ -164,6 +162,7 @@ function UploadZone({ onUpload }: { onUpload: (file: File, name: string) => void
 /* ─── PlaceholderHint ────────────────────────────────────────── */
 
 function PlaceholderHint({ placeholders }: { placeholders: PlaceholderInfo[] }) {
+  const { t } = useTranslation('templates')
   const [open, setOpen] = useState(false)
 
   return (
@@ -174,7 +173,7 @@ function PlaceholderHint({ placeholders }: { placeholders: PlaceholderInfo[] }) 
         aria-expanded={open}
       >
         <Info size={16} aria-hidden />
-        Verfügbare Platzhalter
+        {t('placeholderHint.title')}
         {open ? <ChevronUp size={14} className="ml-auto" /> : <ChevronDown size={14} className="ml-auto" />}
       </button>
       {open && (
@@ -202,6 +201,7 @@ function GenerateModal({
   template: Template
   onClose: () => void
 }) {
+  const { t } = useTranslation('templates')
   const [jobId, setJobId] = useState<number | ''>('')
   const [cvId, setCvId] = useState<number | ''>('')
   const [tone, setTone] = useState('formell')
@@ -213,7 +213,7 @@ function GenerateModal({
 
   const generateMutation = useMutation({
     mutationFn: () => {
-      if (!jobId) throw new Error('Bitte eine Stelle auswählen')
+      if (!jobId) throw new Error(t('generateModal.selectJobError'))
       return api.generateDoc(template.id, jobId as number, cvId || null, tone, model)
     },
     onSuccess: (res) => {
@@ -233,7 +233,7 @@ function GenerateModal({
     },
     onError: (err: unknown) => {
       const detail = axios.isAxiosError(err) ? err.response?.data?.detail : undefined
-      setError(detail || (err instanceof Error ? err.message : 'Fehler bei der Generierung'))
+      setError(detail || (err instanceof Error ? err.message : t('generateModal.genericError')))
     },
   })
 
@@ -243,37 +243,41 @@ function GenerateModal({
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
       role="dialog"
       aria-modal="true"
-      aria-label={`Anschreiben generieren mit Vorlage: ${template.name}`}
+      aria-label={t('generateModal.ariaLabel', { name: template.name })}
     >
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Wand2 size={18} aria-hidden />
-            Anschreiben generieren
+            {t('generateModal.title')}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" aria-label="Schließen">
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" aria-label={t('generateModal.close')}>
             <X size={18} />
           </button>
         </div>
 
         <p className="text-sm text-gray-500">
-          Vorlage: <strong>{template.name}</strong> ({template.placeholders.length} Platzhalter)
+          <Trans
+            i18nKey="templates:generateModal.templateInfo"
+            values={{ name: template.name, count: template.placeholders.length }}
+            components={{ strong: <strong /> }}
+          />
         </p>
 
         {/* Stelle wählen */}
         <div>
-          <label className="text-sm text-gray-500 block mb-1">Stelle *</label>
+          <label className="text-sm text-gray-500 block mb-1">{t('generateModal.jobLabel')}</label>
           <select
             value={jobId}
             onChange={e => setJobId(e.target.value ? Number(e.target.value) : '')}
             className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Stelle auswählen"
+            aria-label={t('generateModal.jobAriaLabel')}
             required
           >
-            <option value="">— Stelle wählen —</option>
+            <option value="">{t('generateModal.jobPlaceholder')}</option>
             {jobs.map((j: Job) => (
               <option key={j.id} value={j.id}>
-                {j.title} – {j.company}
+                {t('generateModal.jobOption', { title: j.title, company: j.company })}
               </option>
             ))}
           </select>
@@ -281,14 +285,14 @@ function GenerateModal({
 
         {/* CV wählen */}
         <div>
-          <label className="text-sm text-gray-500 block mb-1">Lebenslauf (optional)</label>
+          <label className="text-sm text-gray-500 block mb-1">{t('generateModal.cvLabel')}</label>
           <select
             value={cvId}
             onChange={e => setCvId(e.target.value ? Number(e.target.value) : '')}
             className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Lebenslauf auswählen"
+            aria-label={t('generateModal.cvAriaLabel')}
           >
-            <option value="">— Kein CV —</option>
+            <option value="">{t('generateModal.cvPlaceholder')}</option>
             {cvs.map((c: CV) => (
               <option key={c.id} value={c.id}>
                 {c.full_name || c.filename}
@@ -299,21 +303,21 @@ function GenerateModal({
 
         {/* Ton */}
         <div>
-          <label className="text-sm text-gray-500 block mb-1">KI-Ton</label>
+          <label className="text-sm text-gray-500 block mb-1">{t('generateModal.toneLabel')}</label>
           <div className="flex gap-2 flex-wrap">
-            {TONES.map(t => (
+            {TONE_VALUES.map(value => (
               <button
-                key={t.value}
-                onClick={() => setTone(t.value)}
+                key={value}
+                onClick={() => setTone(value)}
                 className={clsx(
                   'text-sm px-3 py-1 rounded-full border transition-colors',
-                  tone === t.value
+                  tone === value
                     ? 'bg-blue-600 text-white border-blue-600'
                     : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700',
                 )}
-                aria-pressed={tone === t.value}
+                aria-pressed={tone === value}
               >
-                {t.label}
+                {t(`tones.${value}`)}
               </button>
             ))}
           </div>
@@ -321,14 +325,14 @@ function GenerateModal({
 
         {/* KI-Modell */}
         <div>
-          <label className="text-sm text-gray-500 block mb-1">KI-Modell</label>
+          <label className="text-sm text-gray-500 block mb-1">{t('generateModal.modelLabel')}</label>
           <input
             type="text"
             value={model}
             onChange={e => setModel(e.target.value)}
             className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="mistral"
-            aria-label="KI-Modell"
+            aria-label={t('generateModal.modelAriaLabel')}
           />
         </div>
 
@@ -343,7 +347,7 @@ function GenerateModal({
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            Abbrechen
+            {t('generateModal.cancel')}
           </button>
           <button
             onClick={() => generateMutation.mutate()}
@@ -351,8 +355,8 @@ function GenerateModal({
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             {generateMutation.isPending
-              ? <><Loader2 size={15} className="animate-spin" aria-hidden /> KI generiert...</>
-              : <><Download size={15} aria-hidden /> DOCX generieren &amp; herunterladen</>
+              ? <><Loader2 size={15} className="animate-spin" aria-hidden /> {t('generateModal.generating')}</>
+              : <><Download size={15} aria-hidden /> {t('generateModal.generate')}</>
             }
           </button>
         </div>
@@ -372,6 +376,7 @@ function TemplateCard({
   onDelete: (id: number) => void
   onGenerate: (t: Template) => void
 }) {
+  const { t, i18n } = useTranslation('templates')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
@@ -385,7 +390,7 @@ function TemplateCard({
           </div>
         </div>
         <span className="text-xs text-gray-400">
-          {new Date(template.created_at).toLocaleDateString('de-DE')}
+          {formatDate(template.created_at, i18n.language)}
         </span>
       </div>
 
@@ -408,32 +413,32 @@ function TemplateCard({
         <button
           onClick={() => onGenerate(template)}
           className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-          aria-label={`Anschreiben generieren mit ${template.name}`}
+          aria-label={t('templateCard.generateAriaLabel', { name: template.name })}
         >
-          <Wand2 size={13} aria-hidden /> Generieren
+          <Wand2 size={13} aria-hidden /> {t('templateCard.generate')}
         </button>
 
         {confirmDelete ? (
           <div className="flex items-center gap-1 ml-auto">
-            <span className="text-xs text-red-500">Wirklich löschen?</span>
+            <span className="text-xs text-red-500">{t('templateCard.confirmDelete')}</span>
             <button
               onClick={() => { onDelete(template.id); setConfirmDelete(false) }}
               className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
             >
-              Ja
+              {t('templateCard.confirmYes')}
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
               className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
             >
-              Nein
+              {t('templateCard.confirmNo')}
             </button>
           </div>
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
             className="ml-auto p-1.5 text-gray-400 hover:text-red-500 rounded transition-colors"
-            aria-label={`Vorlage ${template.name} löschen`}
+            aria-label={t('templateCard.deleteAriaLabel', { name: template.name })}
           >
             <Trash2 size={14} />
           </button>
@@ -446,6 +451,7 @@ function TemplateCard({
 /* ─── Main Page ──────────────────────────────────────────────── */
 
 export default function Templates() {
+  const { t } = useTranslation('templates')
   const queryClient = useQueryClient()
   const [generateTarget, setGenerateTarget] = useState<Template | null>(null)
 
@@ -474,10 +480,10 @@ export default function Templates() {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
-          <FileText size={24} aria-hidden /> Anschreiben-Vorlagen
+          <FileText size={24} aria-hidden /> {t('heading')}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Lade deine eigene DOCX-Vorlage mit Platzhaltern hoch. Die KI befüllt sie automatisch für jede Stelle.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -486,45 +492,47 @@ export default function Templates() {
 
       {/* Upload */}
       <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-2">Vorlage hochladen</h3>
+        <h3 className="text-sm font-medium text-gray-500 mb-2">{t('uploadSectionTitle')}</h3>
         <UploadZone onUpload={(file, name) => uploadMutation.mutate({ file, name })} />
         {uploadMutation.isPending && (
           <p className="text-sm text-blue-500 mt-2 flex items-center gap-1">
-            <Loader2 size={14} className="animate-spin" /> Wird hochgeladen...
+            <Loader2 size={14} className="animate-spin" /> {t('uploading')}
           </p>
         )}
         {uploadMutation.isError && (
           <p className="text-sm text-red-500 mt-2 flex items-center gap-1">
-            <AlertCircle size={14} /> Fehler beim Hochladen: {(axios.isAxiosError(uploadMutation.error) ? uploadMutation.error.response?.data?.detail : undefined) || 'Unbekannter Fehler'}
+            <AlertCircle size={14} /> {t('uploadError', {
+              detail: (axios.isAxiosError(uploadMutation.error) ? uploadMutation.error.response?.data?.detail : undefined) || t('uploadErrorUnknown'),
+            })}
           </p>
         )}
         {uploadMutation.isSuccess && (
-          <p className="text-sm text-green-600 mt-2">✓ Vorlage erfolgreich hochgeladen!</p>
+          <p className="text-sm text-green-600 mt-2">{t('uploadSuccess')}</p>
         )}
       </div>
 
       {/* Template List */}
       <div>
         <h3 className="text-sm font-medium text-gray-500 mb-3">
-          Meine Vorlagen ({templates.length})
+          {t('myTemplates', { count: templates.length })}
         </h3>
 
         {isLoading ? (
           <div className="flex items-center gap-2 text-gray-400 py-8 justify-center">
-            <Loader2 size={18} className="animate-spin" /> Vorlagen werden geladen...
+            <Loader2 size={18} className="animate-spin" /> {t('loadingTemplates')}
           </div>
         ) : templates.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <FileText size={40} className="mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Noch keine Vorlagen vorhanden.</p>
-            <p className="text-xs mt-1">Lade eine DOCX-Datei mit Platzhaltern hoch, um loszulegen.</p>
+            <p className="text-sm">{t('emptyTitle')}</p>
+            <p className="text-xs mt-1">{t('emptySubtitle')}</p>
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
-            {templates.map(t => (
+            {templates.map(tpl => (
               <TemplateCard
-                key={t.id}
-                template={t}
+                key={tpl.id}
+                template={tpl}
                 onDelete={id => deleteMutation.mutate(id)}
                 onGenerate={setGenerateTarget}
               />

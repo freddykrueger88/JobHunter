@@ -14,14 +14,22 @@ router = APIRouter(prefix="/cover-letters", tags=["Anschreiben"])
 
 def _build_pdf(content: str, sender_name: str = "", sender_address: str = "",
                company: str = "", job_title: str = "") -> bytes:
-    """Erstellt ein DIN-5008-nahes PDF mit reportlab."""
+    """Erstellt ein DIN-5008-konformes PDF (Fassung März 2020) mit reportlab.
+
+    Umgesetzte Vorgaben:
+    - Seitenränder: 2,5cm links, 2cm rechts/oben/unten.
+    - Anschriftfeld beginnt 45mm ab Blattoberkante (DIN 5008: 44,7mm
+      allgemein, 62,7mm bei Fensterbriefumschlägen – hier der Normalwert).
+    - Datum rechtsbündig.
+    - Je 2 Leerzeilen zwischen Anschrift→Datum, Datum→Betreff, Betreff→Anrede;
+      1 Leerzeile zwischen Anrede und Fließtext.
+    - Betreff fett, ohne das Wort "Betreff:" (aktuelle Fassung seit 2011).
+    """
     from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import cm
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import cm, mm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.lib.enums import TA_LEFT
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.enums import TA_LEFT, TA_RIGHT
     import datetime
 
     buf = io.BytesIO()
@@ -30,46 +38,72 @@ def _build_pdf(content: str, sender_name: str = "", sender_address: str = "",
         leftMargin=2.5*cm, rightMargin=2*cm,
         topMargin=2*cm, bottomMargin=2*cm,
     )
-    styles = getSampleStyleSheet()
     normal = ParagraphStyle(
-        "Normal", parent=styles["Normal"],
-        fontName="Helvetica", fontSize=11, leading=16, alignment=TA_LEFT,
+        "Normal", fontName="Helvetica", fontSize=11, leading=15.5, alignment=TA_LEFT,
     )
-    small = ParagraphStyle(
-        "Small", parent=normal, fontSize=9, textColor="#666666",
-    )
-    bold = ParagraphStyle(
-        "Bold", parent=normal, fontName="Helvetica-Bold",
-    )
+    right = ParagraphStyle("Right", parent=normal, alignment=TA_RIGHT)
+    small = ParagraphStyle("Small", parent=normal, fontSize=9, textColor="#666666")
 
+    blank_line = Spacer(1, normal.leading)
     story = []
 
-    # Absenderzeile
+    # Anschriftfeld beginnt 45mm ab Blattoberkante (DIN 5008); topMargin
+    # deckt davon bereits 2cm ab, dazu kommt reportlabs Standard-Frame-
+    # Padding von 6pt, der Rest wird per Spacer aufgefüllt.
+    story.append(Spacer(1, 45*mm - doc.topMargin - 6))
+
+    # Rücksendeangabe (kleine Absenderzeile über der Empfängeradresse)
     if sender_name:
-        story.append(Paragraph(sender_name, bold))
+        story.append(Paragraph(sender_name, small))
     if sender_address:
         story.append(Paragraph(sender_address.replace("\n", "<br/>"), small))
-        story.append(Spacer(1, 0.5*cm))
 
     # Empfänger
     if company:
         story.append(Paragraph(company, normal))
-        story.append(Paragraph("z. Hd. Personalabteilung", small))
-        story.append(Spacer(1, 0.5*cm))
+        story.append(Paragraph("z. Hd. Personalabteilung", normal))
 
-    # Datum
-    story.append(Paragraph(datetime.date.today().strftime("%d.%m.%Y"), normal))
-    story.append(Spacer(1, 0.3*cm))
+    # 2 Leerzeilen zwischen Anschrift und Datum
+    story.append(blank_line)
+    story.append(blank_line)
 
-    # Betreff
+    # Datum, rechtsbündig
+    story.append(Paragraph(datetime.date.today().strftime("%d.%m.%Y"), right))
+
+    # 2 Leerzeilen zwischen Datum und Betreff
+    story.append(blank_line)
+    story.append(blank_line)
+
+    # Betreff (fett, ohne Präfix "Betreff:")
     if job_title:
         story.append(Paragraph(f"<b>Bewerbung als {job_title}</b>", normal))
-        story.append(Spacer(1, 0.5*cm))
 
-    # Fließtext (Zeilenumbrüche erhalten)
-    for line in content.split("\n"):
-        line = line.strip()
-        story.append(Paragraph(line if line else "&nbsp;", normal))
+    # 2 Leerzeilen zwischen Betreff und Anrede
+    story.append(blank_line)
+    story.append(blank_line)
+
+    # Fließtext in Absätze gruppieren (durch Leerzeilen getrennte Blöcke).
+    # Erster Block = Anrede, danach exakt 1 Leerzeile (DIN 5008), restliche
+    # Absätze durch je 1 Leerzeile getrennt.
+    raw_lines = [line.strip() for line in content.replace("\r\n", "\n").strip().split("\n")]
+    blocks: list[list[str]] = []
+    current: list[str] = []
+    for line in raw_lines:
+        if line:
+            current.append(line)
+        elif current:
+            blocks.append(current)
+            current = []
+    if current:
+        blocks.append(current)
+    if not blocks:
+        blocks = [[""]]
+
+    for i, block in enumerate(blocks):
+        for line in block:
+            story.append(Paragraph(line, normal))
+        if i < len(blocks) - 1:
+            story.append(blank_line)
 
     doc.build(story)
     buf.seek(0)

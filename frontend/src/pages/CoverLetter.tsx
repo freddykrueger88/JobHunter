@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
-import { Wand2, Copy, Download, Loader2 } from 'lucide-react'
+import { Wand2, Copy, Download, FileDown, Loader2 } from 'lucide-react'
 
 const TONE_VALUES = ['formell', 'direkt', 'modern', 'kreativ'] as const
 
@@ -11,7 +11,9 @@ export default function CoverLetter({ jobId, cvId }: { jobId?: number; cvId?: nu
   const [tone, setTone] = useState('formell')
   const [template, setTemplate] = useState('')
   const [result, setResult] = useState('')
+  const [coverLetterId, setCoverLetterId] = useState<number | null>(null)
   const [copied, setCopied] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
 
   const generateMutation = useMutation({
     mutationFn: () => axios.post('/api/ai/generate-cover-letter', {
@@ -20,7 +22,10 @@ export default function CoverLetter({ jobId, cvId }: { jobId?: number; cvId?: nu
       tone,
       template_text: template || null,
     }),
-    onSuccess: (res) => setResult(res.data.content),
+    onSuccess: (res) => {
+      setResult(res.data.content)
+      setCoverLetterId(res.data.id)
+    },
   })
 
   const handleCopy = () => {
@@ -37,6 +42,26 @@ export default function CoverLetter({ jobId, cvId }: { jobId?: number; cvId?: nu
     a.download = 'anschreiben.txt'
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const handleDownloadPdf = async () => {
+    if (!coverLetterId) return
+    setPdfLoading(true)
+    try {
+      const res = await axios.post(
+        `/api/cover-letters/${coverLetterId}/pdf`,
+        { content: result },
+        { responseType: 'blob' },
+      )
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `anschreiben_${coverLetterId}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setPdfLoading(false)
+    }
   }
 
   return (
@@ -102,6 +127,17 @@ export default function CoverLetter({ jobId, cvId }: { jobId?: number; cvId?: nu
               <button onClick={handleDownload} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
                 <Download size={13} aria-hidden /> {t('download')}
               </button>
+              {coverLetterId && (
+                <button
+                  onClick={handleDownloadPdf}
+                  disabled={pdfLoading}
+                  className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 disabled:opacity-50"
+                >
+                  {pdfLoading
+                    ? <Loader2 size={13} className="animate-spin" aria-hidden />
+                    : <FileDown size={13} aria-hidden />} {t('downloadPdf')}
+                </button>
+              )}
             </div>
           </div>
           <textarea

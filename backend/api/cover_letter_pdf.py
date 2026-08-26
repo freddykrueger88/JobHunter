@@ -1,6 +1,7 @@
 """PDF-Export für generierte Anschreiben."""
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.models.cover_letter import CoverLetter
@@ -9,7 +10,16 @@ from backend.models.job import Job
 from backend.models.cv import CVData
 import io
 
-router = APIRouter(prefix="/cover-letters", tags=["Anschreiben"])
+router = APIRouter(prefix="/api/cover-letters", tags=["Anschreiben"])
+
+
+class PdfDownloadRequest(BaseModel):
+    """Optionaler, im Frontend nachtraeglich editierter Anschreiben-Text.
+
+    Ohne Angabe wird der urspruenglich generierte, in der DB gespeicherte
+    Text verwendet (cl.content).
+    """
+    content: str | None = None
 
 
 def _build_pdf(content: str, sender_name: str = "", sender_address: str = "",
@@ -110,11 +120,17 @@ def _build_pdf(content: str, sender_name: str = "", sender_address: str = "",
     return buf.read()
 
 
-@router.get("/{cl_id}/pdf")
-async def download_pdf(cl_id: int, db: AsyncSession = Depends(get_db)):
+@router.post("/{cl_id}/pdf")
+async def download_pdf(
+    cl_id: int,
+    body: PdfDownloadRequest | None = None,
+    db: AsyncSession = Depends(get_db),
+):
     cl = await db.get(CoverLetter, cl_id)
     if not cl:
         raise HTTPException(status_code=404, detail="Anschreiben nicht gefunden")
+
+    content = (body.content if body and body.content else None) or cl.content
 
     sender_name = ""
     sender_address = ""
@@ -138,7 +154,7 @@ async def download_pdf(cl_id: int, db: AsyncSession = Depends(get_db)):
                 sender_name = cv.full_name or ""
                 sender_address = cv.address or ""
 
-    pdf_bytes = _build_pdf(cl.content, sender_name, sender_address, company, job_title)
+    pdf_bytes = _build_pdf(content, sender_name, sender_address, company, job_title)
     filename = f"anschreiben_{cl_id}.pdf"
     return StreamingResponse(
         io.BytesIO(pdf_bytes),

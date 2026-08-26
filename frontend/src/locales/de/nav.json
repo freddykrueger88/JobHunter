@@ -6,5 +6,8 @@
   "history": "Verlauf",
   "settings": "Einstellungen",
   "templates": "Vorlagen",
-  "profile": "Profil"
+  "profile": "Profil",
+  "searchProfiles": "Suchprofile",
+  "interviewSimulator": "Interview-Training",
+  "companyDossier": "Firmen-Check"
 }

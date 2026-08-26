@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutDashboard, Search, KanbanSquare, History, Settings, Bell, Bot, FileText, User } from 'lucide-react'
+import { LayoutDashboard, Search, KanbanSquare, History, Settings, Bell, Bot, FileText, User, Radar, Mic, Building2 } from 'lucide-react'
 import clsx from 'clsx'
 import CoachChatDrawer from './CoachChatDrawer'
 
 const navItems = [
-  { to: '/',          icon: LayoutDashboard, key: 'dashboard' },
-  { to: '/jobs',      icon: Search,          key: 'jobs' },
-  { to: '/kanban',    icon: KanbanSquare,    key: 'kanban' },
-  { to: '/reminders', icon: Bell,            key: 'reminders' },
-  { to: '/templates', icon: FileText,        key: 'templates' },
-  { to: '/history',   icon: History,         key: 'history' },
-  { to: '/profile',   icon: User,            key: 'profile' },
-  { to: '/settings',  icon: Settings,        key: 'settings' },
+  { to: '/',                    icon: LayoutDashboard, key: 'dashboard' },
+  { to: '/jobs',                icon: Search,          key: 'jobs' },
+  { to: '/search-profiles',     icon: Radar,           key: 'searchProfiles' },
+  { to: '/kanban',              icon: KanbanSquare,    key: 'kanban' },
+  { to: '/interview-simulator', icon: Mic,             key: 'interviewSimulator' },
+  { to: '/company-dossier',     icon: Building2,       key: 'companyDossier' },
+  { to: '/reminders',           icon: Bell,            key: 'reminders' },
+  { to: '/templates',           icon: FileText,        key: 'templates' },
+  { to: '/history',             icon: History,         key: 'history' },
+  { to: '/profile',             icon: User,            key: 'profile' },
+  { to: '/settings',            icon: Settings,        key: 'settings' },
 ]
 
 export default function TopNav() {
@@ -29,7 +32,7 @@ export default function TopNav() {
       >
         <span className="text-xl font-bold text-white select-none">🎯 JobHunter</span>
 
-        <ul className="flex gap-1" role="menubar">
+        <ul className="flex flex-wrap gap-1" role="menubar">
           {navItems.map(({ to, icon: Icon, key }) => (
             <li key={key} role="none">
               <NavLink

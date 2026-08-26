@@ -1,0 +1,18 @@
+{
+  "analysisTitle": "Salary & Work Model",
+  "skillGapTitle": "Skill Gap (CV vs. Job)",
+  "analyze": "Analyze",
+  "analyzing": "Analyzing…",
+  "analysisError": "Analysis failed – is a job description available?",
+  "salary": "Salary: {{min}} – {{max}} EUR",
+  "workModel": "Work model: {{model}}",
+  "workModels": {
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+    "vor-ort": "On-site",
+    "unbekannt": "unknown"
+  },
+  "matchScore": "match",
+  "skillGapNoCv": "No CV with extracted text found – please upload a CV first.",
+  "skillGapGenericError": "Could not determine a skill gap analysis."
+}

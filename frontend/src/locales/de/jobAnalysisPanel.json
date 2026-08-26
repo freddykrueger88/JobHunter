@@ -1,0 +1,18 @@
+{
+  "analysisTitle": "Gehalt & Arbeitsmodell",
+  "skillGapTitle": "Skill-Gap (CV vs. Stelle)",
+  "analyze": "Analysieren",
+  "analyzing": "Analysiere…",
+  "analysisError": "Analyse fehlgeschlagen – ist eine Stellenbeschreibung vorhanden?",
+  "salary": "Gehalt: {{min}} – {{max}} €",
+  "workModel": "Arbeitsmodell: {{model}}",
+  "workModels": {
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+    "vor-ort": "Vor Ort",
+    "unbekannt": "unbekannt"
+  },
+  "matchScore": "Match",
+  "skillGapNoCv": "Kein Lebenslauf mit Originaltext vorhanden – bitte zuerst einen CV hochladen.",
+  "skillGapGenericError": "Skill-Gap-Analyse konnte nicht ermittelt werden."
+}

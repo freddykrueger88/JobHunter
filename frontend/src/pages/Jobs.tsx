@@ -6,6 +6,7 @@ import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X } f
 import clsx from 'clsx'
 import ImageJobUpload from '../components/ImageJobUpload'
 import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
+import JobAnalysisPanel from '../components/JobAnalysisPanel'
 
 interface Job {
   id: number
@@ -217,6 +218,9 @@ export default function Jobs() {
           </div>
           <div className="mt-3">
             <DuplicateJobsPanel jobId={selectedJob.id} />
+          </div>
+          <div className="mt-3">
+            <JobAnalysisPanel jobId={selectedJob.id} />
           </div>
         </aside>
       )}

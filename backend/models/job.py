@@ -1,4 +1,4 @@
-from sqlalchemy import String, Text, DateTime, Boolean, Float
+from sqlalchemy import String, Text, DateTime, Boolean, Float, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from backend.core.database import Base
@@ -26,5 +26,14 @@ class Job(Base):
     published_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
+
+    # Ergebnisse der KI-Stellenanalyse (backend/services/job_analyzer.py)
+    salary_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    work_model: Mapped[str | None] = mapped_column(String(20), nullable=True)  # remote, hybrid, vor-ort, unbekannt
+    tags: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON-codierte Liste
+    # Ergebnis der KI-Skill-Gap-Analyse (backend/services/skill_gap.py)
+    skill_gap_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    skill_gap_json: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     applications: Mapped[list["Application"]] = relationship(back_populates="job", cascade="all, delete-orphan")

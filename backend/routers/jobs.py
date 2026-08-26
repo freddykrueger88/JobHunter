@@ -10,6 +10,8 @@ from backend.schemas.job import JobCreate, JobRead
 from backend.schemas.culture_match import CultureMatchResult
 from backend.services.job_search.aggregator import search_all_sources
 from backend.services.culture_match import analyze_culture_match
+from backend.services.ai_client import get_ai_client
+from backend.models.cv import CVData
 import re
 
 router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
@@ -185,3 +187,39 @@ async def job_duplicates(job_id: int, db: AsyncSession = Depends(get_db)):
     if not job:
         raise HTTPException(status_code=404, detail="Stelle nicht gefunden")
     return await find_duplicates(job_id, db)
+
+
+@router.post("/{job_id}/analyze", response_model=JobRead)
+async def analyze_job_endpoint(
+    job_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI extrahiert Gehaltsspanne/Arbeitsmodell/Tags aus der Stellenbeschreibung."""
+    from backend.services.job_analyzer import analyze_job
+
+    try:
+        await analyze_job(job_id, db, ai_client)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return await db.get(Job, job_id)
+
+
+@router.post("/{job_id}/skill-gap")
+async def skill_gap_endpoint(
+    job_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI vergleicht den zuletzt hochgeladenen Lebenslauf mit der Stellenbeschreibung."""
+    from backend.services.skill_gap import analyze_skill_gap
+
+    cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+    cv = cv_result.scalar_one_or_none()
+    if not cv or not cv.raw_text:
+        raise HTTPException(status_code=400, detail="Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.")
+
+    try:
+        return await analyze_skill_gap(job_id, cv.raw_text, db, ai_client)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

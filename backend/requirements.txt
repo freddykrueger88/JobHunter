@@ -22,6 +22,9 @@ python-docx==1.1.2
 beautifulsoup4==4.15.0
 lxml==5.2.2
 
+# Excel-Export (#65)
+openpyxl==3.1.5
+
 # PDF-Generierung
 reportlab==4.2.2
 

@@ -8,6 +8,7 @@ from backend.core.database import get_db
 from backend.models.application import Application
 from backend.models.job import Job
 from backend.models.history import HistoryEntry
+from backend.schemas.application import ApplicationBase, ApplicationRead
 from backend.services.auto_apply import build_application_zip
 import io
 
@@ -34,7 +35,7 @@ class FollowUpUpdate(BaseModel):
     followup_at: datetime | None = None
 
 
-@router.get("/")
+@router.get("/", response_model=list[ApplicationRead])
 async def list_applications(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Application).order_by(Application.created_at.desc()))
     apps = result.scalars().all()
@@ -42,12 +43,12 @@ async def list_applications(db: AsyncSession = Depends(get_db)):
     for a in apps:
         job = await db.get(Job, a.job_id)
         d = {c.name: getattr(a, c.name) for c in a.__table__.columns}
-        d["job"] = {"title": job.title, "company": job.company, "location": job.location} if job else None
+        d["job"] = {"title": job.title, "company": job.company, "city": job.city} if job else None
         out.append(d)
     return out
 
 
-@router.post("/")
+@router.post("/", response_model=ApplicationBase)
 async def create_application(data: ApplicationCreate, db: AsyncSession = Depends(get_db)):
     app = Application(**data.model_dump())
     db.add(app)
@@ -61,18 +62,18 @@ async def create_application(data: ApplicationCreate, db: AsyncSession = Depends
     return app
 
 
-@router.get("/{app_id}")
+@router.get("/{app_id}", response_model=ApplicationRead)
 async def get_application(app_id: int, db: AsyncSession = Depends(get_db)):
     app = await db.get(Application, app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Nicht gefunden")
     job = await db.get(Job, app.job_id)
     d = {c.name: getattr(app, c.name) for c in app.__table__.columns}
-    d["job"] = {"title": job.title, "company": job.company, "location": job.location} if job else None
+    d["job"] = {"title": job.title, "company": job.company, "city": job.city} if job else None
     return d
 
 
-@router.patch("/{app_id}")
+@router.patch("/{app_id}", response_model=ApplicationBase)
 async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSession = Depends(get_db)):
     app = await db.get(Application, app_id)
     if not app:

@@ -74,7 +74,7 @@ async def build_application_zip(application_id: int, db: AsyncSession) -> tuple[
         }
         if job:
             meta["stellenbeschreibung_url"] = job.url or ""
-            meta["ort"] = job.location or ""
+            meta["ort"] = job.city or ""
             meta["kontakt"] = job.contact_person or ""
         zf.writestr("bewerbung_meta.json", json.dumps(meta, ensure_ascii=False, indent=2))
 

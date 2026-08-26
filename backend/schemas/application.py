@@ -1,40 +1,30 @@
-from pydantic import BaseModel
 from datetime import datetime
 
-APPLICATION_STATUSES = [
-    "interessant",
-    "beworben",
-    "interview",
-    "angenommen",
-    "absage",
-    "archiviert",
-]
+from pydantic import BaseModel
+
+
+class ApplicationJobInfo(BaseModel):
+    title: str
+    company: str
+    city: str | None = None
 
 
 class ApplicationBase(BaseModel):
-    job_id: int
-    status: str = "interessant"
-    notes: str | None = None
-    applied_at: datetime | None = None
-    interview_at: datetime | None = None
-    kanban_position: int = 0
-
-
-class ApplicationCreate(ApplicationBase):
-    pass
-
-
-class ApplicationUpdate(BaseModel):
-    status: str | None = None
-    notes: str | None = None
-    applied_at: datetime | None = None
-    interview_at: datetime | None = None
-    kanban_position: int | None = None
-
-
-class ApplicationRead(ApplicationBase):
     id: int
+    job_id: int
+    status: str
+    notes: str | None
+    applied_at: datetime | None
+    interview_at: datetime | None
+    kanban_position: int
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ApplicationRead(ApplicationBase):
+    """Wie ApplicationBase, aber mit eingebetteten Job-Kerninfos (list/get) -
+    create/update geben die reine ORM-Instanz zurueck, ohne die job-Relation
+    zu laden, deshalb dort ApplicationBase statt ApplicationRead."""
+    job: ApplicationJobInfo | None = None

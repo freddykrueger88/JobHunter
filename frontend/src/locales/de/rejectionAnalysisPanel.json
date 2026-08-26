@@ -1,0 +1,9 @@
+{
+  "title": "Absage-Analyse",
+  "subtitle": "Absage-Text einfügen, KI gibt Verbesserungsvorschläge",
+  "placeholder": "Text der Absage-E-Mail hier einfügen…",
+  "textareaAriaLabel": "Absage-Text",
+  "analyzing": "Analysiere…",
+  "analyze": "Analysieren",
+  "genericError": "Analyse konnte nicht ermittelt werden."
+}

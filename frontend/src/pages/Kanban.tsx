@@ -11,6 +11,7 @@ import AutoApplyButton from '../components/AutoApplyButton'
 import CultureMatchPanel from '../components/CultureMatchPanel'
 import CalendarExportButton from '../components/CalendarExportButton'
 import CoverLetterQualityPanel from '../components/CoverLetterQualityPanel'
+import RejectionAnalysisPanel from '../components/RejectionAnalysisPanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
@@ -488,6 +489,11 @@ export default function Kanban() {
 
                 {/* Anschreiben-Bewertung */}
                 <CoverLetterQualityPanel applicationId={detailApp.id} />
+
+                {/* Absage-Analyse - nur relevant bei Status "absage" */}
+                {detailApp.status === 'absage' && (
+                  <RejectionAnalysisPanel applicationId={detailApp.id} />
+                )}
 
                 {/* Status buttons */}
                 <div>

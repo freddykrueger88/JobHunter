@@ -1,0 +1,9 @@
+{
+  "title": "Rejection Analysis",
+  "subtitle": "Paste the rejection text, AI gives improvement suggestions",
+  "placeholder": "Paste the rejection email text here…",
+  "textareaAriaLabel": "Rejection text",
+  "analyzing": "Analyzing…",
+  "analyze": "Analyze",
+  "genericError": "Could not determine an analysis."
+}

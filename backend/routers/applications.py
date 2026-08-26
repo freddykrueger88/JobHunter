@@ -151,3 +151,23 @@ async def evaluate_cover_letter_endpoint(
         return await evaluate_cover_letter(app_id, db, ai_client)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+class RejectionAnalysisRequest(BaseModel):
+    rejection_text: str
+
+
+@router.post("/{app_id}/analyze-rejection")
+async def analyze_rejection_endpoint(
+    app_id: int,
+    data: RejectionAnalysisRequest,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI analysiert eine eingefuegte Absage im Kontext des Anschreibens."""
+    from backend.services.rejection_analyzer import analyze_rejection
+
+    try:
+        return await analyze_rejection(app_id, data.rejection_text, db, ai_client)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

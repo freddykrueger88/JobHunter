@@ -27,6 +27,7 @@ openpyxl==3.1.5
 
 # OCR-Foto-Upload
 pytesseract==0.3.13
+rapidfuzz==3.14.5
 
 # PDF-Generierung
 reportlab==4.2.2

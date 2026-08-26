@@ -1,0 +1,6 @@
+{
+  "title": "Similar Jobs",
+  "loading": "Searching…",
+  "none": "No similar jobs found.",
+  "similarity": "{{percent}}% similar"
+}

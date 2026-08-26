@@ -32,41 +32,40 @@ async def find_duplicates(job_id: int, db: AsyncSession) -> List[dict]:
 
     duplicates = []
     for other in all_jobs:
-        title_sim = _similarity(job.titel or '', other.titel or '')
-        firma_sim = _similarity(job.firma or '', other.firma or '')
-        ort_sim   = _similarity(job.ort   or '', other.ort   or '')
-        score = title_sim * 0.5 + firma_sim * 0.35 + ort_sim * 0.15
+        title_sim = _similarity(job.title or '', other.title or '')
+        company_sim = _similarity(job.company or '', other.company or '')
+        city_sim = _similarity(job.city or '', other.city or '')
+        score = title_sim * 0.5 + company_sim * 0.35 + city_sim * 0.15
         if score >= THRESHOLD:
             duplicates.append({
                 'id': other.id,
-                'titel': other.titel,
-                'firma': other.firma,
-                'ort': other.ort,
+                'title': other.title,
+                'company': other.company,
+                'city': other.city,
                 'similarity_score': round(score, 2),
-                'status': other.status,
-                'erstellt_am': other.erstellt_am,
+                'created_at': other.created_at,
             })
 
     return sorted(duplicates, key=lambda x: x['similarity_score'], reverse=True)
 
 
-async def check_before_create(titel: str, firma: str, ort: str, db: AsyncSession) -> List[dict]:
+async def check_before_create(title: str, company: str, city: str, db: AsyncSession) -> List[dict]:
     """Prueft vor dem Anlegen ob aehnliche Stellen existieren."""
     all_jobs_result = await db.execute(select(Job))
     all_jobs = all_jobs_result.scalars().all()
 
     duplicates = []
     for other in all_jobs:
-        title_sim = _similarity(titel or '', other.titel or '')
-        firma_sim = _similarity(firma or '', other.firma or '')
-        ort_sim   = _similarity(ort   or '', other.ort   or '')
-        score = title_sim * 0.5 + firma_sim * 0.35 + ort_sim * 0.15
+        title_sim = _similarity(title or '', other.title or '')
+        company_sim = _similarity(company or '', other.company or '')
+        city_sim = _similarity(city or '', other.city or '')
+        score = title_sim * 0.5 + company_sim * 0.35 + city_sim * 0.15
         if score >= THRESHOLD:
             duplicates.append({
                 'id': other.id,
-                'titel': other.titel,
-                'firma': other.firma,
-                'ort': other.ort,
+                'title': other.title,
+                'company': other.company,
+                'city': other.city,
                 'similarity_score': round(score, 2),
             })
     return sorted(duplicates, key=lambda x: x['similarity_score'], reverse=True)

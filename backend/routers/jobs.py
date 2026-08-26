@@ -174,3 +174,14 @@ async def culture_match(job_id: int, db: AsyncSession = Depends(get_db)):
         werte=profile.werte,
         model=model,
     )
+
+
+@router.get("/{job_id}/duplicates")
+async def job_duplicates(job_id: int, db: AsyncSession = Depends(get_db)):
+    """Findet aehnliche/moeglicherweise doppelte Stellen (Fuzzy-Matching)."""
+    from backend.services.duplicate_detection import find_duplicates
+
+    job = await db.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Stelle nicht gefunden")
+    return await find_duplicates(job_id, db)

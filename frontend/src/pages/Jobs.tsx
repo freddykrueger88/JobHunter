@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X } from 'lucide-react'
 import clsx from 'clsx'
 import ImageJobUpload from '../components/ImageJobUpload'
+import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
 
 interface Job {
   id: number
@@ -213,6 +214,9 @@ export default function Jobs() {
                 <EyeOff size={14} aria-hidden /> Ausblenden
               </button>
             </div>
+          </div>
+          <div className="mt-3">
+            <DuplicateJobsPanel jobId={selectedJob.id} />
           </div>
         </aside>
       )}

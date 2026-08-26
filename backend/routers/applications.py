@@ -10,6 +10,7 @@ from backend.models.job import Job
 from backend.models.history import HistoryEntry
 from backend.schemas.application import ApplicationBase, ApplicationRead
 from backend.services.auto_apply import build_application_zip
+from backend.services.ai_client import get_ai_client
 import io
 
 router = APIRouter(prefix="/api/applications", tags=["Bewerbungen"])
@@ -135,3 +136,18 @@ async def download_application_zip(app_id: int, db: AsyncSession = Depends(get_d
         media_type="application/zip",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.post("/{app_id}/evaluate-cover-letter")
+async def evaluate_cover_letter_endpoint(
+    app_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI bewertet das zuletzt generierte Anschreiben dieser Bewerbung."""
+    from backend.services.cover_letter_evaluator import evaluate_cover_letter
+
+    try:
+        return await evaluate_cover_letter(app_id, db, ai_client)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

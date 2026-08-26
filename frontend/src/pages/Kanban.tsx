@@ -10,6 +10,7 @@ import JobSearchDropdown, { type JobOption } from '../components/JobSearchDropdo
 import AutoApplyButton from '../components/AutoApplyButton'
 import CultureMatchPanel from '../components/CultureMatchPanel'
 import CalendarExportButton from '../components/CalendarExportButton'
+import CoverLetterQualityPanel from '../components/CoverLetterQualityPanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
@@ -484,6 +485,9 @@ export default function Kanban() {
 
                 {/* #75/G.3.10 - Kultur-Match (Phase H.4) */}
                 <CultureMatchPanel jobId={detailApp.job_id} />
+
+                {/* Anschreiben-Bewertung */}
+                <CoverLetterQualityPanel applicationId={detailApp.id} />
 
                 {/* Status buttons */}
                 <div>

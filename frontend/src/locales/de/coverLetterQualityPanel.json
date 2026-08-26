@@ -1,0 +1,9 @@
+{
+  "title": "Anschreiben-Qualität",
+  "subtitle": "KI bewertet das generierte Anschreiben",
+  "analyzing": "Analysiere…",
+  "analyze": "Bewerten",
+  "subscores": "Relevanz {{relevance}} · Ton {{tone}} · Struktur {{structure}}",
+  "noCoverLetter": "Noch kein Anschreiben für diese Bewerbung generiert.",
+  "genericError": "Bewertung konnte nicht ermittelt werden."
+}

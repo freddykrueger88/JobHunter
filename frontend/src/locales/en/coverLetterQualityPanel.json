@@ -1,0 +1,9 @@
+{
+  "title": "Cover Letter Quality",
+  "subtitle": "AI evaluates the generated cover letter",
+  "analyzing": "Analyzing…",
+  "analyze": "Evaluate",
+  "subscores": "Relevance {{relevance}} · Tone {{tone}} · Structure {{structure}}",
+  "noCoverLetter": "No cover letter generated yet for this application.",
+  "genericError": "Could not determine an evaluation."
+}

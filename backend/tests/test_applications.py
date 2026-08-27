@@ -144,3 +144,52 @@ class TestCreateAndUpdate:
 
         assert res.status_code == 200, res.text
         assert res.json()["interview_at"] is not None
+
+
+class TestTimeline:
+    """Bugfix-Sweep 2026-08-27: Kanban.tsx rief GET /api/applications/{id}/
+    timeline seit jeher fuer die Detail-Modal-Timeline auf - der Endpoint
+    existierte nie (404, still ignoriert da der Frontend-Query-Default ein
+    leeres Array ist). application_status_logs existierte als Modell ohne
+    Migration und ohne dass je etwas hineingeschrieben wurde."""
+
+    async def test_timeline_logs_initial_status_on_create(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        _, app_id = await _create_job_and_application(client, db)
+
+        res = await client.get(f"/api/applications/{app_id}/timeline")
+
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert len(body) == 1
+        assert body[0]["status"] == "interessant"
+
+    async def test_timeline_logs_status_changes_in_order(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        _, app_id = await _create_job_and_application(client, db)
+
+        await client.patch(f"/api/applications/{app_id}", json={"status": "beworben"})
+        await client.patch(f"/api/applications/{app_id}", json={"status": "interview"})
+
+        res = await client.get(f"/api/applications/{app_id}/timeline")
+
+        assert res.status_code == 200, res.text
+        statuses = [entry["status"] for entry in res.json()]
+        assert statuses == ["interessant", "beworben", "interview"]
+
+    async def test_timeline_does_not_log_when_status_unchanged(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        _, app_id = await _create_job_and_application(client, db)
+
+        await client.patch(f"/api/applications/{app_id}", json={"notes": "nur eine Notiz"})
+
+        res = await client.get(f"/api/applications/{app_id}/timeline")
+
+        assert len(res.json()) == 1  # nur der initiale Eintrag aus create
+
+    async def test_timeline_for_nonexistent_application_returns_404(self, client: httpx.AsyncClient):
+        res = await client.get("/api/applications/999999/timeline")
+        assert res.status_code == 404

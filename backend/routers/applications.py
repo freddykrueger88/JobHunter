@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from backend.core.database import get_db
 from backend.models.application import Application
+from backend.models.application_status_log import ApplicationStatusLog
 from backend.models.job import Job
 from backend.models.cover_letter import CoverLetter
 from backend.models.history import HistoryEntry
@@ -62,6 +63,8 @@ async def create_application(data: ApplicationCreate, db: AsyncSession = Depends
         description=f"Bewerbung f\u00fcr Job-ID {data.job_id} angelegt",
         meta={"job_id": data.job_id, "status": data.status},
     ))
+    await db.flush()
+    db.add(ApplicationStatusLog(application_id=app.id, status=data.status))
     await db.commit()
     await db.refresh(app)
     return app
@@ -85,6 +88,7 @@ async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSess
     app = await db.get(Application, app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Nicht gefunden")
+    status_changed = data.status is not None and data.status != app.status
     for k, v in data.model_dump(exclude_none=True).items():
         setattr(app, k, v)
     db.add(HistoryEntry(
@@ -96,6 +100,8 @@ async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSess
         # betraf jedes Setzen von interview_at/applied_at ueber Kanban.
         meta=data.model_dump(exclude_none=True, mode="json"),
     ))
+    if status_changed:
+        db.add(ApplicationStatusLog(application_id=app_id, status=data.status))
     await db.commit()
     await db.refresh(app)
     return app
@@ -204,3 +210,24 @@ async def ats_check_endpoint(
         raise HTTPException(status_code=400, detail="Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.")
 
     return await full_ats_check(cv.raw_text, job.description, ai_client)
+
+
+@router.get("/{app_id}/timeline")
+async def get_application_timeline(app_id: int, db: AsyncSession = Depends(get_db)):
+    """Status-Verlauf einer Bewerbung fuer die Timeline im Kanban-Detail-
+    Modal. War bisher ein reiner 404 - das Frontend rief den Endpoint
+    seit jeher auf, es gab ihn nie (application_status_logs existierte
+    als Modell, aber ohne Migration und ohne dass je etwas hineingeschrieben
+    wurde)."""
+    app = await db.get(Application, app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Nicht gefunden")
+    result = await db.execute(
+        select(ApplicationStatusLog)
+        .where(ApplicationStatusLog.application_id == app_id)
+        .order_by(ApplicationStatusLog.changed_at.asc())
+    )
+    return [
+        {"status": entry.status, "changed_at": entry.changed_at}
+        for entry in result.scalars().all()
+    ]

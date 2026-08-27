@@ -14,6 +14,7 @@ import CoverLetterQualityPanel from '../components/CoverLetterQualityPanel'
 import RejectionAnalysisPanel from '../components/RejectionAnalysisPanel'
 import AtsScorePanel from '../components/AtsScorePanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
+import CoverLetter from './CoverLetter'
 
 interface Application {
   id: number
@@ -483,6 +484,11 @@ export default function Kanban() {
                   >
                     <Bot size={13} aria-hidden /> {t('detail.coach')}
                   </button>
+                </div>
+
+                {/* KI-Anschreiben generieren - war komplett ungeroutet, siehe BACKLOG */}
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
+                  <CoverLetter jobId={detailApp.job_id} applicationId={detailApp.id} />
                 </div>
 
                 {/* #75/G.3.10 - Kultur-Match (Phase H.4) */}

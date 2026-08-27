@@ -77,23 +77,27 @@ async def api_generate_cover_letter(
         raise HTTPException(status_code=404, detail="Stelle nicht gefunden")
 
     cv_summary = "Kein Lebenslauf vorhanden."
+    cv = None
     if data.cv_id:
         cv = await db.get(CVData, data.cv_id)
-        if cv:
-            parts = []
-            if cv.full_name: parts.append(f"Name: {cv.full_name}")
-            if cv.skills: parts.append(f"Skills: {', '.join(cv.skills[:15])}")
-            if cv.work_experience:
-                exp = cv.work_experience[:3]
-                parts.append("Erfahrung: " + "; ".join(
-                    f"{e.get('role','')} bei {e.get('company','')}" for e in exp
-                ))
-            if cv.education:
-                edu = cv.education[:2]
-                parts.append("Ausbildung: " + "; ".join(
-                    f"{e.get('degree','')} ({e.get('institution','')})" for e in edu
-                ))
-            cv_summary = "\n".join(parts)
+    else:
+        cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+        cv = cv_result.scalar_one_or_none()
+    if cv:
+        parts = []
+        if cv.full_name: parts.append(f"Name: {cv.full_name}")
+        if cv.skills: parts.append(f"Skills: {', '.join(cv.skills[:15])}")
+        if cv.work_experience:
+            exp = cv.work_experience[:3]
+            parts.append("Erfahrung: " + "; ".join(
+                f"{e.get('role','')} bei {e.get('company','')}" for e in exp
+            ))
+        if cv.education:
+            edu = cv.education[:2]
+            parts.append("Ausbildung: " + "; ".join(
+                f"{e.get('degree','')} ({e.get('institution','')})" for e in edu
+            ))
+        cv_summary = "\n".join(parts)
 
     result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
     s = result.scalar_one_or_none()

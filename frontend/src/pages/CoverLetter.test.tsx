@@ -65,4 +65,23 @@ describe('CoverLetter', () => {
     renderWithProviders(<CoverLetter />)
     expect(screen.getByRole('button', { name: /Anschreiben erstellen/ })).toBeDisabled()
   })
+
+  it('sendet application_id mit, wenn applicationId gesetzt ist', async () => {
+    const postSpy = vi.spyOn(axios, 'post').mockResolvedValue({
+      data: { content: 'Sehr geehrte Damen und Herren...' },
+    })
+    const user = userEvent.setup()
+    renderWithProviders(<CoverLetter jobId={1} cvId={2} applicationId={7} />)
+
+    await user.click(screen.getByRole('button', { name: /Anschreiben erstellen/ }))
+
+    await waitFor(() => expect(postSpy).toHaveBeenCalled())
+    expect(postSpy).toHaveBeenCalledWith('/api/ai/generate-cover-letter', {
+      job_id: 1,
+      cv_id: 2,
+      tone: 'formell',
+      template_text: null,
+      application_id: 7,
+    })
+  })
 })

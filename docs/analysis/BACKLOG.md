@@ -586,8 +586,16 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Settings-Sektion. 26 neue Tests. Live end-to-end gegen einen
       echten ntfy.sh-Topic verifiziert (Nachrichteninhalt per API
       abgerufen und bestaetigt). Commit 6985b79.
-- [ ] G.3.5 (#81) Burnout-Fruehwarner - Warnung bei zu vielen Bewerbungen
-      ohne Erfolg in kurzer Zeit (Schwellenwert konfigurierbar)
+- [x] G.3.5 (#81) Burnout-Fruehwarner - Warnung bei zu vielen Bewerbungen
+      ohne Erfolg in kurzer Zeit (Schwellenwert konfigurierbar). ERLEDIGT
+      (2026-08-27): neuer Endpoint GET /api/stats/burnout-check
+      (Bewerbungen mit Status beworben/absage im Zeitfenster, "erfolglos"
+      da kein Interview/Zusage erreicht). Migration 0017 fuer
+      konfigurierbare Schwellenwerte (Default 10 Bewerbungen/14 Tage).
+      Neue BurnoutWarning.tsx-Komponente auf dem Dashboard + neue
+      Settings-Sektion mit zwei Schiebereglern. 10 neue Tests. Live
+      end-to-end verifiziert (10 echte Testbewerbungen, Warnung schaltete
+      sich nachweislich ein/aus). Commit 762a81b.
 - [ ] G.3.6 (#80) Bewerbungs-Tagebuch - freies Tagesnotiz-Textfeld,
       durchsuchbar, PDF-exportierbar
 - [ ] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)

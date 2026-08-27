@@ -1,6 +1,7 @@
 from backend.models.job import Job
 from backend.models.application import Application
 from backend.models.settings import UserSettings
+from backend.models.user_profile import UserProfile
 from backend.models.cv import CVData
 from backend.models.cover_letter import CoverLetter
 from backend.models.cover_letter_template import CoverLetterTemplate
@@ -18,6 +19,7 @@ __all__ = [
     "Job",
     "Application",
     "UserSettings",
+    "UserProfile",
     "CVData",
     "CoverLetter",
     "CoverLetterTemplate",

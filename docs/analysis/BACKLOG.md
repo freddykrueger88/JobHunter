@@ -553,8 +553,18 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Toggle (reiner Seiten-State in Jobs.tsx). Neuer einklappbarer
       Filter-Bereich im Frontend, 500ms Debounce. 11 neue Tests. Commit
       6e2e903.
-- [ ] G.3.2 (#84) Firmen-Blacklist - Firmen dauerhaft markieren/ausblenden,
-      mit Grund+Datum, ex-/importierbar
+- [x] G.3.2 (#84) Firmen-Blacklist - Firmen dauerhaft markieren/ausblenden,
+      mit Grund+Datum, ex-/importierbar. ERLEDIGT (2026-08-27): Backend
+      (Model + CRUD-Router) existierte schon, war aber nirgends wirksam
+      (is_blocked()-Hilfsfunktion nie aufgerufen, keine Frontend-Seite -
+      wieder das "gebaut, aber nie wirklich funktionsfaehig"-Muster).
+      Jetzt tatsaechlich verdrahtet: GET /api/jobs/ filtert blockierte
+      Firmen raus, GET /api/jobs/search speichert ihre Treffer gar nicht
+      erst. Neu: POST /api/blocklist/import (Duplikat-Erkennung),
+      Export clientseitig aus der geladenen Liste. Neue Seite
+      /blocklist (frontend/src/pages/Blocklist.tsx, eigener i18n-
+      Namespace von Anfang an), "Firma blockieren"-Button im Jobs.tsx-
+      Detail-Panel. 9 neue Tests. Commit 6e2aede.
 - [ ] G.3.3 (#83) Erfolgs-Timeline - Bewerbungsprozess pro Stelle als
       Zeitstrahl (Beworben -> Antwort -> Gespraech -> Entscheidung),
       Vergleich mit Durchschnittswerten

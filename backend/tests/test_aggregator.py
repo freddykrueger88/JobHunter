@@ -33,6 +33,9 @@ class TestSearchAllSources:
             "backend.services.job_search.karriere_nrw.KarriereNrwSource.search",
             new=AsyncMock(return_value=[RawJob(title="NRW-Job", company="Z", source_portal="karriere_nrw")]),
         ), patch(
+            "backend.services.job_search.service_bund.ServiceBundSource.search",
+            new=AsyncMock(return_value=[RawJob(title="Bund-Job", company="W", source_portal="service_bund")]),
+        ), patch(
             "backend.services.job_search.eures_scraper.EuresSource.search",
             new=AsyncMock(return_value=[RawJob(title="EURES-Job", company="Y", source_portal="eures")]),
         ):
@@ -41,16 +44,20 @@ class TestSearchAllSources:
         portals = {r.source_portal for r in results}
         assert "arbeitsagentur" in portals
         assert "karriere_nrw" in portals
+        assert "service_bund" in portals
         assert "eures" in portals
 
     async def test_non_de_country_skips_german_specific_sources(self):
         settings_row = UserSettings(id=1)
         aa_search = AsyncMock(return_value=[RawJob(title="AA-Job", company="X", source_portal="arbeitsagentur")])
         nrw_search = AsyncMock(return_value=[RawJob(title="NRW-Job", company="Z", source_portal="karriere_nrw")])
+        bund_search = AsyncMock(return_value=[RawJob(title="Bund-Job", company="W", source_portal="service_bund")])
         with patch(
             "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=aa_search,
         ), patch(
             "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=nrw_search,
+        ), patch(
+            "backend.services.job_search.service_bund.ServiceBundSource.search", new=bund_search,
         ), patch(
             "backend.services.job_search.eures_scraper.EuresSource.search",
             new=AsyncMock(return_value=[RawJob(title="EURES-AT-Job", company="Y", source_portal="eures")]),
@@ -59,6 +66,7 @@ class TestSearchAllSources:
 
         aa_search.assert_not_called()
         nrw_search.assert_not_called()
+        bund_search.assert_not_called()
         portals = {r.source_portal for r in results}
         assert portals == {"eures"}
 

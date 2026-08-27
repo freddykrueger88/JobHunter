@@ -8,6 +8,7 @@ from backend.services.job_search.stepstone import StepStoneSource
 from backend.services.job_search.linkedin import LinkedInSource
 from backend.services.job_search.eures_scraper import EuresSource
 from backend.services.job_search.karriere_nrw import KarriereNrwSource
+from backend.services.job_search.service_bund import ServiceBundSource
 from backend.core.crypto import decrypt
 
 log = logging.getLogger(__name__)
@@ -53,6 +54,12 @@ async def search_all_sources(
     #    Phase I.1, nur fuer DE relevant).
     if country_code == "DE":
         sources.append(KarriereNrwSource())
+
+    # 7. service.bund.de (RSS-Export, oeffentlicher Dienst - Bund, alle 16
+    #    Laender UND Kommunen bundesweit, ~9.000 Ausschreibungen, nur DE).
+    #    Anders als Karriere.NRW: Orts-/Radius-Filter live nachweislich korrekt.
+    if country_code == "DE":
+        sources.append(ServiceBundSource())
 
     log.info(
         "Aggregator: Suche '%s' in '%s' (%d km, Land %s) über %d Quelle(n)",

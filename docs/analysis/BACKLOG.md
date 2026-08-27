@@ -670,15 +670,33 @@ noetig, nicht in einem Rutsch machbar.
       bestaetigt funktionsfaehig (anders als Karriere.NRW). Implementiert
       als ServiceBundSource, 7. Quelle im Aggregator (nur country_code
       =="DE"). Commit 2cec934.
-- [ ] I.1 (Teil 3, offen) andere EU-Laender (nicht nur Deutschland):
-      pro Land nationale/regionale/kommunale Jobportale, die nicht in
-      die EURES-Datenbank einspeisen, + technische Anbindungsmoeglichkeit
-      (API vs. Scraping vs. gar nicht moeglich). EURES deckt v.a.
-      groessere, ueber nationale Arbeitsagenturen gemeldete Stellen ab,
-      keine Kommunalebene. Naechste Kandidaten fuer Recherche (nach
-      Vermutung, noch nicht live geprueft): Frankreich (Pole emploi hat
-      bekanntlich eine offene API), Niederlande (Open-Data-freundliche
-      Verwaltung).
+- [x] I.1 (Teil 3, Niederlande) Recherchiert: die dokumentierte CSO-
+      Vacature-API (WerkenbijdeOverheid.nl/WerkenvoorNederland.nl/
+      Mobiliteitsbank.nl, api.cso20.net) antwortet live auf allen drei
+      Subdomains (prod/sandbox/docs) durchgehend mit 503 - aktuell nicht
+      anbindbar, kein Aufbau moeglich. Nicht weiter verfolgt.
+- [x] I.1 (Teil 3, Frankreich) France Travail (ex-Pole Emploi) angebunden -
+      franzoesisches Gegenstueck zur Arbeitsagentur-Quelle, ~300.000
+      Stellen. Erste Quelle dieser Session, die KEINEN oeffentlichen
+      Fest-Key hat: Nutzer muss eigene, kostenlose OAuth2-Zugangsdaten
+      registrieren (francetravail.io/inscription) und in den
+      Einstellungen hinterlegen (Migration 0015 + neue Settings-UI,
+      folgt dem bestehenden Adzuna/LinkedIn-Muster). Live gegengetestet
+      ohne eigene Zugangsdaten (Token-/Such-Endpoint antworten mit
+      echtem OAuth2-Fehler bzw. 401, nicht 404 - Endpunkte existieren
+      und sind aktuell) sowie end-to-end gegen die echte Instanz mit
+      Test-Zugangsdaten (sauberes Scheitern statt Crash bei falschem
+      Secret, danach wieder entfernt). Response-Feld-Mapping selbst
+      (intitule/lieuTravail/origineOffre) basiert auf offizieller Doku +
+      Referenzimplementierungen, NICHT mit echten Daten verifiziert -
+      braucht dafuer Nutzer-eigene Zugangsdaten. Ort-Aufloesung ueber
+      geo.api.gouv.fr (offizielle franzoesische Geo-API, kein Key
+      noetig). Commit 9c2ae26. **Bitte nach Eintragen eigener
+      Zugangsdaten in den Einstellungen einmal live pruefen.**
+- [ ] I.1 (Teil 4, offen) weitere EU-Laender ausserhalb Deutschland/
+      Frankreich: pro Land nationale/regionale/kommunale Jobportale,
+      die nicht in die EURES-Datenbank einspeisen. Noch keine konkreten
+      Kandidaten recherchiert (Niederlande siehe oben: negativ).
 - [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)

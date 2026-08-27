@@ -576,8 +576,16 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       {entries, avg_days_by_status}. Kanban.tsx zeigt pro Zeitstrahl-
       Eintrag "X Tage in diesem Status · Ø Y Tage". 8 neue Tests (3 API-
       Ebene, 5 Service-Unit-Tests). Commit 7567374.
-- [ ] G.3.4 (#82) Slack/Discord/ntfy-Benachrichtigungen per Webhook bei
-      neuen passenden Stellen/Statusaenderungen
+- [x] G.3.4 (#82) Slack/Discord/ntfy-Benachrichtigungen per Webhook bei
+      neuen passenden Stellen/Statusaenderungen. ERLEDIGT (2026-08-27):
+      neuer Service webhook_notifier.py (Migration 0016 fuer
+      verschluesselte URL + Typ + zwei Opt-in-Schalter), folgt eng dem
+      bestehenden SMTP-Muster. Zwei Trigger: automatische Suchprofil-
+      Treffer (scheduler.py) + Bewerbungs-Statusaenderungen
+      (applications.py, resilient gegen Webhook-Ausfaelle). Neue
+      Settings-Sektion. 26 neue Tests. Live end-to-end gegen einen
+      echten ntfy.sh-Topic verifiziert (Nachrichteninhalt per API
+      abgerufen und bestaetigt). Commit 6985b79.
 - [ ] G.3.5 (#81) Burnout-Fruehwarner - Warnung bei zu vielen Bewerbungen
       ohne Erfolg in kurzer Zeit (Schwellenwert konfigurierbar)
 - [ ] G.3.6 (#80) Bewerbungs-Tagebuch - freies Tagesnotiz-Textfeld,

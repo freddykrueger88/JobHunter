@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Eye, EyeOff, ExternalLink, Check, Save, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, ExternalLink, Check, Save, AlertCircle, Mail } from 'lucide-react'
 import clsx from 'clsx'
 import ExportImportPanel from '../components/ExportImportPanel'
 
@@ -13,6 +13,9 @@ interface SettingsData {
   default_location: string | null; default_radius_km: number
   hide_ausbildung: boolean; reminder_default_days: number
   has_adzuna_key: boolean; has_linkedin_key: boolean
+  smtp_host: string | null; smtp_port: number | null
+  smtp_user: string | null; smtp_recipient: string | null
+  has_smtp_password: boolean
 }
 
 type SaveStatus = 'idle' | 'pending' | 'saved' | 'error'
@@ -212,6 +215,13 @@ export default function Settings() {
     adzuna_app_id: '', adzuna_api_key: '',
   })
   const [saveStatus, setSaveStatus]           = useState<SaveStatus>('idle')
+  const [smtpHost, setSmtpHost]               = useState('')
+  const [smtpPort, setSmtpPort]               = useState('')
+  const [smtpUser, setSmtpUser]               = useState('')
+  const [smtpRecipient, setSmtpRecipient]     = useState('')
+  const [smtpPassword, setSmtpPassword]       = useState('')
+  const [smtpSaveStatus, setSmtpSaveStatus]   = useState<KeysSaveStatus>('idle')
+  const [testMailStatus, setTestMailStatus]   = useState<'idle' | 'pending' | 'success' | 'error'>('idle')
   // keysSaveStatus: 'idle' = Button normal, 'pending' = lädt,
   // 'saved' = grün (Keys noch sichtbar), 'error' = rot
   const [keysSaveStatus, setKeysSaveStatus]   = useState<KeysSaveStatus>('idle')
@@ -229,6 +239,10 @@ export default function Settings() {
       setDefaultRadius(remote.default_radius_km)
       setHideAusbildung(remote.hide_ausbildung)
       setReminderDays(remote.reminder_default_days)
+      setSmtpHost(remote.smtp_host ?? '')
+      setSmtpPort(remote.smtp_port ? String(remote.smtp_port) : '')
+      setSmtpUser(remote.smtp_user ?? '')
+      setSmtpRecipient(remote.smtp_recipient ?? '')
     }
   }, [remote])
 
@@ -295,6 +309,40 @@ export default function Settings() {
     onError: () => {
       setKeysSaveStatus('error')
       setTimeout(() => setKeysSaveStatus('idle'), 3000)
+    },
+  })
+
+  // ─── SMTP: manuell speichern ────────────────────────────────────────────
+  const saveSmtpMutation = useMutation({
+    mutationFn: () => axios.patch('/api/settings/', {
+      smtp_host: smtpHost || null,
+      smtp_port: smtpPort ? Number(smtpPort) : null,
+      smtp_user: smtpUser || null,
+      smtp_recipient: smtpRecipient || null,
+      ...(smtpPassword !== '' && { smtp_password: smtpPassword }),
+    }),
+    onMutate: () => setSmtpSaveStatus('pending'),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['settings'] })
+      setSmtpSaveStatus('saved')
+      setTimeout(() => { setSmtpPassword(''); setSmtpSaveStatus('idle') }, 1500)
+    },
+    onError: () => {
+      setSmtpSaveStatus('error')
+      setTimeout(() => setSmtpSaveStatus('idle'), 3000)
+    },
+  })
+
+  const testMailMutation = useMutation({
+    mutationFn: () => axios.post('/api/settings/test-mail').then(r => r.data),
+    onMutate: () => setTestMailStatus('pending'),
+    onSuccess: (data: { success: boolean }) => {
+      setTestMailStatus(data.success ? 'success' : 'error')
+      setTimeout(() => setTestMailStatus('idle'), 4000)
+    },
+    onError: () => {
+      setTestMailStatus('error')
+      setTimeout(() => setTestMailStatus('idle'), 4000)
     },
   })
 
@@ -552,6 +600,90 @@ export default function Settings() {
             className="w-full accent-blue-600" aria-label={t('reminderLeadTimeAriaLabel')}
           />
           <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{t('reminderLeadTimeMin')}</span><span>{t('reminderLeadTimeMax')}</span></div>
+        </div>
+      </Section>
+
+      {/* ── E-Mail-Benachrichtigungen ── */}
+      <Section title={`✉️ ${t('smtpTitle')}`}>
+        <p className="text-xs text-gray-400 leading-relaxed">{t('smtpIntro')}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="smtp_host" className="text-sm text-gray-500 block mb-1">{t('smtpHostLabel')}</label>
+            <input id="smtp_host" value={smtpHost} onChange={e => setSmtpHost(e.target.value)}
+              placeholder="smtp.gmail.com"
+              className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" />
+          </div>
+          <div>
+            <label htmlFor="smtp_port" className="text-sm text-gray-500 block mb-1">{t('smtpPortLabel')}</label>
+            <input id="smtp_port" type="number" value={smtpPort} onChange={e => setSmtpPort(e.target.value)}
+              placeholder="587"
+              className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="smtp_user" className="text-sm text-gray-500 block mb-1">{t('smtpUserLabel')}</label>
+          <input id="smtp_user" value={smtpUser} onChange={e => setSmtpUser(e.target.value)}
+            className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" />
+        </div>
+        <div>
+          <label htmlFor="smtp_password" className="text-sm text-gray-500 block mb-1">{t('smtpPasswordLabel')}</label>
+          <div className="relative">
+            <input
+              id="smtp_password"
+              type={showKeys.smtp_password ? 'text' : 'password'}
+              value={smtpPassword}
+              onChange={e => setSmtpPassword(e.target.value)}
+              placeholder={remote?.has_smtp_password ? t('smtpPasswordStoredPlaceholder') : ''}
+              className="w-full rounded-lg px-3 py-2 pr-9 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 font-mono"
+            />
+            <button
+              type="button"
+              onClick={() => setShowKeys(s => ({ ...s, smtp_password: !s.smtp_password }))}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              aria-label={showKeys.smtp_password ? t('hideKeyAriaLabel') : t('showKeyAriaLabel')}
+            >
+              {showKeys.smtp_password ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="smtp_recipient" className="text-sm text-gray-500 block mb-1">{t('smtpRecipientLabel')}</label>
+          <input id="smtp_recipient" type="email" value={smtpRecipient} onChange={e => setSmtpRecipient(e.target.value)}
+            className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600" />
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => saveSmtpMutation.mutate()}
+            disabled={smtpSaveStatus === 'pending' || smtpSaveStatus === 'saved'}
+            className={clsx(
+              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              smtpSaveStatus === 'saved'   && 'bg-green-600 text-white cursor-default',
+              smtpSaveStatus === 'error'   && 'bg-red-600 hover:bg-red-700 text-white',
+              smtpSaveStatus === 'pending' && 'bg-blue-400 text-white cursor-wait',
+              smtpSaveStatus === 'idle'    && 'bg-blue-600 hover:bg-blue-700 text-white',
+            )}
+          >
+            {smtpSaveStatus === 'pending' && <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />}
+            {smtpSaveStatus === 'saved'   && <Check size={12} aria-hidden />}
+            {smtpSaveStatus === 'error'   && <AlertCircle size={12} aria-hidden />}
+            {smtpSaveStatus === 'idle'    && <Save size={12} aria-hidden />}
+            {smtpSaveStatus === 'pending' && t('saveKeysPending')}
+            {smtpSaveStatus === 'saved'   && t('saveKeysSaved')}
+            {smtpSaveStatus === 'error'   && t('saveKeysError')}
+            {smtpSaveStatus === 'idle'    && t('saveKeysIdle')}
+          </button>
+
+          <button
+            onClick={() => testMailMutation.mutate()}
+            disabled={testMailStatus === 'pending' || !remote?.smtp_host}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
+          >
+            <Mail size={12} aria-hidden />
+            {testMailStatus === 'pending' ? t('sendingTestMail') : t('sendTestMail')}
+          </button>
+          {testMailStatus === 'success' && <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1"><Check size={12} /> {t('testMailSuccess')}</span>}
+          {testMailStatus === 'error' && <span className="text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} /> {t('testMailError')}</span>}
         </div>
       </Section>
 

@@ -26,6 +26,7 @@ async def create_backup(db: AsyncSession, backup_path: str = './backups') -> str
     for model, key in [
         (Job, 'jobs'), (Application, 'applications'),
         (Reminder, 'reminders'), (SearchProfile, 'search_profiles'),
+        (UserSettings, 'settings'), (TextSnippet, 'text_snippets'),
     ]:
         result = await db.execute(select(model))
         rows = result.scalars().all()

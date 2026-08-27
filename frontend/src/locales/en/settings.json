@@ -10,6 +10,18 @@
   "cognitionTitle": "ADHD & Cognition",
   "jobSearchTitle": "Job Search",
   "remindersTitle": "Reminders",
+  "smtpTitle": "Email Notifications",
+  "smtpIntro": "Also send due reminders by email (checked every 15 minutes). Optional – without an SMTP server, everything works as before.",
+  "smtpHostLabel": "SMTP Server",
+  "smtpPortLabel": "Port",
+  "smtpUserLabel": "Username",
+  "smtpPasswordLabel": "Password",
+  "smtpPasswordStoredPlaceholder": "Stored (leave unchanged)",
+  "smtpRecipientLabel": "Recipient Address",
+  "sendTestMail": "Send Test Email",
+  "sendingTestMail": "Sending…",
+  "testMailSuccess": "Test email sent",
+  "testMailError": "Failed – check settings",
   "dataTitle": "Data",
 
   "themes": {

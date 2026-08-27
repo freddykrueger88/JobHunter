@@ -12,6 +12,9 @@ class Reminder(Base):
     remind_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_done: Mapped[bool] = mapped_column(Boolean, default=False)
+    # War die E-Mail-Benachrichtigung fuer diese Erinnerung schon
+    # verschickt? (backend/services/reminder_mailer.py)
+    mail_sent: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     application: Mapped["Application"] = relationship(back_populates="reminders")

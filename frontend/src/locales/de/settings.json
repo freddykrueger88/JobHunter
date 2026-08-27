@@ -10,6 +10,18 @@
   "cognitionTitle": "ADHS & Kognition",
   "jobSearchTitle": "Stellensuche",
   "remindersTitle": "Erinnerungen",
+  "smtpTitle": "E-Mail-Benachrichtigungen",
+  "smtpIntro": "Fällige Erinnerungen zusätzlich per E-Mail versenden (alle 15 Minuten geprüft). Optional – ohne SMTP-Server bleibt alles wie bisher.",
+  "smtpHostLabel": "SMTP-Server",
+  "smtpPortLabel": "Port",
+  "smtpUserLabel": "Benutzername",
+  "smtpPasswordLabel": "Passwort",
+  "smtpPasswordStoredPlaceholder": "Gespeichert (unverändert lassen)",
+  "smtpRecipientLabel": "Empfänger-Adresse",
+  "sendTestMail": "Test-Mail senden",
+  "sendingTestMail": "Sende…",
+  "testMailSuccess": "Test-Mail gesendet",
+  "testMailError": "Fehlgeschlagen – Einstellungen prüfen",
   "dataTitle": "Daten",
 
   "themes": {

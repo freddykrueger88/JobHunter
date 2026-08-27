@@ -47,6 +47,21 @@ app.include_router(salary.router)
 app.include_router(stats.router)
 
 
+@app.on_event("startup")
+async def start_scheduler():
+    """Startet den APScheduler (Suchprofile, Erinnerungs-Mails, Backups) -
+    war bisher nirgends aufgerufen, siehe scheduler.init_scheduler()."""
+    from backend.services.scheduler import init_scheduler
+    await init_scheduler()
+
+
 @app.get("/health", tags=["System"])
 async def health_check():
-    return {"status": "ok", "version": "1.9.0"}
+    from backend.services.scheduler import scheduler
+
+    return {
+        "status": "ok",
+        "version": "1.9.0",
+        "scheduler_running": scheduler.running,
+        "scheduled_jobs": [j.id for j in scheduler.get_jobs()],
+    }

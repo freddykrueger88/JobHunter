@@ -16,7 +16,7 @@ async def send_due_reminders():
         # Settings laden
         res = await db.execute(select(UserSettings).where(UserSettings.id == 1))
         s = res.scalar_one_or_none()
-        if not s or not getattr(s, "smtp_host", None) or not getattr(s, "smtp_recipient", None):
+        if not s or not s.smtp_host or not s.smtp_recipient:
             return  # SMTP nicht konfiguriert
 
         password = decrypt(s.smtp_password_enc) if s.smtp_password_enc else ""

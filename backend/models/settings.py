@@ -32,3 +32,10 @@ class UserSettings(Base):
     linkedin_api_key_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     arbeitsagentur_client_id_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     arbeitsagentur_client_secret_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # SMTP fuer Erinnerungs-Mails (backend/services/reminder_mailer.py) -
+    # Passwort verschluesselt wie die anderen Zugangsdaten oben.
+    smtp_host: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    smtp_port: Mapped[int | None] = mapped_column(nullable=True)
+    smtp_user: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    smtp_recipient: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    smtp_password_enc: Mapped[str | None] = mapped_column(Text, nullable=True)

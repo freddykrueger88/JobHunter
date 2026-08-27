@@ -82,12 +82,37 @@ def schedule_profile(profile: "SearchProfile"):
     scheduler.add_job(run_search_profile, trigger, args=[profile.id], id=job_id, replace_existing=True)
 
 
+async def run_reminder_mailer():
+    from backend.services.reminder_mailer import send_due_reminders
+    await send_due_reminders()
+
+
+async def run_backup():
+    async with async_session_factory() as db:
+        from backend.services.backup import create_backup
+        await create_backup(db)
+
+
 async def init_scheduler():
-    """Startet den Scheduler und lädt alle aktiven Suchprofile."""
+    """Startet den Scheduler und laedt alle aktiven Suchprofile.
+
+    War bisher nirgends aufgerufen - der Scheduler wurde nie gestartet
+    (scheduler.start() steckte ausschliesslich hier drin), wodurch die
+    automatische Stellensuche trotz funktionierender CRUD-API nie
+    tatsaechlich lief: schedule_profile() registrierte Jobs zwar bei
+    jedem Anlegen/Aktivieren eines Suchprofils, aber ohne .start() feuert
+    APScheduler keinen einzigen davon. Gleichzeitig hier mit angebunden:
+    reminder_mailer.py (faellige Erinnerungen per Mail, alle 15 Minuten)
+    und backup.py (taegliches lokales Backup mit 7-Tage-Rotation) - beide
+    waren als reine Cron-Jobs konzipiert, aber ebenfalls nie eingehaengt."""
     async with async_session_factory() as db:
         result = await db.execute(select(SearchProfile).where(SearchProfile.is_active == True))  # noqa
         profiles = result.scalars().all()
         for p in profiles:
             schedule_profile(p)
+
+    scheduler.add_job(run_reminder_mailer, CronTrigger(minute="*/15"), id="reminder_mailer", replace_existing=True)
+    scheduler.add_job(run_backup, CronTrigger(hour=3, minute=0), id="daily_backup", replace_existing=True)
+
     scheduler.start()
     logger.info(f"Scheduler gestartet mit {len(scheduler.get_jobs())} Jobs")

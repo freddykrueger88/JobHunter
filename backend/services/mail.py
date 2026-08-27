@@ -37,7 +37,7 @@ async def send_reminder_email(
 
 async def send_test_mail(settings_row) -> dict:
     """Sendet eine Test-Mail mit den gespeicherten SMTP-Einstellungen."""
-    if not getattr(settings_row, "smtp_host", None):
+    if not settings_row.smtp_host:
         return {"success": False, "error": "SMTP nicht konfiguriert"}
     password = decrypt(settings_row.smtp_password_enc) if settings_row.smtp_password_enc else ""
     ok = await send_reminder_email(

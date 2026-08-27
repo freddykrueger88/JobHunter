@@ -601,7 +601,8 @@ Nutzerwunsch: alle europaeischen Jobboersen anbinden, von national bis
 zur kleinsten Kommune, EU-weit. Aktuell integriert: Bundesagentur,
 Adzuna, StepStone, LinkedIn, EURES (EU-weit, offizielle Zentralportale
 aller 31 EURES-Laender), Karriere.NRW (Open-Data-API des Landes NRW,
-Land- + Kommunalstellen - siehe I.1-Funde unten). Umfasst automatisch
+Land- + Kommunalstellen), service.bund.de (Bund + alle 16 Laender +
+Kommunen bundesweit, RSS-basiert - siehe I.1-Funde unten). Umfasst automatisch
 G.3.13 (#67, Kommunalportale) und G.3.14 (#66, Skandinavien/EU-Portale)
 - nicht als Einzel-Issues umsetzen, sondern hier gebuendelt planen.
 Sehr grosser Umfang (potenziell hunderte Portale/APIs, jedes Land/jede
@@ -649,12 +650,35 @@ noetig, nicht in einem Rutsch machbar.
       (die immer einen Ort mitschickt) faktisch stummgemacht. Deshalb
       reicht die Quelle Ort/Radius bewusst nicht durch, nur Stichwort-
       suche ueber ganz NRW.
-- [ ] I.1 (Teil 2, offen) restliche 15 Bundeslaender + andere EU-Laender:
-      pro Land/Region nationale/regionale/kommunale Jobportale, die
-      nicht in die EURES-Datenbank einspeisen, + technische Anbindungs-
-      moeglichkeit (API vs. Scraping vs. gar nicht moeglich). EURES
-      deckt v.a. groessere, ueber nationale Arbeitsagenturen gemeldete
-      Stellen ab, keine Kommunalebene.
+- [x] I.1 (Teil 2, Gegenrecherche) Bayern/Baden-Wuerttemberg (siehe oben)
+      sowie Hessen, Niedersachsen, Berlin gegengeprueft (2026-08-27) -
+      durchweg KEINE vergleichbare offene Job-API gefunden (nur
+      allgemeine Open-Data-Portale wie opendata.hessen.de ohne
+      Stellen-Datensatz, GovData etc.). NRW bestaetigt sich damit als
+      echter Ausreisser unter den Bundeslaendern, nicht als Normalfall -
+      Einzel-Bundeslaender-Recherche hat abnehmenden Ertrag, deshalb
+      nicht laenderweise fortgesetzt.
+- [x] I.1 (Teil 2, service.bund.de) Stattdessen (Nutzerentscheidung
+      2026-08-27, siehe Optionsabwaegung: Scraping vs. weitere
+      Laender-Recherche vs. Stopp) service.bund.de angebunden -
+      buendelt Bund + alle 16 Laender + Kommunen bundesweit in einer
+      Quelle (~9.000 Ausschreibungen). Keine saubere JSON-API
+      (klassisches Government-Site-Builder-CMS), aber ein
+      dokumentierter, zustandsloser RSS-Export der Suchergebnisse
+      gefunden und live verifiziert (kein Session-Scraping noetig,
+      sauberes XML statt HTML-Parsing). Ort-/Radius-Filter live
+      bestaetigt funktionsfaehig (anders als Karriere.NRW). Implementiert
+      als ServiceBundSource, 7. Quelle im Aggregator (nur country_code
+      =="DE"). Commit 2cec934.
+- [ ] I.1 (Teil 3, offen) andere EU-Laender (nicht nur Deutschland):
+      pro Land nationale/regionale/kommunale Jobportale, die nicht in
+      die EURES-Datenbank einspeisen, + technische Anbindungsmoeglichkeit
+      (API vs. Scraping vs. gar nicht moeglich). EURES deckt v.a.
+      groessere, ueber nationale Arbeitsagenturen gemeldete Stellen ab,
+      keine Kommunalebene. Naechste Kandidaten fuer Recherche (nach
+      Vermutung, noch nicht live geprueft): Frankreich (Pole emploi hat
+      bekanntlich eine offene API), Niederlande (Open-Data-freundliche
+      Verwaltung).
 - [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)

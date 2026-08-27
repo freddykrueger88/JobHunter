@@ -17,8 +17,14 @@ async def generate_overview_pdf(
     db: AsyncSession,
     since: datetime | None = None,
     status: str | None = None,
+    exclude_status: str | None = None,
 ) -> bytes:
-    """Erstellt ein PDF mit einer Tabelle aller Bewerbungen."""
+    """Erstellt ein PDF mit einer Tabelle aller Bewerbungen.
+
+    exclude_status: Gegenstueck zu status (Ist-Gleich-Filter) - schliesst
+    einen Status aus, statt sich auf einen zu beschraenken. Fuer den
+    Nachweis gegenueber der Agentur fuer Arbeit zaehlen nur tatsaechlich
+    abgeschickte Bewerbungen, nicht nur vorgemerkte ("interessant")."""
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.units import cm
@@ -31,6 +37,8 @@ async def generate_overview_pdf(
         query = query.where(Application.applied_at >= since)
     if status:
         query = query.where(Application.status == status)
+    if exclude_status:
+        query = query.where(Application.status != exclude_status)
     query = query.order_by(Application.applied_at.desc())
 
     result = await db.execute(query)

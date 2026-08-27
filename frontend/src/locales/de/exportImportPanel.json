@@ -5,6 +5,7 @@
   "exportCsv": "CSV",
   "exportXlsx": "Excel (.xlsx)",
   "exportPdf": "PDF (Übersicht)",
+  "excludeInteressant": "Nur tatsächliche Bewerbungen (\"Interessant\" ausschließen) – z. B. als Nachweis für die Agentur für Arbeit",
   "exportHint": "JSON enthält alle Daten (DSGVO Art. 20). CSV & XLSX enthalten Bewerbungen + Stellen.",
   "import": "Importieren",
   "chooseFile": "Datei wählen",

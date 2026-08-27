@@ -9,6 +9,7 @@ export default function ExportImportPanel() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [status, setStatus] = useState<ImportStatus>({ state: 'idle' });
+  const [excludeInteressant, setExcludeInteressant] = useState(false);
 
   // ── Export helpers ──────────────────────────────────────────────────────────
   const triggerDownload = (url: string) => {
@@ -89,13 +90,22 @@ export default function ExportImportPanel() {
 
           {/* PDF-Uebersicht */}
           <button
-            onClick={() => triggerDownload('/api/export/pdf-overview')}
+            onClick={() => triggerDownload(`/api/export/pdf-overview${excludeInteressant ? '?exclude_status=interessant' : ''}`)}
             className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
           >
             <FileOutput size={16} />
             {t('exportPdf')}
           </button>
         </div>
+        <label className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer w-fit">
+          <input
+            type="checkbox"
+            checked={excludeInteressant}
+            onChange={(e) => setExcludeInteressant(e.target.checked)}
+            className="rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500"
+          />
+          {t('excludeInteressant')}
+        </label>
         <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
           {t('exportHint')}
         </p>

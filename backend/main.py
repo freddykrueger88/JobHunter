@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.api import calendar, cover_letter_pdf, search_profiles
 from backend.routers import (
     ai, applications, badges, blocklist, company_dossier, cover_letter_templates,
-    cv, dashboard, email_parsing, eures, export, followups, history,
+    cv, dashboard, email_parsing, export, followups, history,
     interview, jobs, jobs_image, profile, reminders, salary, settings, stats,
 )
 
@@ -31,7 +31,6 @@ app.include_router(history.router)
 app.include_router(reminders.router)
 app.include_router(export.router)
 app.include_router(interview.router)
-app.include_router(eures.router)
 app.include_router(followups.router)
 app.include_router(blocklist.router)
 app.include_router(calendar.router)

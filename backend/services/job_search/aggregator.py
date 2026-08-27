@@ -6,6 +6,7 @@ from backend.services.job_search.arbeitsagentur import ArbeitsagenturSource
 from backend.services.job_search.adzuna import AdzunaSource
 from backend.services.job_search.stepstone import StepStoneSource
 from backend.services.job_search.linkedin import LinkedInSource
+from backend.services.job_search.eures_scraper import EuresSource
 from backend.core.crypto import decrypt
 
 log = logging.getLogger(__name__)
@@ -16,15 +17,19 @@ async def search_all_sources(
     location: str,
     radius_km: int,
     settings_row,
+    country_code: str = "DE",
 ) -> list[RawJob]:
     sources = []
 
-    # 1. Bundesagentur für Arbeit (immer aktiv, benötigt keinen Nutzer-Key)
+    # 1. Bundesagentur für Arbeit (immer aktiv, benötigt keinen Nutzer-Key) -
+    #    nur sinnvoll fuer Deutschland, Country-Auswahl betrifft sie nicht.
     #    Die API nutzt einen öffentlichen API-Key, der im Adapter fest hinterlegt ist.
-    sources.append(ArbeitsagenturSource())
+    if country_code == "DE":
+        sources.append(ArbeitsagenturSource())
 
-    # 2. StepStone (immer aktiv, kein Key nötig)
-    sources.append(StepStoneSource())
+    # 2. StepStone (immer aktiv, kein Key nötig, ebenfalls DE-fokussiert)
+    if country_code == "DE":
+        sources.append(StepStoneSource())
 
     # 3. Adzuna (nur mit Keys)
     if getattr(settings_row, "adzuna_app_id_enc", None) and getattr(settings_row, "adzuna_api_key_enc", None):
@@ -37,9 +42,14 @@ async def search_all_sources(
     if getattr(settings_row, "linkedin_api_key_enc", None):
         sources.append(LinkedInSource(decrypt(settings_row.linkedin_api_key_enc)))
 
+    # 5. EURES (immer aktiv, kein Key noetig, einzige Quelle mit echter
+    #    EU-weiter Abdeckung - #72/Phase I.1). War fertig implementiert,
+    #    aber nie hier registriert; die alte API-URL war zudem tot (404).
+    sources.append(EuresSource(country_code=country_code))
+
     log.info(
-        "Aggregator: Suche '%s' in '%s' (%d km) über %d Quelle(n)",
-        keywords, location, radius_km, len(sources)
+        "Aggregator: Suche '%s' in '%s' (%d km, Land %s) über %d Quelle(n)",
+        keywords, location, radius_km, country_code, len(sources)
     )
 
     if not sources:

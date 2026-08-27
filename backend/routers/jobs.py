@@ -46,6 +46,17 @@ async def list_jobs(
     return result.scalars().all()
 
 
+@router.get("/eures-countries")
+async def list_eures_countries():
+    """Von EURES unterstuetzte Laender (Code + deutscher Name) fuers Land-
+    Dropdown der Stellensuche - #72/Phase I.1. Muss vor /{job_id} stehen,
+    sonst faengt die dynamische Route den Aufruf ab und versucht
+    "eures-countries" als job_id zu parsen (404/422 statt der Liste)."""
+    from backend.services.job_search.eures_scraper import EURES_COUNTRIES
+
+    return [{"code": code, "name": name} for code, name in sorted(EURES_COUNTRIES.items(), key=lambda kv: kv[1])]
+
+
 @router.get("/search")
 async def search_jobs(
     keywords: str = Query(..., description="Suchbegriff, z.B. 'IT-Support'"),
@@ -55,6 +66,7 @@ async def search_jobs(
         min_length=2,
     ),
     radius_km: int = Query(default=25, ge=0, le=200),
+    country_code: str = Query(default="DE", min_length=2, max_length=2, description="EU-Land fuer die EURES-Suche, z.B. 'DE', 'AT', 'FR'"),
     save: bool = Query(default=True, description="Ergebnisse in DB speichern"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -67,7 +79,7 @@ async def search_jobs(
     if not settings_row:
         settings_row = UserSettings(id=1)
 
-    raw_jobs = await search_all_sources(keywords, location, radius_km, settings_row)
+    raw_jobs = await search_all_sources(keywords, location, radius_km, settings_row, country_code=country_code.upper())
 
     new_count = 0
     if save:

@@ -33,8 +33,11 @@ interface Job {
 const portalBadgeColor: Record<string, string> = {
   arbeitsagentur: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
   adzuna: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  eures: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
   default: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
 }
+
+interface EuresCountry { code: string; name: string }
 
 export default function Jobs() {
   const { t } = useTranslation(['jobs', 'common'])
@@ -42,6 +45,7 @@ export default function Jobs() {
   const [keywords, setKeywords] = useState('')
   const [location, setLocation] = useState('')
   const [radius, setRadius] = useState(25)
+  const [countryCode, setCountryCode] = useState('DE')
   const [hideAusbildung, setHideAusbildung] = useState(true)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
   const [showPhotoUpload, setShowPhotoUpload] = useState(false)
@@ -51,9 +55,15 @@ export default function Jobs() {
     queryFn: () => axios.get(`/api/jobs/?hide_ausbildung=${hideAusbildung}`).then(r => r.data),
   })
 
+  const { data: euresCountries = [] } = useQuery<EuresCountry[]>({
+    queryKey: ['eures-countries'],
+    queryFn: () => axios.get('/api/jobs/eures-countries').then(r => r.data),
+    staleTime: Infinity,
+  })
+
   const searchMutation = useMutation({
     mutationFn: () => axios.get('/api/jobs/search', {
-      params: { keywords, location, radius_km: radius, save: true },
+      params: { keywords, location, radius_km: radius, country_code: countryCode, save: true },
     }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['jobs'] }),
   })
@@ -97,7 +107,21 @@ export default function Jobs() {
             >
               {[10, 25, 50, 100].map(r => <option key={r} value={r}>{r} km</option>)}
             </select>
+            <select
+              className="w-36 rounded-lg px-2 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm"
+              value={countryCode}
+              onChange={e => setCountryCode(e.target.value)}
+              aria-label="Land (EURES)"
+              title="Land für die EU-weite EURES-Suche – Ort/Radius gelten nur für die deutschen Portale"
+            >
+              {euresCountries.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+            </select>
           </div>
+          {countryCode !== 'DE' && (
+            <p className="text-xs text-gray-400">
+              EU-weite Suche über EURES in {euresCountries.find(c => c.code === countryCode)?.name ?? countryCode}. Ort und Radius gelten nur für die deutschen Portale (Arbeitsagentur, StepStone) und werden hier ignoriert.
+            </p>
+          )}
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input

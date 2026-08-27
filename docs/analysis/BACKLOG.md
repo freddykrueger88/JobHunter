@@ -599,20 +599,41 @@ gemeinsames Datenmodell fuer beides nutzen statt zwei parallele Profile.
 
 Nutzerwunsch: alle europaeischen Jobboersen anbinden, von national bis
 zur kleinsten Kommune, EU-weit. Aktuell integriert: Bundesagentur,
-Adzuna, StepStone, LinkedIn, EURES (EU-weit, aber nur grosse
-Zentralportale). Umfasst automatisch G.3.13 (#67, Kommunalportale) und
-G.3.14 (#66, Skandinavien/EU-Portale) - nicht als Einzel-Issues
-umsetzen, sondern hier gebuendelt planen. Sehr grosser Umfang
-(potenziell hunderte Portale/APIs, jedes Land/jede Region unterschiedliche
-Struktur) - eigener mehrstufiger Umsetzungsplan noetig, nicht in einem
-Rutsch machbar. Noch nicht begonnen: erster Schritt waere eine
-Bestandsaufnahme, welche Laender/Portale ueberhaupt eine nutzbare API
-oder zumindest strukturiert scrapebare Seite haben, priorisiert nach
-Marktgroesse/Nutzerbedarf.
-- [ ] I.1 Bestandsaufnahme: pro EU-Land verfuegbare Jobportale +
-      technische Anbindungsmoeglichkeit (API vs. Scraping vs. gar nicht
-      moeglich)
-- [ ] I.2 Priorisierung (welche Laender/Portale zuerst)
+Adzuna, StepStone, LinkedIn, EURES (EU-weit, offizielle Zentralportale
+aller 31 EURES-Laender - siehe I.1-Fund unten). Umfasst automatisch
+G.3.13 (#67, Kommunalportale) und G.3.14 (#66, Skandinavien/EU-Portale)
+- nicht als Einzel-Issues umsetzen, sondern hier gebuendelt planen.
+Sehr grosser Umfang (potenziell hunderte Portale/APIs, jedes Land/jede
+Region unterschiedliche Struktur) - eigener mehrstufiger Umsetzungsplan
+noetig, nicht in einem Rutsch machbar.
+
+- [x] I.1 (Teil 1) Bestandsaufnahme ergab: EURES (EU-weit) war bereits
+      als Code vorhanden (backend/services/job_search/eures_scraper.py),
+      aber (a) nie im Aggregator registriert und (b) die hartcodierte
+      API-URL war tot (404 - hat sich seither geaendert). Recherchiert,
+      aktuellen Endpoint gefunden, live gegen echte Daten verifiziert
+      (12.212 Treffer fuer "python developer" in DE), neu implementiert
+      und als 5. Quelle im Aggregator registriert (2026-08-27). Dabei
+      mit angebunden: Laender-Dropdown in Jobs.tsx (alle 31 EURES-
+      Laender), Ortsnamen-Aufloesung ueber die offizielle Eurostat/
+      GISCO-NUTS-2024-Referenztabelle (EURES liefert nur NUTS-Codes wie
+      "DE111", keine Klartext-Ortsnamen). Offen: der Detail-Link pro
+      Stellenanzeige ist aus der API-Konvention plausibel konstruiert,
+      aber NICHT mit einem echten Browser verifiziert (EURES ist eine
+      JS-SPA, HTTP-Statuscodes sind wegen Client-Routing-Fallback nicht
+      aussagekraeftig) - bei Gelegenheit einmal manuell pruefen.
+      Nebenfund: ein zweiter, unabhaengiger EURES-Router
+      (backend/routers/eures.py, GET /api/eures/search) haengte
+      ebenfalls an der toten API und wurde von keinem Frontend je
+      aufgerufen - als redundanter toter Code entfernt statt repariert.
+- [ ] I.1 (Teil 2) Bestandsaufnahme fuer Portale UNTERHALB von EURES:
+      pro EU-Land nationale/regionale/kommunale Jobportale, die nicht
+      in die EURES-Datenbank einspeisen, + technische Anbindungs-
+      moeglichkeit (API vs. Scraping vs. gar nicht moeglich). EURES
+      deckt v.a. groessere, ueber nationale Arbeitsagenturen gemeldete
+      Stellen ab, keine Kommunalebene.
+- [ ] I.2 Priorisierung (welche Laender/Portale unterhalb von EURES
+      zuerst)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)
 - [ ] I.4 Rollout Land fuer Land

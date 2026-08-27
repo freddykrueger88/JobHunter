@@ -693,10 +693,24 @@ noetig, nicht in einem Rutsch machbar.
       geo.api.gouv.fr (offizielle franzoesische Geo-API, kein Key
       noetig). Commit 9c2ae26. **Bitte nach Eintragen eigener
       Zugangsdaten in den Einstellungen einmal live pruefen.**
-- [ ] I.1 (Teil 4, offen) weitere EU-Laender ausserhalb Deutschland/
-      Frankreich: pro Land nationale/regionale/kommunale Jobportale,
-      die nicht in die EURES-Datenbank einspeisen. Noch keine konkreten
-      Kandidaten recherchiert (Niederlande siehe oben: negativ).
+- [x] I.1 (Teil 4, Schweden) Arbetsformedlingen (schwedische
+      Arbeitsagentur, "JobTech"-Plattform) angebunden - wieder
+      zero-config wie die deutschen Quellen (kein Nutzer-Key), live mit
+      echten Daten verifiziert. Fund: der dokumentierte municipality-
+      Filter braucht eine Taxonomy-Concept-ID statt Klartext und matched
+      nur exakte volle Gemeindenamen (kein Fuzzy-Match) - haette bei
+      freier Texteingabe im Frontend still leere Ergebnisse liefern
+      koennen, aehnlich dem Karriere.NRW-Fund. Stattdessen: Ort wird ins
+      Freitext-Suchfeld eingemischt (von der API selbst so vorgesehen,
+      live verifiziert). Commit e5b05b2.
+- [ ] I.1 (Teil 5, offen) weitere EU-Laender ausserhalb Deutschland/
+      Frankreich/Schweden: pro Land nationale/regionale/kommunale
+      Jobportale, die nicht in die EURES-Datenbank einspeisen. Noch keine
+      konkreten Kandidaten recherchiert (Niederlande: negativ, siehe
+      oben). Naechste Kandidaten nach Vermutung, noch nicht live geprueft:
+      Daenemark (jobnet.dk), Finnland (TE-palvelut), Polen (praca.gov.pl/
+      ePraca - erste Recherche fand keine klar dokumentierte API),
+      Belgien (regional: VDAB/FOREM/Actiris), Spanien (SEPE).
 - [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)

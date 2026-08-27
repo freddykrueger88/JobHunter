@@ -596,8 +596,20 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Settings-Sektion mit zwei Schiebereglern. 10 neue Tests. Live
       end-to-end verifiziert (10 echte Testbewerbungen, Warnung schaltete
       sich nachweislich ein/aus). Commit 762a81b.
-- [ ] G.3.6 (#80) Bewerbungs-Tagebuch - freies Tagesnotiz-Textfeld,
-      durchsuchbar, PDF-exportierbar
+- [x] G.3.6 (#80) Bewerbungs-Tagebuch - freies Tagesnotiz-Textfeld,
+      durchsuchbar, PDF-exportierbar. ERLEDIGT (2026-08-28): neues Modell
+      DiaryEntry + CRUD-Router (backend/routers/diary.py), Volltextsuche
+      (?search=) auf Liste UND PDF-Export, reportlab-basierter PDF-Export
+      (Fliesstext statt Tabelle). Neue Seite /diary mit Inline-Bearbeiten.
+      12 neue Tests. Live end-to-end verifiziert. Commit 5f34539.
+      NEBENFUND (nicht behoben, ausserhalb des Feature-Umfangs): `alembic
+      check` zeigt umfangreiche Nullability-Drift ueber fast alle
+      bestehenden Tabellen (server_default vs. Python-seitigem default
+      in den Modellen) - voellig unabhaengig von diesem Feature
+      (diary_entries selbst ist sauber), aber ein eigener Aufraeum-
+      Durchgang waere sinnvoll, bevor der naechste `alembic revision
+      --autogenerate` versehentlich Dutzende falsche NOT-NULL-Aenderungen
+      vorschlaegt.
 - [ ] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)
       fuer Bewerbungsaktivitaet
 - [ ] G.3.8 (#78) Ruecklaufquoten-Tracker - welche Portale/Wochentage/

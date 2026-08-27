@@ -68,9 +68,20 @@ def get_template(template_type: TemplateType, lang: str = 'de') -> dict:
     templates = TEMPLATES_DE  # EN-Templates koennen spaeter ergaenzt werden
     return templates.get(template_type, {'betreff': '', 'body': ''})
 
+
+class _SafeDict(dict):
+    """Fehlende Platzhalter crashen nicht mit KeyError, sondern bleiben
+    sichtbar stehen ({feld}) - jeder Template-Typ braucht eine andere
+    Teilmenge der Platzhalter, der Aufrufer soll nicht jeden davon
+    zwingend kennen muessen."""
+    def __missing__(self, key):
+        return '{' + key + '}'
+
+
 def fill_template(template_type: TemplateType, lang: str = 'de', **kwargs) -> dict:
     t = get_template(template_type, lang)
+    safe_kwargs = _SafeDict(**kwargs)
     return {
-        'betreff': t['betreff'].format_map({**kwargs}),
-        'body': t['body'].format_map({**kwargs}),
+        'betreff': t['betreff'].format_map(safe_kwargs),
+        'body': t['body'].format_map(safe_kwargs),
     }

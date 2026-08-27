@@ -1,0 +1,18 @@
+{
+  "title": "E-Mail-Vorlagen",
+  "subtitle": "Fertige Textbausteine für typische Situationen",
+  "typeAriaLabel": "Vorlagen-Typ wählen",
+  "types": {
+    "followup": "Nachfrage nach Bewerbung",
+    "nachfrage": "Status-Nachfrage",
+    "absage_antwort": "Antwort auf Absage",
+    "zusage": "Zusage bestätigen",
+    "termin_bestaetigen": "Termin bestätigen",
+    "termin_absagen": "Termin absagen"
+  },
+  "generating": "Generiere…",
+  "generate": "Erstellen",
+  "subjectLabel": "Betreff",
+  "bodyLabel": "Text",
+  "copy": "Kopieren"
+}

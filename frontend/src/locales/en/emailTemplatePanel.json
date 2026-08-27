@@ -1,0 +1,18 @@
+{
+  "title": "Email Templates",
+  "subtitle": "Ready-made text for typical situations",
+  "typeAriaLabel": "Select template type",
+  "types": {
+    "followup": "Follow up on application",
+    "nachfrage": "Status inquiry",
+    "absage_antwort": "Reply to rejection",
+    "zusage": "Confirm acceptance",
+    "termin_bestaetigen": "Confirm interview",
+    "termin_absagen": "Cancel interview"
+  },
+  "generating": "Generating…",
+  "generate": "Generate",
+  "subjectLabel": "Subject",
+  "bodyLabel": "Body",
+  "copy": "Copy"
+}

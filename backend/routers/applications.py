@@ -299,3 +299,45 @@ async def cv_optimize_endpoint(
 
     job = await db.get(Job, app.job_id)
     return await optimize_cv(cv.raw_text, job.description if job else None, ai_client)
+
+
+@router.get("/{app_id}/email-template/{template_type}")
+async def email_template_endpoint(app_id: int, template_type: str, db: AsyncSession = Depends(get_db)):
+    """Ausgefuellte E-Mail-Vorlage (Nachfrage, Absage-Antwort, Termin
+    bestaetigen/absagen, Zusage) fuer diese Bewerbung. Fehlende Angaben
+    (z.B. kein Interview-Termin fuer die Termin-Vorlagen) bleiben als
+    sichtbarer Platzhalter stehen statt zu crashen - der generierte Text
+    ist ohnehin nur ein editierbarer Entwurf."""
+    from backend.models.cv import CVData
+    from backend.services.email_templates import TEMPLATES_DE, fill_template
+
+    if template_type not in TEMPLATES_DE:
+        raise HTTPException(status_code=400, detail="Unbekannter Vorlagen-Typ")
+
+    app = await db.get(Application, app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Bewerbung nicht gefunden")
+
+    job = await db.get(Job, app.job_id)
+    cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+    cv = cv_result.scalar_one_or_none()
+    vorname, _, nachname = (cv.full_name or "").partition(" ") if cv and cv.full_name else ("", "", "")
+
+    # SQLite (Tests) liefert DateTime(timezone=True)-Spalten teils naiv
+    # zurueck, Postgres (Produktion) immer aware - hier defensiv normalisiert.
+    bezugsdatum = app.applied_at or app.created_at
+    if bezugsdatum.tzinfo is None:
+        bezugsdatum = bezugsdatum.replace(tzinfo=timezone.utc)
+    tage = (datetime.now(timezone.utc) - bezugsdatum).days
+
+    return fill_template(
+        template_type,
+        stelle=job.title if job else "",
+        firma=job.company if job else "",
+        anrede="Damen und Herren",
+        vorname=vorname,
+        nachname=nachname,
+        tage=tage,
+        datum=app.interview_at.strftime("%d.%m.%Y") if app.interview_at else "",
+        uhrzeit=app.interview_at.strftime("%H:%M") if app.interview_at else "",
+    )

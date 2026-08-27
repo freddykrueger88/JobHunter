@@ -18,6 +18,7 @@ import SalaryNegotiationModal from '../components/SalaryNegotiationModal'
 import QualityScoreCard from '../components/QualityScoreCard'
 import MarketAnalyzerPanel from '../components/MarketAnalyzerPanel'
 import CvOptimizerPanel from '../components/CvOptimizerPanel'
+import EmailTemplatePanel from '../components/EmailTemplatePanel'
 import CoverLetter from './CoverLetter'
 
 interface Application {
@@ -544,6 +545,9 @@ export default function Kanban() {
 
                 {/* Lebenslauf-Optimierung - war komplett ungeroutet, siehe BACKLOG */}
                 <CvOptimizerPanel applicationId={detailApp.id} />
+
+                {/* E-Mail-Vorlagen - war komplett ungeroutet, siehe BACKLOG */}
+                <EmailTemplatePanel applicationId={detailApp.id} />
 
                 {/* Absage-Analyse - nur relevant bei Status "absage" */}
                 {detailApp.status === 'absage' && (

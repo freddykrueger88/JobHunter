@@ -7,6 +7,7 @@ from backend.services.job_search.adzuna import AdzunaSource
 from backend.services.job_search.stepstone import StepStoneSource
 from backend.services.job_search.linkedin import LinkedInSource
 from backend.services.job_search.eures_scraper import EuresSource
+from backend.services.job_search.karriere_nrw import KarriereNrwSource
 from backend.core.crypto import decrypt
 
 log = logging.getLogger(__name__)
@@ -46,6 +47,12 @@ async def search_all_sources(
     #    EU-weiter Abdeckung - #72/Phase I.1). War fertig implementiert,
     #    aber nie hier registriert; die alte API-URL war zudem tot (404).
     sources.append(EuresSource(country_code=country_code))
+
+    # 6. Karriere.NRW (Open-Data-API des Landes NRW, oeffentliche Stellen
+    #    von Land + Kommunen - erster echter Kommunalebene-Fund fuer
+    #    Phase I.1, nur fuer DE relevant).
+    if country_code == "DE":
+        sources.append(KarriereNrwSource())
 
     log.info(
         "Aggregator: Suche '%s' in '%s' (%d km, Land %s) über %d Quelle(n)",

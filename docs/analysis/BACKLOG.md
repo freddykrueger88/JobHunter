@@ -600,7 +600,8 @@ gemeinsames Datenmodell fuer beides nutzen statt zwei parallele Profile.
 Nutzerwunsch: alle europaeischen Jobboersen anbinden, von national bis
 zur kleinsten Kommune, EU-weit. Aktuell integriert: Bundesagentur,
 Adzuna, StepStone, LinkedIn, EURES (EU-weit, offizielle Zentralportale
-aller 31 EURES-Laender - siehe I.1-Fund unten). Umfasst automatisch
+aller 31 EURES-Laender), Karriere.NRW (Open-Data-API des Landes NRW,
+Land- + Kommunalstellen - siehe I.1-Funde unten). Umfasst automatisch
 G.3.13 (#67, Kommunalportale) und G.3.14 (#66, Skandinavien/EU-Portale)
 - nicht als Einzel-Issues umsetzen, sondern hier gebuendelt planen.
 Sehr grosser Umfang (potenziell hunderte Portale/APIs, jedes Land/jede
@@ -626,14 +627,35 @@ noetig, nicht in einem Rutsch machbar.
       (backend/routers/eures.py, GET /api/eures/search) haengte
       ebenfalls an der toten API und wurde von keinem Frontend je
       aufgerufen - als redundanter toter Code entfernt statt repariert.
-- [ ] I.1 (Teil 2) Bestandsaufnahme fuer Portale UNTERHALB von EURES:
-      pro EU-Land nationale/regionale/kommunale Jobportale, die nicht
-      in die EURES-Datenbank einspeisen, + technische Anbindungs-
+- [x] I.1 (Teil 2, erster Fund) Bestandsaufnahme fuer Portale UNTERHALB
+      von EURES ergab einen ersten echten Kommunalebene-Treffer:
+      Karriere.NRW, eine offizielle, dokumentierte Open-Data-API des
+      Landes NRW (https://karriere.nrw/karriere.nrw-opendata-api.pdf)
+      fuer Stellen von Land UND Kommunen (Staedte, Gemeinden,
+      Landkreise) - live verifiziert, 1105 offene Stellen, u.a. von
+      kleinen Staedten wie Meerbusch/Kamen/Korschenbroich. NRW gewaehlt
+      als bevoelkerungsreichstes Bundesland (~18 Mio. Einwohner). Kurze
+      Gegenrecherche zu Bayern ("Traumjob vor Ort") und Baden-
+      Wuerttemberg ergab KEINE vergleichbare oeffentliche API - NRW ist
+      ein Ausreisser, nicht der Normalfall; die uebrigen 15 Bundeslaender
+      brauchen vermutlich Scraping oder sind gar nicht anbindbar.
+      Implementiert (2026-08-27) und als 6. Quelle im Aggregator
+      registriert, nur fuer country_code=="DE" aktiv.
+      Kritischer Fund waehrend der Implementierung: der dokumentierte
+      ort-Parameter (PDF-Beispiel "ort=Bochum") liefert live 0
+      Ergebnisse, selbst fuer Staedte mit nachweislich vorhandenen
+      Treffern (z.B. "ort=Krefeld" trotz eines Krefeld-Jobs im
+      ungefilterten Datensatz) - haette die Quelle in der echten App
+      (die immer einen Ort mitschickt) faktisch stummgemacht. Deshalb
+      reicht die Quelle Ort/Radius bewusst nicht durch, nur Stichwort-
+      suche ueber ganz NRW.
+- [ ] I.1 (Teil 2, offen) restliche 15 Bundeslaender + andere EU-Laender:
+      pro Land/Region nationale/regionale/kommunale Jobportale, die
+      nicht in die EURES-Datenbank einspeisen, + technische Anbindungs-
       moeglichkeit (API vs. Scraping vs. gar nicht moeglich). EURES
       deckt v.a. groessere, ueber nationale Arbeitsagenturen gemeldete
       Stellen ab, keine Kommunalebene.
-- [ ] I.2 Priorisierung (welche Laender/Portale unterhalb von EURES
-      zuerst)
+- [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)
 - [ ] I.4 Rollout Land fuer Land

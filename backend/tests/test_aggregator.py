@@ -30,6 +30,9 @@ class TestSearchAllSources:
             "backend.services.job_search.stepstone.StepStoneSource.search",
             new=AsyncMock(return_value=[]),
         ), patch(
+            "backend.services.job_search.karriere_nrw.KarriereNrwSource.search",
+            new=AsyncMock(return_value=[RawJob(title="NRW-Job", company="Z", source_portal="karriere_nrw")]),
+        ), patch(
             "backend.services.job_search.eures_scraper.EuresSource.search",
             new=AsyncMock(return_value=[RawJob(title="EURES-Job", company="Y", source_portal="eures")]),
         ):
@@ -37,13 +40,17 @@ class TestSearchAllSources:
 
         portals = {r.source_portal for r in results}
         assert "arbeitsagentur" in portals
+        assert "karriere_nrw" in portals
         assert "eures" in portals
 
     async def test_non_de_country_skips_german_specific_sources(self):
         settings_row = UserSettings(id=1)
         aa_search = AsyncMock(return_value=[RawJob(title="AA-Job", company="X", source_portal="arbeitsagentur")])
+        nrw_search = AsyncMock(return_value=[RawJob(title="NRW-Job", company="Z", source_portal="karriere_nrw")])
         with patch(
             "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=aa_search,
+        ), patch(
+            "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=nrw_search,
         ), patch(
             "backend.services.job_search.eures_scraper.EuresSource.search",
             new=AsyncMock(return_value=[RawJob(title="EURES-AT-Job", company="Y", source_portal="eures")]),
@@ -51,6 +58,7 @@ class TestSearchAllSources:
             results = await search_all_sources("koch", "Wien", 25, settings_row, country_code="AT")
 
         aa_search.assert_not_called()
+        nrw_search.assert_not_called()
         portals = {r.source_portal for r in results}
         assert portals == {"eures"}
 

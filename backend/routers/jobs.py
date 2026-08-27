@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_, and_
 from backend.core.database import get_db
 from backend.models.job import Job
 from backend.models.settings import UserSettings
@@ -24,12 +24,28 @@ def _normalize_location(location: str) -> str:
     return location.strip()
 
 
+def _parse_keywords(raw: str | None) -> list[str]:
+    """Komma-getrennte Freitext-Begriffe -> bereinigte Liste (Leerzeichen
+    getrimmt, leere Eintraege verworfen)."""
+    if not raw:
+        return []
+    return [kw.strip() for kw in raw.split(",") if kw.strip()]
+
+
 @router.get("/", response_model=list[JobRead])
 async def list_jobs(
     hide_hidden: bool = True,
     hide_ausbildung: bool = Query(default=None),
     city: str | None = None,
     postal_code: str | None = None,
+    benefit_keywords: str | None = Query(
+        default=None,
+        description="Komma-getrennte Begriffe (#88) - nur Stellen zeigen, die mindestens einen davon in Titel/Beschreibung enthalten",
+    ),
+    blacklist_keywords: str | None = Query(
+        default=None,
+        description="Komma-getrennte Begriffe (#88) - Stellen mit einem dieser Begriffe in Titel/Beschreibung ausblenden",
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     q = select(Job)
@@ -41,6 +57,24 @@ async def list_jobs(
         q = q.where(Job.city.ilike(f"%{city}%"))
     if postal_code:
         q = q.where(Job.postal_code.ilike(f"%{postal_code}%"))
+
+    benefits = _parse_keywords(benefit_keywords)
+    if benefits:
+        q = q.where(or_(*[
+            or_(Job.title.ilike(f"%{kw}%"), Job.description.ilike(f"%{kw}%"))
+            for kw in benefits
+        ]))
+
+    blacklist = _parse_keywords(blacklist_keywords)
+    if blacklist:
+        q = q.where(and_(*[
+            and_(
+                ~Job.title.ilike(f"%{kw}%"),
+                or_(Job.description.is_(None), ~Job.description.ilike(f"%{kw}%")),
+            )
+            for kw in blacklist
+        ]))
+
     q = q.order_by(Job.created_at.desc())
     result = await db.execute(q)
     return result.scalars().all()

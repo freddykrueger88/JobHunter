@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X } from 'lucide-react'
+import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X, SlidersHorizontal } from 'lucide-react'
 import clsx from 'clsx'
 import ImageJobUpload from '../components/ImageJobUpload'
 import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
@@ -51,12 +51,34 @@ export default function Jobs() {
   const [radius, setRadius] = useState(25)
   const [countryCode, setCountryCode] = useState('DE')
   const [hideAusbildung, setHideAusbildung] = useState(true)
+  const [benefitKeywordsInput, setBenefitKeywordsInput] = useState('')
+  const [blacklistKeywordsInput, setBlacklistKeywordsInput] = useState('')
+  const [benefitKeywords, setBenefitKeywords] = useState('')
+  const [blacklistKeywords, setBlacklistKeywords] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
   const [showPhotoUpload, setShowPhotoUpload] = useState(false)
 
+  // Freitext-Filter (#88) erst nach kurzer Tippschreib-Pause anwenden,
+  // statt bei jedem Tastendruck eine neue Anfrage auszuloesen.
+  useEffect(() => {
+    const timer = setTimeout(() => setBenefitKeywords(benefitKeywordsInput), 500)
+    return () => clearTimeout(timer)
+  }, [benefitKeywordsInput])
+  useEffect(() => {
+    const timer = setTimeout(() => setBlacklistKeywords(blacklistKeywordsInput), 500)
+    return () => clearTimeout(timer)
+  }, [blacklistKeywordsInput])
+
   const { data: jobs = [], isLoading: loadingJobs } = useQuery<Job[]>({
-    queryKey: ['jobs', hideAusbildung],
-    queryFn: () => axios.get(`/api/jobs/?hide_ausbildung=${hideAusbildung}`).then(r => r.data),
+    queryKey: ['jobs', hideAusbildung, benefitKeywords, blacklistKeywords],
+    queryFn: () => axios.get('/api/jobs/', {
+      params: {
+        hide_ausbildung: hideAusbildung,
+        benefit_keywords: benefitKeywords || undefined,
+        blacklist_keywords: blacklistKeywords || undefined,
+      },
+    }).then(r => r.data),
   })
 
   const { data: euresCountries = [] } = useQuery<EuresCountry[]>({
@@ -127,15 +149,28 @@ export default function Jobs() {
             </p>
           )}
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox"
-                checked={hideAusbildung}
-                onChange={e => setHideAusbildung(e.target.checked)}
-                className="rounded"
-              />
-              Ausbildungsstellen ausblenden
-            </label>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hideAusbildung}
+                  onChange={e => setHideAusbildung(e.target.checked)}
+                  className="rounded"
+                />
+                Ausbildungsstellen ausblenden
+              </label>
+              <button
+                onClick={() => setShowFilters(s => !s)}
+                className={clsx(
+                  'flex items-center gap-1.5 text-sm transition-colors',
+                  (benefitKeywords || blacklistKeywords) ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                )}
+                aria-expanded={showFilters}
+              >
+                <SlidersHorizontal size={14} aria-hidden />
+                Filter{(benefitKeywords || blacklistKeywords) ? ' (aktiv)' : ''}
+              </button>
+            </div>
             <button
               onClick={() => searchMutation.mutate()}
               disabled={searchMutation.isPending || !keywords || !location}
@@ -148,6 +183,34 @@ export default function Jobs() {
               {t('search')}
             </button>
           </div>
+          {showFilters && (
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div>
+                <label htmlFor="benefit-keywords" className="text-xs text-gray-500 block mb-1">
+                  Gewünschte Begriffe (Komma-getrennt)
+                </label>
+                <input
+                  id="benefit-keywords"
+                  className="w-full rounded-lg px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm"
+                  placeholder="z.B. Homeoffice, Dienstwagen"
+                  value={benefitKeywordsInput}
+                  onChange={e => setBenefitKeywordsInput(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="blacklist-keywords" className="text-xs text-gray-500 block mb-1">
+                  Ausschluss-Begriffe (Komma-getrennt)
+                </label>
+                <input
+                  id="blacklist-keywords"
+                  className="w-full rounded-lg px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm"
+                  placeholder="z.B. Zeitarbeit, Callcenter"
+                  value={blacklistKeywordsInput}
+                  onChange={e => setBlacklistKeywordsInput(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Foto-Upload */}
@@ -218,7 +281,9 @@ export default function Jobs() {
           ))}
           {!loadingJobs && jobs.length === 0 && (
             <li className="text-gray-400 text-sm text-center py-8">
-              Noch keine Stellen – starte eine Suche oben 👆
+              {(benefitKeywords || blacklistKeywords)
+                ? 'Keine Stellen entsprechen den aktuellen Filtern.'
+                : 'Noch keine Stellen – starte eine Suche oben 👆'}
             </li>
           )}
         </ul>

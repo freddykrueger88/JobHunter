@@ -565,9 +565,17 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       /blocklist (frontend/src/pages/Blocklist.tsx, eigener i18n-
       Namespace von Anfang an), "Firma blockieren"-Button im Jobs.tsx-
       Detail-Panel. 9 neue Tests. Commit 6e2aede.
-- [ ] G.3.3 (#83) Erfolgs-Timeline - Bewerbungsprozess pro Stelle als
+- [x] G.3.3 (#83) Erfolgs-Timeline - Bewerbungsprozess pro Stelle als
       Zeitstrahl (Beworben -> Antwort -> Gespraech -> Entscheidung),
-      Vergleich mit Durchschnittswerten
+      Vergleich mit Durchschnittswerten. ERLEDIGT (2026-08-27): der reine
+      Zeitstrahl existierte schon aus einer frueheren Session, der
+      Durchschnittsvergleich fehlte. Neuer Service
+      application_timeline.py::get_avg_days_by_status() (Verweildauer je
+      Status aus ApplicationStatusLog-Differenzen, ueber alle Bewerbungen
+      gemittelt). GET /api/applications/{id}/timeline liefert jetzt
+      {entries, avg_days_by_status}. Kanban.tsx zeigt pro Zeitstrahl-
+      Eintrag "X Tage in diesem Status · Ø Y Tage". 8 neue Tests (3 API-
+      Ebene, 5 Service-Unit-Tests). Commit 7567374.
 - [ ] G.3.4 (#82) Slack/Discord/ntfy-Benachrichtigungen per Webhook bei
       neuen passenden Stellen/Statusaenderungen
 - [ ] G.3.5 (#81) Burnout-Fruehwarner - Warnung bei zu vielen Bewerbungen

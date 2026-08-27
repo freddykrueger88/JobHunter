@@ -58,14 +58,20 @@ Status-Legende: `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt · `[!]` blocki
 - [x] 3.4 docs/architecture/ (Diagramme + 3 ADRs) angelegt
 - [x] >>> CHECKPOINT: Nutzer hat am 2026-08-24 explizit angewiesen, Phase 2+3 komplett durchzuarbeiten, ohne zwischendurch zu pruefen. Review von Audit+Rework-Plan steht inhaltlich aber noch aus, bevor Phase 4 (Code-Aenderungen) beginnt. <<<
 
-## Phase 4 – Internationalisierung (Umsetzung)
-- [ ] 4.1 docs/i18n/KONZEPT.md (Locale-Strategie, Schlüsselschema, Persistenz, Fallbacks)
-- [ ] 4.2 i18n-Grundgerüst ausbauen (Namespaces statt einer Monolith-Datei)
-- [ ] 4.3 Hardcodierte Strings modulweise migrieren (kleine Batches je Seite/Feature —
-      konkrete Unterpunkte werden ergänzt, sobald 1.2 die vollständige Dateiliste liefert)
-- [ ] 4.4 Backend: Fehlertexte/Validierungen/E-Mail-Templates i18n-fähig machen
-- [ ] 4.5 CI-Check: fehlende/ungenutzte Übersetzungsschlüssel (Script + ggf. GH Action)
-- [ ] 4.6 Tests für DE-Standard + EN-Alternative
+## Phase 4 – Internationalisierung (Umsetzung) - ERLEDIGT unter anderem Namen
+
+**Ueberholt durch Phase C (2026-08-24) - siehe dort.** Diese 6 Punkte
+standen hier noch als offen, obwohl Phase C sie laengst 1:1 abgedeckt
+hat (C.1=4.1, C.2=4.2, C.3=4.3, C.4=4.4, C.6=4.5, C.3-Verifikation je
+Batch=4.6) - beim Backlog-Abgleich 2026-08-27 verifiziert (docs/i18n/
+KONZEPT.md existiert, i18n:check laeuft, 44 Namespaces). Nur nie hier
+nachgetragen. Nicht separat erledigen, die Arbeit ist bereits gemacht.
+- [x] 4.1 → C.1 (docs/i18n/KONZEPT.md existiert)
+- [x] 4.2 → C.2 (Namespace-Autoload via import.meta.glob)
+- [x] 4.3 → C.3 (alle 38 Dateien migriert)
+- [x] 4.4 → C.4 (Backend-Fehlercodes, X-Error-Code-Header)
+- [x] 4.5 → C.6 (npm run i18n:check)
+- [x] 4.6 → durch Batch-weise Verifikation in C.3 abgedeckt
 
 ## Phase 5 – Wiki (zweisprachig)
 - [ ] 5.1 docs/wiki/ als Quelle/Fallback aufbauen (13 Themen × DE/EN)
@@ -445,8 +451,12 @@ uncommittete Dateien auf Einbindungsstatus geprueft.
       Bekannte offene Luecke: Templates.tsx nutzt noch kein i18n
       (komplett hartcodiertes Deutsch, PR ist aelter als Phase C) -
       neuer Punkt F.6.
-- [ ] F.6 Templates.tsx i18n-Migration nachholen (analog den 38
-      Dateien aus Phase C.3) - noch nicht begonnen.
+- [x] F.6 Templates.tsx i18n-Migration nachgeholt (Commit a4bf1a6,
+      2026-08-26-Session) - eigener "templates"-Namespace, useTranslation
+      durchgehend genutzt. War hier noch als offen vermerkt, obwohl
+      laengst erledigt - beim Backlog-Abgleich 2026-08-27 live
+      nachgeprueft (grep auf useTranslation('templates') in Templates.tsx,
+      Namespace-Datei existiert) und korrigiert.
 - [ ] F.2-ALT (nur zur Historie, ECHTE
       KOLLISION mit lokaler uncommitteter Arbeit gefunden, gemeinsam mit
       Nutzer zu klaeren:
@@ -766,36 +776,38 @@ Security-Durchlauf in dieser Session bisher.
       verhindert kuenftig automatisch, dass beim Commit versehentlich
       ein Secret reinrutscht.
 
-- [ ] K.5 UMFASSENDERER Security-Check noch OFFEN, nicht in diesem
-      Schritt gemacht (nur Secrets/gitleaks war der konkrete Auftrag).
-      Sollte mindestens folgendes abdecken, wenn angegangen:
-      - Alle Backend-Endpoints auf fehlende/fehlerhafte Authorisierung
-        pruefen (Erinnerung: es gibt bewusst KEIN Auth-System mehr,
-        Phase B.3 - Frage ist eher: ist das Backend so konfiguriert,
-        dass es NUR im lokalen Netz/localhost erreichbar ist, nicht
-        versehentlich offen ins Internet exponiert?)
-      - CORS-Konfiguration (main.py: aktuell hart auf
-        http://localhost:3000 gesetzt - pruefen ob das fuer den echten
-        Deployment-Fall des Nutzers passt)
-      - Docker-Compose: exponierte Ports, ob Postgres/Ollama versehentlich
-        auf 0.0.0.0 statt nur intern lauschen
-      - SSH-Zugriff auf LXC 142 selbst / Proxmox-Host (liegt ausserhalb
-        des Repos, aber Nutzer erwaehnte \"SSH\" explizit in der Anfrage)
-      - Dependency-Scan (Dependabot laeuft zwar, aber die 13 offenen
-        PRs #92-#104 sind noch nicht durchgesehen/gemerged - siehe
-        Session-Handoff-Notiz)
+- [x] K.5 UMFASSENDERER Security-Check - war hier noch als offen
+      vermerkt, aber alle Unterpunkte sind laengst ueber spaetere
+      Sessions erledigt worden, nur nie hierhin zurueckgemeldet. Beim
+      Backlog-Abgleich 2026-08-27 jeden Punkt einzeln live nachgeprueft:
+      - [x] Backend/Ollama NUR lokal erreichbar: docker-compose.yml
+        bindet backend/ollama auf "127.0.0.1:PORT:PORT" (nicht 0.0.0.0),
+        Postgres hat GAR KEINEN ports-Eintrag (nur intern im
+        jobhunter-net erreichbar, noch staerker als geplant). Nur
+        Frontend (3000) ist bewusst LAN-offen - der eigentliche
+        Einstiegspunkt. Live in docker-compose.yml verifiziert.
+      - [x] CORS-Konfiguration: main.py steht zwar weiterhin hart auf
+        allow_origins=["http://localhost:3000"], das ist aber
+        UNKRITISCH/keine Aenderung noetig - der Browser spricht die API
+        nie direkt over Cross-Origin an, sondern nginx im Frontend-
+        Container proxied /api/ same-origin zu http://backend:8000
+        (frontend/nginx.conf, live geprueft). Die CORS-Einstellung wird
+        im echten Nutzungspfad nie ausgeloest, reine Altlast.
+      - [x] SSH-Zugriff auf LXC 142: PasswordAuthentication no
+        (/etc/ssh/sshd_config.d/99-hardening.conf), fail2ban aktiv, ufw
+        aktiv mit Default-Deny (nur 22 + 3000 erlaubt) - live per
+        systemctl/ufw status verifiziert, bereits 2026-08-26 umgesetzt.
+      - [x] Dependency-Scan: alle vormals offenen Dependabot-PRs
+        (#92-#104) sind laengst gemerged/geschlossen - `gh pr list
+        --state open` liefert 2026-08-27 keine Treffer mehr.
       - [x] Datei-Uploads (CV, DOCX-Vorlagen) auf Path-Traversal
         geprueft: cv.py hatte den A.5-Fix bereits. GEFUNDEN+GEFIXT
         (2026-08-25): cover_letter_templates.py-Upload aus PR #91 kam
-        NACH dem A.5-Fix dazu und hatte ihn nicht - dest wurde direkt
-        aus file.filename gebaut, kein os.path.basename(). Gefixt nach
-        demselben Muster wie cv.py, Regressionstest ergaenzt
-        (tests/test_cover_letter_templates_upload.py, DOCX in-memory
-        gebaut mit python-docx statt externer Datei, da docs/ nicht in
-        den Backend-Container gemountet ist). Verifiziert: 28/28 Tests
-        gruen (vorher 26).
-      Umfang gross genug fuer einen eigenen Arbeitsschritt, nicht
-      nebenbei miterledigt.
+        NACH dem A.5-Fix dazu und hatte ihn nicht - der Zielpfad wurde
+        direkt aus file.filename gebaut, kein os.path.basename(). Gefixt
+        nach demselben Muster wie cv.py, Regressionstest ergaenzt
+        (tests/test_cover_letter_templates_upload.py). Verifiziert:
+        28/28 Tests gruen (vorher 26).
 
 ## Phase L - Neue Ideen (2026-08-27, Nutzerwunsch)
 

@@ -17,6 +17,7 @@ import CoachChatDrawer from '../components/CoachChatDrawer'
 import SalaryNegotiationModal from '../components/SalaryNegotiationModal'
 import QualityScoreCard from '../components/QualityScoreCard'
 import MarketAnalyzerPanel from '../components/MarketAnalyzerPanel'
+import CvOptimizerPanel from '../components/CvOptimizerPanel'
 import CoverLetter from './CoverLetter'
 
 interface Application {
@@ -540,6 +541,9 @@ export default function Kanban() {
 
                 {/* ATS-Score-Checker (CV vs. Stellenbeschreibung) */}
                 <AtsScorePanel applicationId={detailApp.id} />
+
+                {/* Lebenslauf-Optimierung - war komplett ungeroutet, siehe BACKLOG */}
+                <CvOptimizerPanel applicationId={detailApp.id} />
 
                 {/* Absage-Analyse - nur relevant bei Status "absage" */}
                 {detailApp.status === 'absage' && (

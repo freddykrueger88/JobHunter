@@ -1,0 +1,9 @@
+{
+  "title": "CV Optimization",
+  "subtitle": "AI improvement suggestions for your CV",
+  "analyzing": "Analyzing…",
+  "analyze": "Analyze",
+  "suggestions": "Suggestions",
+  "noCv": "No CV with extracted text available - please upload a CV first.",
+  "genericError": "Analysis failed. Please try again later."
+}

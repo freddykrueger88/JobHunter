@@ -275,3 +275,27 @@ async def market_analysis_endpoint(
         firma=data.firma,
         ai_client=ai_client,
     )
+
+
+@router.post("/{app_id}/cv-optimize")
+async def cv_optimize_endpoint(
+    app_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI-Verbesserungsvorschlaege fuer den zuletzt hochgeladenen Lebenslauf,
+    im Kontext der Stellenbeschreibung dieser Bewerbung."""
+    from backend.models.cv import CVData
+    from backend.services.cv_optimizer import optimize_cv
+
+    app = await db.get(Application, app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Bewerbung nicht gefunden")
+
+    cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+    cv = cv_result.scalar_one_or_none()
+    if not cv or not cv.raw_text:
+        raise HTTPException(status_code=400, detail="Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.")
+
+    job = await db.get(Job, app.job_id)
+    return await optimize_cv(cv.raw_text, job.description if job else None, ai_client)

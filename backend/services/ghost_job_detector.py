@@ -1,7 +1,7 @@
 """Ghost-Job-Erkennung: Erkennt veraltete oder fiktive Stellenanzeigen."""
 from __future__ import annotations
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 # Typische Boilerplate-Phrasen in Ghost Jobs
@@ -39,7 +39,12 @@ def detect_ghost_job(
 
     # 1. Alter
     if veroeffentlicht:
-        alter = (datetime.utcnow() - veroeffentlicht).days
+        # veroeffentlicht kommt aus einer timezone-aware DB-Spalte -
+        # datetime.utcnow() ist naiv und wuerde die Subtraktion mit
+        # "can't subtract offset-naive and offset-aware datetimes" crashen.
+        now = datetime.now(timezone.utc)
+        vgl = veroeffentlicht if veroeffentlicht.tzinfo else veroeffentlicht.replace(tzinfo=timezone.utc)
+        alter = (now - vgl).days
         if alter > 30:
             score += WEIGHTS['alter']
             gruende.append(f'Anzeige ist {alter} Tage alt (>30 Tage)')

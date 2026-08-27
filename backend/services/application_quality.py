@@ -1,24 +1,34 @@
-"""Bewerbungs-Qualitaetsscore: Gewichteter Gesamt-Score aus allen vorhandenen KI-Tools."""
+"""Bewerbungs-Qualitaetsscore: Gewichteter Gesamt-Score aus allen vorhandenen KI-Tools.
+
+Ursprungsversion griff auf Application.anschreiben/anschreiben_score/
+cv_pfad/ats_score zu - keines davon existierte je auf dem Modell
+(Anschreiben liegen in einer eigenen Tabelle, CVs sind global statt pro
+Bewerbung, ATS-/Anschreiben-Scores wurden nirgends zwischengespeichert).
+Jetzt: CoverLetter.quality_score + Application.ats_score werden von
+cover_letter_evaluator.py bzw. dem ats-check-Endpoint befuellt, sobald
+sie einmal gelaufen sind; CV-Vorhandensein ist global wie ueberall sonst
+im Projekt (skill_gap, job_analyzer, ats_scorer nutzen denselben
+"zuletzt hochgeladener CV"-Ansatz)."""
 from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from backend.models import Application, Job
+from sqlalchemy import select, func
+from backend.models import Application, CoverLetter, CVData, Job
 
 # Gewichtung der einzelnen Komponenten
 WEIGHTS = {
     'anschreiben':       20,  # vorhanden?
-    'anschreiben_score': 25,  # Bewertung aus v1.5
+    'anschreiben_score': 25,  # KI-Bewertung (cover_letter_evaluator.py)
     'cv_vorhanden':      15,  # Lebenslauf hochgeladen?
-    'ats_score':         25,  # ATS-Keyword-Match (v1.8)
-    'skill_gap':         15,  # Skill-Gap-Score (v1.5)
+    'ats_score':         25,  # ATS-Keyword-Match
+    'skill_gap':         15,  # Skill-Gap-Score (job_analyzer/skill_gap.py)
 }
 
 CHECKS = [
-    {'key': 'anschreiben',       'label': 'Anschreiben vorhanden',     'link': 'anschreiben'},
-    {'key': 'anschreiben_score', 'label': 'Anschreiben bewertet',      'link': 'anschreiben-bewertung'},
-    {'key': 'cv_vorhanden',      'label': 'Lebenslauf hochgeladen',    'link': 'lebenslauf'},
-    {'key': 'ats_score',         'label': 'ATS-Score berechnet',       'link': 'ats-check'},
-    {'key': 'skill_gap',         'label': 'Skill-Gap analysiert',      'link': 'skill-gap'},
+    {'key': 'anschreiben',       'label': 'Anschreiben vorhanden'},
+    {'key': 'anschreiben_score', 'label': 'Anschreiben bewertet'},
+    {'key': 'cv_vorhanden',      'label': 'Lebenslauf hochgeladen'},
+    {'key': 'ats_score',         'label': 'ATS-Score berechnet'},
+    {'key': 'skill_gap',         'label': 'Skill-Gap analysiert'},
 ]
 
 
@@ -32,39 +42,28 @@ async def get_quality_score(application_id: int, db: AsyncSession) -> dict:
     job_result = await db.execute(select(Job).where(Job.id == app.job_id))
     job = job_result.scalar_one_or_none()
 
-    # Einzelkomponenten bewerten
-    components = {}
+    cl_result = await db.execute(
+        select(CoverLetter)
+        .where(CoverLetter.application_id == application_id)
+        .order_by(CoverLetter.created_at.desc())
+        .limit(1)
+    )
+    cover_letter = cl_result.scalar_one_or_none()
 
-    # Anschreiben vorhanden (0 oder 100)
-    components['anschreiben'] = 100 if app.anschreiben else 0
+    cv_count = (await db.execute(select(func.count()).select_from(CVData))).scalar() or 0
 
-    # Anschreiben-Score aus DB (aus cover_letter_evaluator v1.5)
-    if hasattr(app, 'anschreiben_score') and app.anschreiben_score:
-        components['anschreiben_score'] = min(int(app.anschreiben_score), 100)
-    else:
-        components['anschreiben_score'] = 0
+    components = {
+        'anschreiben': 100 if cover_letter else 0,
+        'anschreiben_score': min(cover_letter.quality_score, 100) if cover_letter and cover_letter.quality_score else 0,
+        'cv_vorhanden': 100 if cv_count > 0 else 0,
+        'ats_score': min(app.ats_score, 100) if app.ats_score else 0,
+        'skill_gap': min(job.skill_gap_score, 100) if job and job.skill_gap_score else 0,
+    }
 
-    # CV vorhanden
-    components['cv_vorhanden'] = 100 if getattr(app, 'cv_pfad', None) else 0
-
-    # ATS-Score aus DB
-    if hasattr(app, 'ats_score') and app.ats_score:
-        components['ats_score'] = min(int(app.ats_score), 100)
-    else:
-        components['ats_score'] = 0
-
-    # Skill-Gap-Score aus Job (gecacht in v1.5)
-    if job and hasattr(job, 'skill_gap_score') and job.skill_gap_score:
-        components['skill_gap'] = min(int(job.skill_gap_score), 100)
-    else:
-        components['skill_gap'] = 0
-
-    # Gewichteter Gesamt-Score
     total_weight = sum(WEIGHTS.values())
     weighted_sum = sum(components[k] * WEIGHTS[k] for k in WEIGHTS)
     gesamt_score = round(weighted_sum / total_weight)
 
-    # Checkliste mit Status und Schnelllinks
     checklist = []
     for check in CHECKS:
         key = check['key']
@@ -74,7 +73,10 @@ async def get_quality_score(application_id: int, db: AsyncSession) -> dict:
             'label': check['label'],
             'erledigt': done,
             'score': components[key],
-            'link': f'/bewerbung/{application_id}/{check["link"]}' if not done else None,
+            # Kein Deep-Link ins Kanban-Board fuer eine einzelne Bewerbung
+            # moeglich (keine entsprechende Route) - bewusst kein Link
+            # statt eines toten.
+            'link': None,
         })
 
     fehlende = [c for c in checklist if not c['erledigt']]

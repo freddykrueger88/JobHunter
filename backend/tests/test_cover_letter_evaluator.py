@@ -74,3 +74,30 @@ class TestEvaluateCoverLetterEndpoint:
         body = res.json()
         assert body["overall_score"] == 82
         assert body["strengths"] == ["klar"]
+
+    async def test_persists_overall_score_for_quality_score_cache(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """application_quality.py liest CoverLetter.quality_score, damit es
+        nicht bei jedem Aufruf neu bewerten muss - evaluate_cover_letter
+        muss das Feld befuellen."""
+        job = Job(title="Backend Engineer", company="Beispiel GmbH",
+                   description="Wir suchen einen Python-Entwickler.")
+        db.add(job)
+        await db.commit()
+        await db.refresh(job)
+        app_res = await client.post("/api/applications/", json={"job_id": job.id})
+        app_id = app_res.json()["id"]
+
+        cl = CoverLetter(application_id=app_id, content="Sehr geehrte Damen und Herren, ...")
+        db.add(cl)
+        await db.commit()
+        await db.refresh(cl)
+
+        raw = '{"overall_score": 91, "relevance": 90, "tone": 90, "structure": 90, "strengths": [], "improvements": [], "summary": "..."}'
+        with patch("httpx.AsyncClient", return_value=_mock_ollama_response(raw)):
+            res = await client.post(f"/api/applications/{app_id}/evaluate-cover-letter")
+
+        assert res.status_code == 200, res.text
+        await db.refresh(cl)
+        assert cl.quality_score == 91

@@ -13,6 +13,9 @@ class CoverLetter(Base):
     tone_used: Mapped[str | None] = mapped_column(String(50), nullable=True)  # formell, direkt etc.
     model_used: Mapped[str | None] = mapped_column(String(100), nullable=True)
     template_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Zwischengespeicherter overall_score aus cover_letter_evaluator.py,
+    # damit application_quality.py nicht bei jedem Aufruf neu bewerten muss.
+    quality_score: Mapped[int | None] = mapped_column(nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     application: Mapped["Application"] = relationship(back_populates="cover_letters")

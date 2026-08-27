@@ -7,6 +7,14 @@ import clsx from 'clsx'
 import ImageJobUpload from '../components/ImageJobUpload'
 import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
 import JobAnalysisPanel from '../components/JobAnalysisPanel'
+import GhostJobBadge from '../components/GhostJobBadge'
+
+interface GhostJobResult {
+  ghost_score: number
+  ist_ghost_job: boolean
+  wahrscheinlichkeit: 'hoch' | 'mittel' | 'niedrig'
+  gruende: string[]
+}
 
 interface Job {
   id: number
@@ -19,6 +27,7 @@ interface Job {
   job_type: string | null
   is_hidden: boolean
   created_at: string
+  ghost_job: GhostJobResult
 }
 
 const portalBadgeColor: Record<string, string> = {
@@ -160,6 +169,7 @@ export default function Jobs() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  <GhostJobBadge result={job.ghost_job} />
                   {job.source_portal && (
                     <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium',
                       portalBadgeColor[job.source_portal] ?? portalBadgeColor.default)}>

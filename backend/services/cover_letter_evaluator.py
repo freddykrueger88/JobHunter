@@ -66,4 +66,12 @@ Gib NUR valides JSON zurueck, genau dieses Format (Schluessel immer englisch):
         data = json.loads(response[start:end])
     except (ValueError, json.JSONDecodeError):
         return {'raw': response}
+
+    # Zwischenspeichern fuer application_quality.py (Gesamt-Qualitaetsscore
+    # ueber alle KI-Tools hinweg), damit nicht bei jedem Checklisten-Aufruf
+    # neu bewertet werden muss.
+    if isinstance(data.get('overall_score'), (int, float)):
+        cover_letter.quality_score = int(data['overall_score'])
+        await db.commit()
+
     return data

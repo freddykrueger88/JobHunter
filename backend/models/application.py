@@ -15,6 +15,10 @@ class Application(Base):
     applied_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     interview_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     kanban_position: Mapped[int] = mapped_column(Integer, default=0)  # Reihenfolge im Kanban
+    # Zwischengespeicherter ATS-Score (backend/services/ats_scorer.py),
+    # damit application_quality.py nicht bei jedem Checklisten-Aufruf neu
+    # gegen den CV rechnen muss.
+    ats_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 

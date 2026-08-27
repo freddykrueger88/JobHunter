@@ -209,7 +209,12 @@ async def ats_check_endpoint(
     if not cv or not cv.raw_text:
         raise HTTPException(status_code=400, detail="Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.")
 
-    return await full_ats_check(cv.raw_text, job.description, ai_client)
+    result = await full_ats_check(cv.raw_text, job.description, ai_client)
+    # Zwischenspeichern fuer application_quality.py (Gesamt-Qualitaetsscore),
+    # damit nicht bei jedem Checklisten-Aufruf neu gerechnet werden muss.
+    app.ats_score = result.get("score")
+    await db.commit()
+    return result
 
 
 @router.get("/{app_id}/timeline")
@@ -231,3 +236,42 @@ async def get_application_timeline(app_id: int, db: AsyncSession = Depends(get_d
         {"status": entry.status, "changed_at": entry.changed_at}
         for entry in result.scalars().all()
     ]
+
+
+@router.get("/{app_id}/quality-score")
+async def get_quality_score_endpoint(app_id: int, db: AsyncSession = Depends(get_db)):
+    """Gewichteter Gesamt-Qualitaetsscore ueber alle KI-Tools hinweg."""
+    from backend.services.application_quality import get_quality_score
+
+    try:
+        return await get_quality_score(app_id, db)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+class MarketAnalysisRequest(BaseModel):
+    job_title: str
+    firma: str
+    job_description: str
+
+
+@router.post("/{app_id}/market-analysis")
+async def market_analysis_endpoint(
+    app_id: int,
+    data: MarketAnalysisRequest,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """KI schaetzt Wettbewerb, optimalen Bewerbungszeitpunkt und Strategie."""
+    from backend.services.market_analyzer import analyze_market
+
+    app = await db.get(Application, app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Bewerbung nicht gefunden")
+
+    return await analyze_market(
+        job_title=data.job_title,
+        job_description=data.job_description,
+        firma=data.firma,
+        ai_client=ai_client,
+    )

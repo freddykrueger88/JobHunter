@@ -1,7 +1,9 @@
 import json
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, computed_field, field_validator
 from datetime import datetime
+
+from backend.services.ghost_job_detector import detect_ghost_job
 
 
 class JobBase(BaseModel):
@@ -34,6 +36,21 @@ class JobRead(JobBase):
     skill_gap_score: int | None = None
 
     model_config = {"from_attributes": True}
+
+    @computed_field
+    @property
+    def ghost_job(self) -> dict:
+        """Deterministische Ghost-Job-Heuristik (kein KI-Call, rein aus
+        bereits vorhandenen Job-Feldern) - wird bei jeder Serialisierung
+        live berechnet statt gespeichert, da guenstig genug fuer
+        Listen-Ansichten."""
+        return detect_ghost_job(
+            beschreibung=self.description or "",
+            veroeffentlicht=self.published_at,
+            kontakt_name=self.contact_person,
+            gehalt_min=self.salary_min,
+            gehalt_max=self.salary_max,
+        )
 
     @field_validator("tags", mode="before")
     @classmethod

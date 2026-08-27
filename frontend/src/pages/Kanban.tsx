@@ -15,6 +15,8 @@ import RejectionAnalysisPanel from '../components/RejectionAnalysisPanel'
 import AtsScorePanel from '../components/AtsScorePanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 import SalaryNegotiationModal from '../components/SalaryNegotiationModal'
+import QualityScoreCard from '../components/QualityScoreCard'
+import MarketAnalyzerPanel from '../components/MarketAnalyzerPanel'
 import CoverLetter from './CoverLetter'
 
 interface Application {
@@ -35,6 +37,7 @@ interface Job {
   url: string | null
   salary_min: number | null
   salary_max: number | null
+  description: string | null
 }
 interface TimelineEntry {
   status: string
@@ -506,6 +509,9 @@ export default function Kanban() {
                   </button>
                 </div>
 
+                {/* Gesamt-Qualitaetsscore - war komplett ungeroutet, siehe BACKLOG */}
+                <QualityScoreCard applicationId={detailApp.id} />
+
                 {/* KI-Anschreiben generieren - war komplett ungeroutet, siehe BACKLOG */}
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
                   <CoverLetter
@@ -517,6 +523,14 @@ export default function Kanban() {
                     }}
                   />
                 </div>
+
+                {/* Marktlage-Analyse - war komplett ungeroutet, siehe BACKLOG */}
+                <MarketAnalyzerPanel
+                  applicationId={detailApp.id}
+                  jobTitle={job?.title ?? ''}
+                  firma={job?.company ?? ''}
+                  jobDescription={job?.description ?? ''}
+                />
 
                 {/* #75/G.3.10 - Kultur-Match (Phase H.4) */}
                 <CultureMatchPanel jobId={detailApp.job_id} />

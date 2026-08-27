@@ -14,6 +14,7 @@ from backend.models.blocklist import Blocklist
 from backend.models.user_badge import UserBadge
 from backend.models.backup_log import BackupLog
 from backend.models.text_snippet import TextSnippet
+from backend.models.diary_entry import DiaryEntry
 
 __all__ = [
     "Job",
@@ -32,4 +33,5 @@ __all__ = [
     "UserBadge",
     "BackupLog",
     "TextSnippet",
+    "DiaryEntry",
 ]

@@ -1,0 +1,15 @@
+{
+  "title": "Application Diary",
+  "newEntryPlaceholder": "How's the job search going today? Note down thoughts, experiences, insights ...",
+  "newEntryAriaLabel": "New diary entry",
+  "save": "Save",
+  "cancel": "Cancel",
+  "searchPlaceholder": "Search entries …",
+  "searchAriaLabel": "Search diary",
+  "exportPdf": "Export as PDF",
+  "editEntry": "Edit entry",
+  "editEntryAriaLabel": "Edit entry",
+  "deleteEntry": "Delete entry",
+  "empty": "No entries yet – write something down 👆",
+  "noResults": "No entries found."
+}

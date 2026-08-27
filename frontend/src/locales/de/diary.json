@@ -1,0 +1,15 @@
+{
+  "title": "Bewerbungs-Tagebuch",
+  "newEntryPlaceholder": "Wie läuft die Jobsuche heute? Notiere dir Gedanken, Erlebnisse, Erkenntnisse ...",
+  "newEntryAriaLabel": "Neuer Tagebucheintrag",
+  "save": "Speichern",
+  "cancel": "Abbrechen",
+  "searchPlaceholder": "Einträge durchsuchen …",
+  "searchAriaLabel": "Tagebuch durchsuchen",
+  "exportPdf": "Als PDF exportieren",
+  "editEntry": "Eintrag bearbeiten",
+  "editEntryAriaLabel": "Eintrag bearbeiten",
+  "deleteEntry": "Eintrag löschen",
+  "empty": "Noch keine Einträge – schreib dir etwas auf 👆",
+  "noResults": "Keine Einträge gefunden."
+}

@@ -31,6 +31,7 @@ const Templates = lazy(() => import('./pages/Templates'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Blocklist = lazy(() => import('./pages/Blocklist'))
+const Diary = lazy(() => import('./pages/Diary'))
 
 function RouteFallback() {
   const { t } = useTranslation('common')
@@ -84,6 +85,7 @@ function AppInner() {
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/blocklist" element={<Blocklist />} />
+              <Route path="/diary" element={<Diary />} />
             </Routes>
           )}
         </Suspense>

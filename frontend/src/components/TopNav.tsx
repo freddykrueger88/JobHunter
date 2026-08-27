@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutDashboard, Search, KanbanSquare, History, Settings, Bell, Bot, FileText, User, Radar, Mic, Building2, Ban } from 'lucide-react'
+import { LayoutDashboard, Search, KanbanSquare, History, Settings, Bell, Bot, FileText, User, Radar, Mic, Building2, Ban, BookOpen } from 'lucide-react'
 import clsx from 'clsx'
 import CoachChatDrawer from './CoachChatDrawer'
 
@@ -16,6 +16,7 @@ const navItems = [
   { to: '/templates',           icon: FileText,        key: 'templates' },
   { to: '/history',             icon: History,         key: 'history' },
   { to: '/blocklist',           icon: Ban,             key: 'blocklist' },
+  { to: '/diary',               icon: BookOpen,        key: 'diary' },
   { to: '/profile',             icon: User,            key: 'profile' },
   { to: '/settings',            icon: Settings,        key: 'settings' },
 ]

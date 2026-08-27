@@ -45,6 +45,10 @@
     "setDate": "+ Termin setzen",
     "appliedOn": "Beworben am:",
     "timeline": "Statusverlauf",
+    "daysInStatus_one": "{{count}} Tag in diesem Status",
+    "daysInStatus_other": "{{count}} Tage in diesem Status",
+    "avgDaysInStatus_one": "Ø {{count}} Tag",
+    "avgDaysInStatus_other": "Ø {{count}} Tage",
     "confirmDelete": "Bewerbung wirklich entfernen?",
     "remove": "Entfernen"
   }

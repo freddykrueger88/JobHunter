@@ -46,6 +46,11 @@ interface TimelineEntry {
   changed_at: string
 }
 
+interface TimelineResponse {
+  entries: TimelineEntry[]
+  avg_days_by_status: Record<string, number>
+}
+
 const COLUMNS: { key: string; label: string; colorClass: string; borderClass: string; bgClass: string }[] = [
   { key: 'interessant', label: 'Interessant',  colorClass: 'text-purple-600 dark:text-purple-400',  borderClass: 'border-t-purple-400',  bgClass: 'bg-purple-50 dark:bg-purple-950/30' },
   { key: 'beworben',    label: 'Beworben',     colorClass: 'text-blue-600 dark:text-blue-400',     borderClass: 'border-t-blue-400',    bgClass: 'bg-blue-50 dark:bg-blue-950/30' },
@@ -124,14 +129,16 @@ export default function Kanban() {
     queryFn: () => axios.get('/api/profile/').then(r => r.data),
   })
 
-  const { data: timeline = [], refetch: fetchTimeline } = useQuery<TimelineEntry[]>({
+  const { data: timelineData, refetch: fetchTimeline } = useQuery<TimelineResponse>({
     queryKey: ['timeline', detailApp?.id],
     queryFn: () =>
       detailApp
         ? axios.get(`/api/applications/${detailApp.id}/timeline`).then(r => r.data)
-        : Promise.resolve([]),
+        : Promise.resolve({ entries: [], avg_days_by_status: {} }),
     enabled: !!detailApp,
   })
+  const timeline = timelineData?.entries ?? []
+  const avgDaysByStatus = timelineData?.avg_days_by_status ?? {}
 
   // ───── Mutations ─────
   const moveMutation = useMutation({
@@ -635,13 +642,22 @@ export default function Kanban() {
                       <Clock size={12} aria-hidden /> {t('detail.timeline')}
                     </label>
                     <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-2 space-y-3">
-                      {timeline.map((entry, i) => (
-                        <li key={i} className="ml-4">
-                          <span className="absolute -left-1.5 w-3 h-3 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800" aria-hidden />
-                          <p className="text-xs font-medium">{STATUS_ICONS[entry.status] ?? '🟡'} {entry.status}</p>
-                          <p className="text-xs text-gray-400">{formatDateTimeIntl(entry.changed_at, i18n.language)}</p>
-                        </li>
-                      ))}
+                      {timeline.map((entry, i) => {
+                        const end = i + 1 < timeline.length ? new Date(timeline[i + 1].changed_at) : new Date()
+                        const days = Math.max(0, (end.getTime() - new Date(entry.changed_at).getTime()) / 86_400_000)
+                        const avg = avgDaysByStatus[entry.status]
+                        return (
+                          <li key={i} className="ml-4">
+                            <span className="absolute -left-1.5 w-3 h-3 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800" aria-hidden />
+                            <p className="text-xs font-medium">{STATUS_ICONS[entry.status] ?? '🟡'} {entry.status}</p>
+                            <p className="text-xs text-gray-400">{formatDateTimeIntl(entry.changed_at, i18n.language)}</p>
+                            <p className="text-xs text-gray-400">
+                              {t('detail.daysInStatus', { count: Math.round(days * 10) / 10 })}
+                              {avg !== undefined && ` · ${t('detail.avgDaysInStatus', { count: avg })}`}
+                            </p>
+                          </li>
+                        )
+                      })}
                     </ol>
                   </div>
                 )}

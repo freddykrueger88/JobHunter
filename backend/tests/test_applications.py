@@ -151,7 +151,12 @@ class TestTimeline:
     timeline seit jeher fuer die Detail-Modal-Timeline auf - der Endpoint
     existierte nie (404, still ignoriert da der Frontend-Query-Default ein
     leeres Array ist). application_status_logs existierte als Modell ohne
-    Migration und ohne dass je etwas hineingeschrieben wurde."""
+    Migration und ohne dass je etwas hineingeschrieben wurde.
+
+    #83/G.3.3 (spaetere Session): Response-Form von einem nackten Array
+    auf {entries, avg_days_by_status} umgestellt, um den im Issue
+    gewuenschten "Vergleich mit Durchschnittswerten" zu liefern - siehe
+    TestTimelineAverages unten fuer die neuen Tests dazu."""
 
     async def test_timeline_logs_initial_status_on_create(
         self, client: httpx.AsyncClient, db: AsyncSession,
@@ -161,9 +166,9 @@ class TestTimeline:
         res = await client.get(f"/api/applications/{app_id}/timeline")
 
         assert res.status_code == 200, res.text
-        body = res.json()
-        assert len(body) == 1
-        assert body[0]["status"] == "interessant"
+        entries = res.json()["entries"]
+        assert len(entries) == 1
+        assert entries[0]["status"] == "interessant"
 
     async def test_timeline_logs_status_changes_in_order(
         self, client: httpx.AsyncClient, db: AsyncSession,
@@ -176,7 +181,7 @@ class TestTimeline:
         res = await client.get(f"/api/applications/{app_id}/timeline")
 
         assert res.status_code == 200, res.text
-        statuses = [entry["status"] for entry in res.json()]
+        statuses = [entry["status"] for entry in res.json()["entries"]]
         assert statuses == ["interessant", "beworben", "interview"]
 
     async def test_timeline_does_not_log_when_status_unchanged(
@@ -188,8 +193,59 @@ class TestTimeline:
 
         res = await client.get(f"/api/applications/{app_id}/timeline")
 
-        assert len(res.json()) == 1  # nur der initiale Eintrag aus create
+        assert len(res.json()["entries"]) == 1  # nur der initiale Eintrag aus create
 
     async def test_timeline_for_nonexistent_application_returns_404(self, client: httpx.AsyncClient):
         res = await client.get("/api/applications/999999/timeline")
         assert res.status_code == 404
+
+
+class TestTimelineAverages:
+    """#83/G.3.3: avg_days_by_status im Timeline-Response."""
+
+    async def test_single_application_has_no_completed_stage_yet(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """Eine einzelne, gerade erst angelegte Bewerbung hat noch keinen
+        abgeschlossenen Statuswechsel - der Durchschnitt fuer 'interessant'
+        existiert trotzdem (Dauer bis jetzt), ist aber >= 0."""
+        _, app_id = await _create_job_and_application(client, db)
+
+        res = await client.get(f"/api/applications/{app_id}/timeline")
+
+        avg = res.json()["avg_days_by_status"]
+        assert "interessant" in avg
+        assert avg["interessant"] >= 0
+
+    async def test_average_reflects_multiple_applications(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """Zwei Bewerbungen wechseln von 'interessant' zu 'beworben' -
+        der Durchschnitt fuer 'interessant' wird aus beiden Verweildauern
+        gebildet, nicht nur aus der zuletzt abgefragten Bewerbung."""
+        _, app_id_1 = await _create_job_and_application(client, db)
+        _, app_id_2 = await _create_job_and_application(client, db)
+
+        await client.patch(f"/api/applications/{app_id_1}", json={"status": "beworben"})
+        await client.patch(f"/api/applications/{app_id_2}", json={"status": "beworben"})
+
+        res = await client.get(f"/api/applications/{app_id_1}/timeline")
+
+        avg = res.json()["avg_days_by_status"]
+        assert "interessant" in avg
+        assert "beworben" in avg  # aktueller Status beider Bewerbungen, Dauer bis jetzt
+
+    async def test_avg_is_shared_across_all_applications_not_just_this_one(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """Der Durchschnitt in der Timeline-Antwort von Bewerbung A
+        beruecksichtigt auch den Statusverlauf von Bewerbung B - es ist
+        eine globale Statistik, keine rein bewerbungsbezogene."""
+        _, app_id_1 = await _create_job_and_application(client, db)
+        _, app_id_2 = await _create_job_and_application(client, db)
+        await client.patch(f"/api/applications/{app_id_2}", json={"status": "absage"})
+
+        res = await client.get(f"/api/applications/{app_id_1}/timeline")
+
+        avg = res.json()["avg_days_by_status"]
+        assert "absage" in avg  # stammt nur aus Bewerbung 2s Verlauf

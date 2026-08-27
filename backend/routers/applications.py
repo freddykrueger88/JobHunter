@@ -13,6 +13,7 @@ from backend.models.history import HistoryEntry
 from backend.schemas.application import ApplicationBase, ApplicationRead
 from backend.services.auto_apply import build_application_zip
 from backend.services.ai_client import get_ai_client
+from backend.services.application_timeline import get_avg_days_by_status
 import io
 
 router = APIRouter(prefix="/api/applications", tags=["Bewerbungen"])
@@ -223,7 +224,12 @@ async def get_application_timeline(app_id: int, db: AsyncSession = Depends(get_d
     Modal. War bisher ein reiner 404 - das Frontend rief den Endpoint
     seit jeher auf, es gab ihn nie (application_status_logs existierte
     als Modell, aber ohne Migration und ohne dass je etwas hineingeschrieben
-    wurde)."""
+    wurde).
+
+    #83/G.3.3: liefert zusaetzlich avg_days_by_status - die
+    durchschnittliche Verweildauer je Status ueber ALLE Bewerbungen, damit
+    das Frontend jeden Zeitstrahl-Eintrag mit dem Durchschnitt vergleichen
+    kann ("5 Tage, im Schnitt 6,1 Tage")."""
     app = await db.get(Application, app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Nicht gefunden")
@@ -232,10 +238,14 @@ async def get_application_timeline(app_id: int, db: AsyncSession = Depends(get_d
         .where(ApplicationStatusLog.application_id == app_id)
         .order_by(ApplicationStatusLog.changed_at.asc())
     )
-    return [
+    entries = [
         {"status": entry.status, "changed_at": entry.changed_at}
         for entry in result.scalars().all()
     ]
+    return {
+        "entries": entries,
+        "avg_days_by_status": await get_avg_days_by_status(db),
+    }
 
 
 @router.get("/{app_id}/quality-score")

@@ -45,6 +45,10 @@
     "setDate": "+ Set date",
     "appliedOn": "Applied on:",
     "timeline": "Status History",
+    "daysInStatus_one": "{{count}} day in this status",
+    "daysInStatus_other": "{{count}} days in this status",
+    "avgDaysInStatus_one": "avg. {{count}} day",
+    "avgDaysInStatus_other": "avg. {{count}} days",
     "confirmDelete": "Really remove this application?",
     "remove": "Remove"
   }

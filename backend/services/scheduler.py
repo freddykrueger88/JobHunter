@@ -10,6 +10,7 @@ from backend.models.reminder import Reminder
 from backend.models.history import HistoryEntry
 from backend.models.settings import UserSettings
 from backend.services.job_search.aggregator import search_all_sources
+from backend.services.webhook_notifier import notify_new_jobs
 from datetime import datetime, timezone, timedelta
 import logging
 
@@ -58,6 +59,7 @@ async def run_search_profile(profile_id: int):
                 description=f"Automatische Suche '{profile.name}': {new_count} neue Stellen",
                 meta={"profile_id": profile_id, "keywords": profile.keywords, "new": new_count},
             ))
+            await notify_new_jobs(settings_row, profile.name, new_count)
 
         profile.last_run = datetime.now(timezone.utc)
         profile.last_result_count = new_count

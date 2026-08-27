@@ -22,6 +22,17 @@
   "sendingTestMail": "Sende…",
   "testMailSuccess": "Test-Mail gesendet",
   "testMailError": "Fehlgeschlagen – Einstellungen prüfen",
+  "webhookTitle": "Webhook-Benachrichtigungen",
+  "webhookIntro": "Benachrichtigung an Slack, Discord oder ntfy bei neuen Suchprofil-Treffern und/oder Bewerbungs-Statusänderungen. Optional – ohne Webhook-URL bleibt alles wie bisher.",
+  "webhookTypeLabel": "Dienst",
+  "webhookUrlLabel": "Webhook-URL",
+  "webhookUrlPlaceholder": "https://hooks.slack.com/services/...",
+  "webhookNotifyNewJobs": "Bei neuen Suchprofil-Treffern benachrichtigen",
+  "webhookNotifyStatusChange": "Bei Bewerbungs-Statusänderungen benachrichtigen",
+  "sendTestWebhook": "Test-Benachrichtigung senden",
+  "sendingTestWebhook": "Sende…",
+  "testWebhookSuccess": "Test-Benachrichtigung gesendet",
+  "testWebhookError": "Fehlgeschlagen – Webhook-URL prüfen",
   "dataTitle": "Daten",
 
   "themes": {

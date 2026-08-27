@@ -22,6 +22,17 @@
   "sendingTestMail": "Sending…",
   "testMailSuccess": "Test email sent",
   "testMailError": "Failed – check settings",
+  "webhookTitle": "Webhook Notifications",
+  "webhookIntro": "Send a notification to Slack, Discord, or ntfy on new search-profile matches and/or application status changes. Optional – without a webhook URL, everything stays as before.",
+  "webhookTypeLabel": "Service",
+  "webhookUrlLabel": "Webhook URL",
+  "webhookUrlPlaceholder": "https://hooks.slack.com/services/...",
+  "webhookNotifyNewJobs": "Notify on new search-profile matches",
+  "webhookNotifyStatusChange": "Notify on application status changes",
+  "sendTestWebhook": "Send test notification",
+  "sendingTestWebhook": "Sending…",
+  "testWebhookSuccess": "Test notification sent",
+  "testWebhookError": "Failed – check webhook URL",
   "dataTitle": "Data",
 
   "themes": {

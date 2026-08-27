@@ -28,6 +28,7 @@ class TestGetSettings:
         assert "theme" in body
         assert "has_adzuna_key" in body
         assert "has_francetravail_key" in body
+        assert "has_webhook_url" in body
 
 
 class TestUpdateSettings:
@@ -67,3 +68,22 @@ class TestUpdateSettings:
 
         res2 = await client.get("/api/settings/")
         assert res2.json()["has_francetravail_key"] is True
+
+    async def test_encrypts_webhook_url_and_saves_type_and_toggles(self, client: httpx.AsyncClient):
+        res = await client.patch("/api/settings/", json={
+            "webhook_url": "https://hooks.slack.com/services/super-secret",
+            "webhook_type": "slack",
+            "webhook_notify_new_jobs": True,
+            "webhook_notify_status_change": True,
+        })
+
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["has_webhook_url"] is True
+        assert body["webhook_type"] == "slack"
+        assert body["webhook_notify_new_jobs"] is True
+        assert body["webhook_notify_status_change"] is True
+        assert "super-secret" not in res.text
+
+        res2 = await client.get("/api/settings/")
+        assert res2.json()["has_webhook_url"] is True

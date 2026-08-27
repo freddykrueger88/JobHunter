@@ -249,3 +249,67 @@ class TestTimelineAverages:
 
         avg = res.json()["avg_days_by_status"]
         assert "absage" in avg  # stammt nur aus Bewerbung 2s Verlauf
+
+
+class TestStatusChangeWebhook:
+    """#82/G.3.4: PATCH .../status loest bei konfiguriertem Webhook eine
+    Benachrichtigung aus - darf den eigentlichen Statuswechsel aber nicht
+    blockieren/verzoegern, falls der Webhook-Versand fehlschlaegt."""
+
+    async def test_notifies_on_status_change_when_configured(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        from unittest.mock import AsyncMock, patch
+        from backend.models.settings import UserSettings
+
+        job_id, app_id = await _create_job_and_application(client, db)
+        db.add(UserSettings(id=1))
+        await db.commit()
+
+        with patch(
+            "backend.routers.applications.notify_status_change", new=AsyncMock(),
+        ) as mock_notify:
+            res = await client.patch(f"/api/applications/{app_id}", json={"status": "beworben"})
+
+        assert res.status_code == 200, res.text
+        mock_notify.assert_called_once()
+        call_args = mock_notify.call_args.args
+        assert call_args[3] == "interessant"  # old_status
+        assert call_args[4] == "beworben"     # new_status
+
+    async def test_does_not_notify_when_status_unchanged(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        from unittest.mock import AsyncMock, patch
+
+        _, app_id = await _create_job_and_application(client, db)
+
+        with patch(
+            "backend.routers.applications.notify_status_change", new=AsyncMock(),
+        ) as mock_notify:
+            res = await client.patch(f"/api/applications/{app_id}", json={"notes": "nur eine Notiz"})
+
+        assert res.status_code == 200, res.text
+        mock_notify.assert_not_called()
+
+    async def test_status_change_succeeds_even_if_notification_raises(
+        self, client: httpx.AsyncClient, db: AsyncSession,
+    ):
+        """Ein Fehler im Webhook-Versand darf den eigentlichen, bereits
+        committeten Statuswechsel nicht rueckgaengig machen oder die
+        Response crashen lassen."""
+        from unittest.mock import AsyncMock, patch
+        from backend.models.settings import UserSettings
+
+        _, app_id = await _create_job_and_application(client, db)
+        db.add(UserSettings(id=1))
+        await db.commit()
+
+        with patch(
+            "backend.routers.applications.notify_status_change",
+            new=AsyncMock(side_effect=Exception("Webhook down")),
+        ):
+            res = await client.patch(f"/api/applications/{app_id}", json={"status": "beworben"})
+
+        assert res.status_code == 200, res.text
+        assert res.json()["status"] == "beworben"

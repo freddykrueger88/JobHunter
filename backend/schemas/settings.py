@@ -22,6 +22,10 @@ class SettingsRead(BaseModel):
     smtp_user: str | None
     smtp_recipient: str | None
     has_smtp_password: bool
+    webhook_type: str | None
+    webhook_notify_new_jobs: bool
+    webhook_notify_status_change: bool
+    has_webhook_url: bool
 
     model_config = {"from_attributes": True}
 
@@ -51,3 +55,7 @@ class SettingsUpdate(BaseModel):
     smtp_user: str | None = None
     smtp_recipient: str | None = None
     smtp_password: str | None = None
+    webhook_url: str | None = None
+    webhook_type: str | None = None
+    webhook_notify_new_jobs: bool | None = None
+    webhook_notify_status_change: bool | None = None

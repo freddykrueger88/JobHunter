@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useTheme, type Theme, type ColorBlindMode } from '../context/ThemeContext'
 import { useA11y, type Density } from '../context/AccessibilityContext'
-import { Eye, EyeOff, ExternalLink, Check, Save, AlertCircle, Mail } from 'lucide-react'
+import { Eye, EyeOff, ExternalLink, Check, Save, AlertCircle, Mail, Bell } from 'lucide-react'
 import clsx from 'clsx'
 import ExportImportPanel from '../components/ExportImportPanel'
 
@@ -16,6 +16,8 @@ interface SettingsData {
   smtp_host: string | null; smtp_port: number | null
   smtp_user: string | null; smtp_recipient: string | null
   has_smtp_password: boolean
+  webhook_type: string | null; webhook_notify_new_jobs: boolean
+  webhook_notify_status_change: boolean; has_webhook_url: boolean
 }
 
 type SaveStatus = 'idle' | 'pending' | 'saved' | 'error'
@@ -224,6 +226,12 @@ export default function Settings() {
   const [smtpPassword, setSmtpPassword]       = useState('')
   const [smtpSaveStatus, setSmtpSaveStatus]   = useState<KeysSaveStatus>('idle')
   const [testMailStatus, setTestMailStatus]   = useState<'idle' | 'pending' | 'success' | 'error'>('idle')
+  const [webhookUrl, setWebhookUrl]           = useState('')
+  const [webhookType, setWebhookType]         = useState('slack')
+  const [webhookNotifyNewJobs, setWebhookNotifyNewJobs] = useState(false)
+  const [webhookNotifyStatusChange, setWebhookNotifyStatusChange] = useState(false)
+  const [webhookSaveStatus, setWebhookSaveStatus] = useState<KeysSaveStatus>('idle')
+  const [testWebhookStatus, setTestWebhookStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle')
   // keysSaveStatus: 'idle' = Button normal, 'pending' = lädt,
   // 'saved' = grün (Keys noch sichtbar), 'error' = rot
   const [keysSaveStatus, setKeysSaveStatus]   = useState<KeysSaveStatus>('idle')
@@ -245,6 +253,9 @@ export default function Settings() {
       setSmtpPort(remote.smtp_port ? String(remote.smtp_port) : '')
       setSmtpUser(remote.smtp_user ?? '')
       setSmtpRecipient(remote.smtp_recipient ?? '')
+      setWebhookType(remote.webhook_type ?? 'slack')
+      setWebhookNotifyNewJobs(remote.webhook_notify_new_jobs)
+      setWebhookNotifyStatusChange(remote.webhook_notify_status_change)
     }
   }, [remote])
 
@@ -345,6 +356,39 @@ export default function Settings() {
     onError: () => {
       setTestMailStatus('error')
       setTimeout(() => setTestMailStatus('idle'), 4000)
+    },
+  })
+
+  // ─── Webhook: manuell speichern ─────────────────────────────────────────
+  const saveWebhookMutation = useMutation({
+    mutationFn: () => axios.patch('/api/settings/', {
+      webhook_type: webhookType,
+      webhook_notify_new_jobs: webhookNotifyNewJobs,
+      webhook_notify_status_change: webhookNotifyStatusChange,
+      ...(webhookUrl !== '' && { webhook_url: webhookUrl }),
+    }),
+    onMutate: () => setWebhookSaveStatus('pending'),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['settings'] })
+      setWebhookSaveStatus('saved')
+      setTimeout(() => { setWebhookUrl(''); setWebhookSaveStatus('idle') }, 1500)
+    },
+    onError: () => {
+      setWebhookSaveStatus('error')
+      setTimeout(() => setWebhookSaveStatus('idle'), 3000)
+    },
+  })
+
+  const testWebhookMutation = useMutation({
+    mutationFn: () => axios.post('/api/settings/test-webhook').then(r => r.data),
+    onMutate: () => setTestWebhookStatus('pending'),
+    onSuccess: (data: { success: boolean }) => {
+      setTestWebhookStatus(data.success ? 'success' : 'error')
+      setTimeout(() => setTestWebhookStatus('idle'), 4000)
+    },
+    onError: () => {
+      setTestWebhookStatus('error')
+      setTimeout(() => setTestWebhookStatus('idle'), 4000)
     },
   })
 
@@ -698,6 +742,89 @@ export default function Settings() {
           </button>
           {testMailStatus === 'success' && <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1"><Check size={12} /> {t('testMailSuccess')}</span>}
           {testMailStatus === 'error' && <span className="text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} /> {t('testMailError')}</span>}
+        </div>
+      </Section>
+
+      {/* ── Webhook-Benachrichtigungen ── */}
+      <Section title={`🔔 ${t('webhookTitle')}`}>
+        <p className="text-xs text-gray-400 leading-relaxed">{t('webhookIntro')}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="webhook_type" className="text-sm text-gray-500 block mb-1">{t('webhookTypeLabel')}</label>
+            <select id="webhook_type" value={webhookType} onChange={e => setWebhookType(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
+              <option value="slack">Slack</option>
+              <option value="discord">Discord</option>
+              <option value="ntfy">ntfy</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="webhook_url" className="text-sm text-gray-500 block mb-1">{t('webhookUrlLabel')}</label>
+          <div className="relative">
+            <input
+              id="webhook_url"
+              type={showKeys.webhook_url ? 'text' : 'password'}
+              value={webhookUrl}
+              onChange={e => setWebhookUrl(e.target.value)}
+              placeholder={remote?.has_webhook_url ? t('smtpPasswordStoredPlaceholder') : t('webhookUrlPlaceholder')}
+              className="w-full rounded-lg px-3 py-2 pr-9 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 font-mono"
+            />
+            <button
+              type="button"
+              onClick={() => setShowKeys(s => ({ ...s, webhook_url: !s.webhook_url }))}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              aria-label={showKeys.webhook_url ? t('hideKeyAriaLabel') : t('showKeyAriaLabel')}
+            >
+              {showKeys.webhook_url ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
+            </button>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={webhookNotifyNewJobs}
+              onChange={e => setWebhookNotifyNewJobs(e.target.checked)} className="rounded" />
+            {t('webhookNotifyNewJobs')}
+          </label>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={webhookNotifyStatusChange}
+              onChange={e => setWebhookNotifyStatusChange(e.target.checked)} className="rounded" />
+            {t('webhookNotifyStatusChange')}
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => saveWebhookMutation.mutate()}
+            disabled={webhookSaveStatus === 'pending' || webhookSaveStatus === 'saved'}
+            className={clsx(
+              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              webhookSaveStatus === 'saved'   && 'bg-green-600 text-white cursor-default',
+              webhookSaveStatus === 'error'   && 'bg-red-600 hover:bg-red-700 text-white',
+              webhookSaveStatus === 'pending' && 'bg-blue-400 text-white cursor-wait',
+              webhookSaveStatus === 'idle'    && 'bg-blue-600 hover:bg-blue-700 text-white',
+            )}
+          >
+            {webhookSaveStatus === 'pending' && <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />}
+            {webhookSaveStatus === 'saved'   && <Check size={12} aria-hidden />}
+            {webhookSaveStatus === 'error'   && <AlertCircle size={12} aria-hidden />}
+            {webhookSaveStatus === 'idle'    && <Save size={12} aria-hidden />}
+            {webhookSaveStatus === 'pending' && t('saveKeysPending')}
+            {webhookSaveStatus === 'saved'   && t('saveKeysSaved')}
+            {webhookSaveStatus === 'error'   && t('saveKeysError')}
+            {webhookSaveStatus === 'idle'    && t('saveKeysIdle')}
+          </button>
+
+          <button
+            onClick={() => testWebhookMutation.mutate()}
+            disabled={testWebhookStatus === 'pending' || !remote?.has_webhook_url}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
+          >
+            <Bell size={12} aria-hidden />
+            {testWebhookStatus === 'pending' ? t('sendingTestWebhook') : t('sendTestWebhook')}
+          </button>
+          {testWebhookStatus === 'success' && <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1"><Check size={12} /> {t('testWebhookSuccess')}</span>}
+          {testWebhookStatus === 'error' && <span className="text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} /> {t('testWebhookError')}</span>}
         </div>
       </Section>
 

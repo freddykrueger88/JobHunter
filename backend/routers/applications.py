@@ -14,7 +14,10 @@ from backend.schemas.application import ApplicationBase, ApplicationRead
 from backend.services.auto_apply import build_application_zip
 from backend.services.ai_client import get_ai_client
 from backend.services.application_timeline import get_avg_days_by_status
+from backend.services.webhook_notifier import notify_status_change
+from backend.models.settings import UserSettings
 import io
+import logging
 
 router = APIRouter(prefix="/api/applications", tags=["Bewerbungen"])
 
@@ -90,6 +93,7 @@ async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSess
     if not app:
         raise HTTPException(status_code=404, detail="Nicht gefunden")
     status_changed = data.status is not None and data.status != app.status
+    old_status = app.status
     for k, v in data.model_dump(exclude_none=True).items():
         setattr(app, k, v)
     db.add(HistoryEntry(
@@ -105,6 +109,20 @@ async def update_application(app_id: int, data: ApplicationUpdate, db: AsyncSess
         db.add(ApplicationStatusLog(application_id=app_id, status=data.status))
     await db.commit()
     await db.refresh(app)
+
+    if status_changed:
+        job = await db.get(Job, app.job_id)
+        settings_result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
+        settings_row = settings_result.scalar_one_or_none()
+        if settings_row and job:
+            # Der Statuswechsel ist bereits committet - ein Fehler beim
+            # Benachrichtigen (z.B. Webhook nicht erreichbar) darf die
+            # Response nicht mehr crashen lassen.
+            try:
+                await notify_status_change(settings_row, job.title, job.company, old_status, app.status)
+            except Exception:
+                logging.getLogger(__name__).exception("Webhook-Benachrichtigung fehlgeschlagen")
+
     return app
 
 

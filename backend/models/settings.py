@@ -43,3 +43,11 @@ class UserSettings(Base):
     smtp_user: Mapped[str | None] = mapped_column(String(255), nullable=True)
     smtp_recipient: Mapped[str | None] = mapped_column(String(255), nullable=True)
     smtp_password_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Webhook-Benachrichtigungen (#82, G.3.4) - Slack/Discord/ntfy bei
+    # neuen Suchprofil-Treffern und/oder Bewerbungs-Statusaenderungen.
+    # URL verschluesselt wie SMTP-Passwort (Discord/Slack-Webhook-URLs
+    # erlauben direktes Posten, wenn sie geleakt werden).
+    webhook_url_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    webhook_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # slack, discord, ntfy
+    webhook_notify_new_jobs: Mapped[bool] = mapped_column(Boolean, default=False)
+    webhook_notify_status_change: Mapped[bool] = mapped_column(Boolean, default=False)

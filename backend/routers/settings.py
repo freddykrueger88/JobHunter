@@ -45,6 +45,10 @@ def _to_read(s: UserSettings) -> SettingsRead:
         smtp_user=s.smtp_user,
         smtp_recipient=s.smtp_recipient,
         has_smtp_password=bool(s.smtp_password_enc),
+        webhook_type=s.webhook_type,
+        webhook_notify_new_jobs=s.webhook_notify_new_jobs,
+        webhook_notify_status_change=s.webhook_notify_status_change,
+        has_webhook_url=bool(s.webhook_url_enc),
     )
 
 
@@ -62,6 +66,7 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
         "default_radius_km", "hide_ausbildung", "reminder_default_days",
         "weekly_goal", "color_blind_mode", "onboarding_done",
         "smtp_host", "smtp_port", "smtp_user", "smtp_recipient",
+        "webhook_type", "webhook_notify_new_jobs", "webhook_notify_status_change",
     ]
     for field in simple_fields:
         value = getattr(data, field)
@@ -84,6 +89,8 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
         s.francetravail_client_secret_enc = encrypt(data.francetravail_client_secret)
     if data.smtp_password:
         s.smtp_password_enc = encrypt(data.smtp_password)
+    if data.webhook_url:
+        s.webhook_url_enc = encrypt(data.webhook_url)
     await db.commit()
     await db.refresh(s)
     return _to_read(s)
@@ -96,3 +103,12 @@ async def send_test_mail_endpoint(db: AsyncSession = Depends(get_db)):
 
     s = await get_or_create_settings(db)
     return await send_test_mail(s)
+
+
+@router.post("/test-webhook")
+async def send_test_webhook_endpoint(db: AsyncSession = Depends(get_db)):
+    """Sendet eine Test-Benachrichtigung mit der gespeicherten Webhook-URL (#82, G.3.4)."""
+    from backend.services.webhook_notifier import send_test_webhook
+
+    s = await get_or_create_settings(db)
+    return await send_test_webhook(s)

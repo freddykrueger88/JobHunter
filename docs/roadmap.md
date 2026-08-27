@@ -20,6 +20,7 @@
 | v1.7 | Statistics & Motivation | ✅ Done |
 | v1.8 | ATS Optimization & Application Quality | 🚧 In Progress |
 | v1.9 | Application Coach & Automation | 📌 Planned |
+| v2.0 | EU-wide Job Portals (see below) | 🚧 In Progress |
 
 ---
 
@@ -42,6 +43,17 @@
 - **#64** – Follow-Up System with Reminders: "Follow up in X days" per application, dashboard shows due items
 
 ---
+
+### v2.0 – EU-wide Job Portals
+
+> Vision: connect European job boards from national down to municipal level (see [docs/portals.md](portals.md) for the full list and technical notes).
+
+- EURES – the EU's own pan-European job board, all 31 member countries, country picker in the Jobs page
+- Karriere.NRW – Open Data API for North Rhine-Westphalia (state + municipalities)
+- service.bund.de – German public-sector postings, federal + all 16 states + municipalities
+- France Travail – France's national employment agency (requires free registration, see [docs/api-keys.md](api-keys.md))
+- Arbetsförmedlingen – Sweden's national employment agency (JobTech open-data platform)
+- More EU countries: researched and parked for now (see `docs/analysis/BACKLOG.md`, Phase M) – several require manual approval from the national agency or deeper reverse-engineering rather than a clean self-service API
 
 ### Future (v2.0+)
 
@@ -79,6 +91,7 @@
 | v1.7 | Statistiken & Motivation | ✅ Fertig |
 | v1.8 | ATS-Optimierung & Bewerbungsqualität | 🚧 In Arbeit |
 | v1.9 | Bewerbungscoach & Automatisierung | 📌 Geplant |
+| v2.0 | EU-weite Jobportale (siehe unten) | 🚧 In Arbeit |
 
 ---
 
@@ -99,6 +112,17 @@
 - **#64** – Wiedervorlagen-System: Nachfassen-Erinnerungen mit Ampel
 
 ---
+
+### v2.0 – EU-weite Jobportale
+
+> Vision: europaeische Jobboersen anbinden, von national bis zur kleinsten Kommune (vollstaendige Liste + technische Details siehe [docs/portals.md](portals.md)).
+
+- EURES – das offizielle EU-weite Jobportal, alle 31 Mitgliedslaender, Laenderauswahl auf der Jobs-Seite
+- Karriere.NRW – Open-Data-API des Landes NRW (Land + Kommunen)
+- service.bund.de – deutsche oeffentliche Stellen, Bund + alle 16 Laender + Kommunen
+- France Travail – franzoesische nationale Arbeitsagentur (braucht kostenlose Registrierung, siehe [docs/api-keys.md](api-keys.md))
+- Arbetsförmedlingen – schwedische nationale Arbeitsagentur (offene "JobTech"-Plattform)
+- Weitere EU-Laender: recherchiert und vorerst zurueckgestellt (siehe `docs/analysis/BACKLOG.md`, Phase M) - mehrere brauchen eine manuelle Freigabe der jeweiligen Behoerde oder tieferes Reverse-Engineering statt einer sauberen Self-Service-API
 
 ### Zukunft (v2.0+)
 

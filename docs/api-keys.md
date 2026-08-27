@@ -17,6 +17,8 @@ All keys are stored **AES-256 encrypted** in the local database – never in pla
 | StepStone | ❌ No | Free | Works via scraping |
 | **Adzuna** | Optional | Free | Millions of jobs worldwide (Indeed, Monster, etc.) |
 | **LinkedIn** | Optional | Free* | LinkedIn jobs directly |
+| EURES, Karriere.NRW, service.bund.de, Arbetsförmedlingen | ❌ No | Free | Work without a key, see [docs/portals.md](portals.md) |
+| **France Travail** | Optional (required to search France) | Free | French national job listings (~300,000) |
 
 *LinkedIn API access requires approval and can take several days.
 
@@ -86,6 +88,26 @@ Works without a key. With a registered Client ID you get a higher rate limit.
 
 ---
 
+## France Travail (required to search France)
+
+Unlike EURES/Karriere.NRW/service.bund.de/Arbetsförmedlingen, France Travail (France's national employment agency, formerly Pôle Emploi) has no public key — you need your own free OAuth2 credentials.
+
+### Step 1 – Register
+1. Go to https://francetravail.io/inscription
+2. Create a free account
+
+### Step 2 – Create an app and subscribe to the API
+1. Create an application in your space
+2. Subscribe it to at least the **"Offres d'emploi v2"** API
+3. You will receive a `client_id` and `client_secret`
+
+### Step 3 – Enter in JobHunter
+1. **Settings** → **🔑 API Keys** → "France Travail" section
+2. Enter `Client ID` and `Client Secret` → **Save**
+3. Select "France" as the search country on the Jobs page to activate it
+
+---
+
 ## Security
 
 - All keys are encrypted with **Fernet AES-128** before being stored in the database
@@ -109,6 +131,8 @@ Alle Keys werden **AES-256-verschlüsselt** in der lokalen Datenbank gespeichert
 | StepStone | ❌ Nein | Kostenlos | Funktioniert via Scraping |
 | **Adzuna** | Optional | Kostenlos | Millionen Jobs weltweit |
 | **LinkedIn** | Optional | Kostenlos* | LinkedIn-Jobs direkt |
+| EURES, Karriere.NRW, service.bund.de, Arbetsförmedlingen | ❌ Nein | Kostenlos | Funktionieren ohne Key, siehe [docs/portals.md](portals.md) |
+| **France Travail** | Optional (fuer Suche in Frankreich noetig) | Kostenlos | Franzoesische nationale Stellenangebote (~300.000) |
 
 ## Adzuna (empfohlen)
 
@@ -150,6 +174,19 @@ Alle Keys werden **AES-256-verschlüsselt** in der lokalen Datenbank gespeichert
 
 1. https://jobsuche.api.bund.dev/ aufrufen → registrieren → `Client ID` erhalten
 2. **Einstellungen** → **🔑 API Keys** → `BA Client ID` eintragen
+
+---
+
+## France Travail (fuer Suche in Frankreich noetig)
+
+Anders als EURES/Karriere.NRW/service.bund.de/Arbetsförmedlingen hat France Travail (franzoesische nationale Arbeitsagentur, ehem. Pôle Emploi) keinen oeffentlichen Fest-Key - eigene, kostenlose OAuth2-Zugangsdaten sind noetig.
+
+### Schritte
+1. https://francetravail.io/inscription aufrufen → kostenloses Konto anlegen
+2. Eine Anwendung anlegen und mindestens die API **"Offres d'emploi v2"** abonnieren
+3. `client_id` und `client_secret` erhalten
+4. In JobHunter: **Einstellungen** → **🔑 API Keys** → Abschnitt "France Travail" → eintragen → **Speichern**
+5. Auf der Jobs-Seite "Frankreich" als Suchland auswaehlen, damit die Quelle aktiv wird
 
 ---
 

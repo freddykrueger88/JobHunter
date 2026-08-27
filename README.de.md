@@ -23,7 +23,7 @@ JobHunter ist ein vollständig lokaler Bewerbungs-Tracker mit KI-Unterstützung.
 ## ✨ Features
 
 ### 🔍 Stellensuche & Import
-- Stellensuche via Bundesagentur für Arbeit, Adzuna, StepStone, LinkedIn
+- Stellensuche via Bundesagentur für Arbeit, Adzuna, StepStone, LinkedIn, EURES (EU-weit, 31 Länder), Karriere.NRW, service.bund.de, France Travail, Arbetsförmedlingen — siehe [docs/portals.md](docs/portals.md)
 - Foto-Upload von Stellenanzeigen (OCR + KI-Extraktion)
 - Duplikat-Erkennung (Fuzzy Matching)
 - Ghost-Job-Erkennung ⚠️
@@ -170,7 +170,8 @@ docker exec jobhunter-ollama ollama pull mistral
 | v1.0 – v1.8 | Grundgerüst, KI, Barrierefreiheit, Analytics, ATS | ✅ Fertig |
 | v1.9 | Coach, IMAP, Kalender, Dossier, Import/Export (#62 #65 #68 #71 #77) | ✅ Fertig |
 | v1.9.x | Anschreiben-Vorlage & KI-Befüllung (#89), Auto-Apply (#63) | 🚧 In Arbeit |
-| v2.0+ | EU-Jobportale, Browser-Extension, Multi-User | 💡 Backlog |
+| v2.0 | EU-weite Jobportale (EURES + DE/FR/SE-Quellen) | 🚧 In Arbeit |
+| v2.0+ | Weitere EU-Länder, Browser-Extension, Multi-User | 💡 Backlog |
 
 → Vollständige Roadmap: [docs/roadmap.md](docs/roadmap.md)
 

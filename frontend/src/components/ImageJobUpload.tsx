@@ -2,7 +2,7 @@
  * Foto-Upload Komponente fuer Stellenanzeigen.
  * Unterstuetzt Drag & Drop, Klick-Upload und Kamera (Mobile).
  */
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Camera, Upload, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import axios from 'axios'
@@ -29,6 +29,14 @@ export default function ImageJobUpload({ onJobCreated }: Props) {
   const [result, setResult] = useState<{ job: ParsedJob; ocr_text: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Object-URL der aktuellen Vorschau immer freigeben, wenn sie ersetzt
+  // wird oder die Komponente verschwindet - sonst haeuft jeder Upload-
+  // Versuch (auch fehlgeschlagene/wiederholte) einen weiteren Blob im
+  // Speicher an, den der Browser nie mehr freigibt.
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview) }
+  }, [preview])
 
   const upload = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {

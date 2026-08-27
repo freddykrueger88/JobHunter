@@ -7,6 +7,7 @@ import BadgesPanel from '../components/BadgesPanel'
 import StatsChart from '../components/StatsChart'
 import WeeklyGoalWidget from '../components/WeeklyGoalWidget'
 import BurnoutWarning from '../components/BurnoutWarning'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 
 interface DueReminder {
   id: number
@@ -107,6 +108,11 @@ export default function Dashboard() {
       {/* Wochenziel */}
       <div className="mb-8">
         <WeeklyGoalWidget />
+      </div>
+
+      {/* Aktivitäts-Heatmap */}
+      <div className="mb-8">
+        <ActivityHeatmap />
       </div>
 
       {/* Abzeichen */}

@@ -125,3 +125,29 @@ async def get_burnout_check(db: AsyncSession = Depends(get_db)):
         "schwellenwert": threshold_count,
         "tage": threshold_days,
     }
+
+
+@router.get("/activity-heatmap")
+async def get_activity_heatmap(days: int = 365, db: AsyncSession = Depends(get_db)):
+    """Taegliche Bewerbungsaktivitaet fuer die Heatmap (#79, G.3.7,
+    GitHub-Contribution-Graph-Stil). Liefert JEDEN Tag im Zeitraum, auch
+    mit 0 - das Frontend baut daraus ein durchgehendes Wochenraster ohne
+    Luecken."""
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    result = await db.execute(
+        select(Application.created_at).where(Application.created_at >= since)
+    )
+    counts: dict[str, int] = {}
+    for (created_at,) in result.all():
+        if not created_at:
+            continue
+        key = created_at.date().isoformat()
+        counts[key] = counts.get(key, 0) + 1
+
+    today = datetime.now(timezone.utc).date()
+    heatmap = []
+    for i in range(days - 1, -1, -1):
+        d = today - timedelta(days=i)
+        key = d.isoformat()
+        heatmap.append({"datum": key, "anzahl": counts.get(key, 0)})
+    return heatmap

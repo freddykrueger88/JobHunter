@@ -11,12 +11,11 @@ import {
 import axios from 'axios'
 
 const STATUS_COLORS: Record<string, string> = {
+  interessant: '#a855f7',
   beworben:    '#3b82f6',
-  eingeladen:  '#8b5cf6',
-  gespraech:   '#f59e0b',
-  zusage:      '#10b981',
+  interview:   '#f59e0b',
+  angenommen:  '#10b981',
   absage:      '#ef4444',
-  zurueckgezogen: '#6b7280',
 }
 
 interface Stats {
@@ -48,9 +47,8 @@ export default function StatsChart() {
   }))
   const funnelData = [
     { name: t('funnelLabels.applied'),   value: stats.gesamt },
-    { name: t('funnelLabels.invited'),   value: (stats.nach_status?.eingeladen || 0) + (stats.nach_status?.gespraech || 0) },
-    { name: t('funnelLabels.interview'), value: stats.nach_status?.gespraech || 0 },
-    { name: t('funnelLabels.offer'),     value: stats.nach_status?.zusage || 0 },
+    { name: t('funnelLabels.interview'), value: (stats.nach_status?.interview || 0) + (stats.nach_status?.angenommen || 0) },
+    { name: t('funnelLabels.offer'),     value: stats.nach_status?.angenommen || 0 },
   ].filter(d => d.value > 0)
 
   return (
@@ -92,7 +90,7 @@ export default function StatsChart() {
             <FunnelChart>
               <Funnel dataKey="value" data={funnelData} isAnimationActive>
                 {funnelData.map((entry, i) => (
-                  <Cell key={i} fill={['#3b82f6','#8b5cf6','#f59e0b','#10b981'][i] ?? '#94a3b8'} />
+                  <Cell key={i} fill={['#3b82f6','#f59e0b','#10b981'][i] ?? '#94a3b8'} />
                 ))}
                 <LabelList position="center" fill="#fff" fontSize={12} />
               </Funnel>

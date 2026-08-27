@@ -37,6 +37,8 @@
     "toJob": "📋 View Job",
     "coach": "Coach",
     "coachAriaLabel": "Open application coach for this job",
+    "salaryCoach": "Salary",
+    "salaryCoachAriaLabel": "Open salary negotiation coach for this job",
     "changeStatus": "Change Status",
     "interviewDate": "Interview Date",
     "interviewDateAriaLabel": "Interview date and time",

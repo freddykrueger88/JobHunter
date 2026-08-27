@@ -15,5 +15,7 @@
   "tabPhone": "📞 Phone Call",
   "perYear": "{{amount}} / year",
   "generalTips": "General Tips:",
-  "introPrefix": "AI is generating 3 negotiation scenarios for"
+  "introPrefix": "AI is generating 3 negotiation scenarios for",
+  "desiredSalaryLabel": "Desired salary (EUR gross/year)",
+  "desiredSalaryPlaceholder": "e.g. 55000"
 }

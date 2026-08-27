@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api import calendar, cover_letter_pdf, search_profiles
 from backend.routers import (
-    ai, applications, blocklist, company_dossier, cover_letter_templates,
+    ai, applications, badges, blocklist, company_dossier, cover_letter_templates,
     cv, dashboard, email_parsing, eures, export, followups, history,
-    interview, jobs, jobs_image, profile, reminders, settings,
+    interview, jobs, jobs_image, profile, reminders, salary, settings, stats,
 )
 
 app = FastAPI(
@@ -42,6 +42,9 @@ app.include_router(profile.router)
 app.include_router(cover_letter_pdf.router)
 app.include_router(search_profiles.router)
 app.include_router(jobs_image.router)
+app.include_router(badges.router)
+app.include_router(salary.router)
+app.include_router(stats.router)
 
 
 @app.get("/health", tags=["System"])

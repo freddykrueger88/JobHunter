@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { GripVertical, X, Clock, Plus, Calendar, ChevronRight, Bot } from 'lucide-react'
+import { GripVertical, X, Clock, Plus, Calendar, ChevronRight, Bot, TrendingUp } from 'lucide-react'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import { formatDate as formatDateIntl, formatDateTime as formatDateTimeIntl } from '../lib/formatDate'
@@ -14,6 +14,7 @@ import CoverLetterQualityPanel from '../components/CoverLetterQualityPanel'
 import RejectionAnalysisPanel from '../components/RejectionAnalysisPanel'
 import AtsScorePanel from '../components/AtsScorePanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
+import SalaryNegotiationModal from '../components/SalaryNegotiationModal'
 import CoverLetter from './CoverLetter'
 
 interface Application {
@@ -32,6 +33,8 @@ interface Job {
   company: string
   city: string | null
   url: string | null
+  salary_min: number | null
+  salary_max: number | null
 }
 interface TimelineEntry {
   status: string
@@ -73,6 +76,9 @@ export default function Kanban() {
   // Coach-Drawer (kontextbewusst aus dem Detail-Modal)
   const [coachOpen, setCoachOpen] = useState(false)
 
+  // Gehaltsverhandlungs-Coach
+  const [salaryModalOpen, setSalaryModalOpen] = useState(false)
+
   // Inline note editing
   const [editingNotes, setEditingNotes] = useState<number | null>(null)
   const [notesValue, setNotesValue] = useState('')
@@ -107,6 +113,11 @@ export default function Kanban() {
     company: j.company,
     city: j.city,
   }))
+
+  const { data: profile } = useQuery<{ erfahrungsjahre: number | null }>({
+    queryKey: ['profile'],
+    queryFn: () => axios.get('/api/profile/').then(r => r.data),
+  })
 
   const { data: timeline = [], refetch: fetchTimeline } = useQuery<TimelineEntry[]>({
     queryKey: ['timeline', detailApp?.id],
@@ -485,6 +496,14 @@ export default function Kanban() {
                   >
                     <Bot size={13} aria-hidden /> {t('detail.coach')}
                   </button>
+                  {/* Gehaltsverhandlungs-Coach */}
+                  <button
+                    onClick={() => setSalaryModalOpen(true)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition-colors"
+                    aria-label={t('detail.salaryCoachAriaLabel')}
+                  >
+                    <TrendingUp size={13} aria-hidden /> {t('detail.salaryCoach')}
+                  </button>
                 </div>
 
                 {/* KI-Anschreiben generieren - war komplett ungeroutet, siehe BACKLOG */}
@@ -630,6 +649,22 @@ export default function Kanban() {
           status={detailApp.status}
         />
       )}
+
+      {/* Gehaltsverhandlungs-Coach – war komplett ungeroutet, siehe BACKLOG */}
+      {salaryModalOpen && detailApp && (() => {
+        const job = jobMap[detailApp.job_id]
+        return (
+          <SalaryNegotiationModal
+            applicationId={detailApp.id}
+            stelle={job?.title ?? ''}
+            ort={job?.city ?? ''}
+            gehaltMin={job?.salary_min ?? undefined}
+            gehaltMax={job?.salary_max ?? undefined}
+            erfahrungJahre={profile?.erfahrungsjahre ?? 0}
+            onClose={() => setSalaryModalOpen(false)}
+          />
+        )
+      })()}
     </div>
   )
 }

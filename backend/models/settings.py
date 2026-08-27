@@ -22,6 +22,8 @@ class UserSettings(Base):
     hide_ausbildung: Mapped[bool] = mapped_column(Boolean, default=True)
     # Erinnerungen
     reminder_default_days: Mapped[int] = mapped_column(default=7)
+    # Wochenziel fuer WeeklyGoalWidget (Anzahl Bewerbungen/Woche)
+    weekly_goal: Mapped[int] = mapped_column(default=5)
     # Onboarding-Wizard beim ersten Start bereits durchlaufen?
     onboarding_done: Mapped[bool] = mapped_column(Boolean, default=False)
     # API-Keys (Fernet-verschlüsselt)

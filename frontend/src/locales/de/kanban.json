@@ -37,6 +37,8 @@
     "toJob": "📋 Zur Stelle",
     "coach": "Coach",
     "coachAriaLabel": "Bewerbungscoach für diese Stelle öffnen",
+    "salaryCoach": "Gehalt",
+    "salaryCoachAriaLabel": "Gehaltsverhandlungs-Coach für diese Stelle öffnen",
     "changeStatus": "Status ändern",
     "interviewDate": "Gesprächstermin",
     "interviewDateAriaLabel": "Gesprächstermin Datum und Uhrzeit",

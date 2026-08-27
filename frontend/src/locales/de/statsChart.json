@@ -3,17 +3,15 @@
   "weeklyRate": "Bewerbungen pro Woche",
   "funnel": "Bewerbungs-Funnel",
   "statusLabels": {
+    "interessant": "Interessant",
     "beworben": "Beworben",
-    "eingeladen": "Eingeladen",
-    "gespraech": "Gespräch",
-    "zusage": "Zusage",
-    "absage": "Absage",
-    "zurueckgezogen": "Zurückgezogen"
+    "interview": "Interview",
+    "angenommen": "Angenommen",
+    "absage": "Absage"
   },
   "funnelLabels": {
     "applied": "Beworben",
-    "invited": "Eingeladen",
-    "interview": "Gespräch",
-    "offer": "Zusage"
+    "interview": "Interview",
+    "offer": "Angenommen"
   }
 }

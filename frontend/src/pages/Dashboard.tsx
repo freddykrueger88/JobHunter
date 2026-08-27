@@ -3,6 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { formatDateTime } from '../lib/formatDate'
 import { Briefcase, XCircle, CheckCircle, MessageSquare, Star, Bell, BellOff } from 'lucide-react'
+import BadgesPanel from '../components/BadgesPanel'
+import StatsChart from '../components/StatsChart'
+import WeeklyGoalWidget from '../components/WeeklyGoalWidget'
 
 interface DueReminder {
   id: number
@@ -97,6 +100,21 @@ export default function Dashboard() {
           {t('totalBefore')} <strong>{data?.total ?? 0}</strong> {t('totalAfter')}
         </p>
       )}
+
+      {/* Wochenziel */}
+      <div className="mb-8">
+        <WeeklyGoalWidget />
+      </div>
+
+      {/* Abzeichen */}
+      <div className="mb-8">
+        <BadgesPanel />
+      </div>
+
+      {/* Erweiterte Statistiken */}
+      <div className="mb-8">
+        <StatsChart />
+      </div>
 
       {/* Letzte Aktivitäten */}
       <h2 className="text-lg font-semibold mb-3">{t('recentActivityHeading')}</h2>

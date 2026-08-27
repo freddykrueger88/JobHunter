@@ -3,17 +3,15 @@
   "weeklyRate": "Applications per Week",
   "funnel": "Application Funnel",
   "statusLabels": {
+    "interessant": "Interested",
     "beworben": "Applied",
-    "eingeladen": "Invited",
-    "gespraech": "Interview",
-    "zusage": "Offer",
-    "absage": "Rejected",
-    "zurueckgezogen": "Withdrawn"
+    "interview": "Interview",
+    "angenommen": "Accepted",
+    "absage": "Rejected"
   },
   "funnelLabels": {
     "applied": "Applied",
-    "invited": "Invited",
     "interview": "Interview",
-    "offer": "Offer"
+    "offer": "Accepted"
   }
 }

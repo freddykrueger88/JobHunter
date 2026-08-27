@@ -15,5 +15,7 @@
   "tabPhone": "📞 Telefonat",
   "perYear": "{{amount}} / Jahr",
   "generalTips": "Allgemeine Tipps:",
-  "introPrefix": "KI generiert 3 Verhandlungsszenarien für"
+  "introPrefix": "KI generiert 3 Verhandlungsszenarien für",
+  "desiredSalaryLabel": "Gehaltswunsch (EUR brutto/Jahr)",
+  "desiredSalaryPlaceholder": "z.B. 55000"
 }

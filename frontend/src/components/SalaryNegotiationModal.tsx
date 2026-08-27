@@ -44,7 +44,6 @@ interface Props {
   applicationId: number
   stelle: string
   ort: string
-  gehaltWunsch: number
   gehaltMin?: number
   gehaltMax?: number
   erfahrungJahre: number
@@ -53,6 +52,7 @@ interface Props {
 
 export default function SalaryNegotiationModal(props: Props) {
   const { t, i18n } = useTranslation('salaryNegotiationModal')
+  const [gehaltWunsch, setGehaltWunsch] = useState(props.gehaltMax ?? props.gehaltMin ?? 0)
   const [result, setResult] = useState<NegResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'email' | 'telefon'>('email')
@@ -63,7 +63,7 @@ export default function SalaryNegotiationModal(props: Props) {
       const { data } = await axios.post('/api/salary/negotiate', {
         stelle: props.stelle, ort: props.ort,
         erfahrung_jahre: props.erfahrungJahre,
-        gehalt_wunsch: props.gehaltWunsch,
+        gehalt_wunsch: gehaltWunsch,
         gehalt_anzeige_min: props.gehaltMin,
         gehalt_anzeige_max: props.gehaltMax,
       })
@@ -88,7 +88,20 @@ export default function SalaryNegotiationModal(props: Props) {
           {!result && (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">{t('introPrefix')} <strong>{props.stelle}</strong></p>
-              <button onClick={run} disabled={loading}
+              <div className="max-w-xs mx-auto mb-4 text-left">
+                <label htmlFor="gehalt-wunsch" className="text-xs text-gray-500 block mb-1">{t('desiredSalaryLabel')}</label>
+                <input
+                  id="gehalt-wunsch"
+                  type="number"
+                  min={0}
+                  step={1000}
+                  value={gehaltWunsch || ''}
+                  onChange={e => setGehaltWunsch(Number(e.target.value))}
+                  className="w-full text-sm px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={t('desiredSalaryPlaceholder')}
+                />
+              </div>
+              <button onClick={run} disabled={loading || !gehaltWunsch}
                 className="px-6 py-2 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 disabled:opacity-50 transition-colors">
                 {loading ? t('generating') : t('generate')}
               </button>

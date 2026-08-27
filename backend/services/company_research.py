@@ -80,7 +80,11 @@ async def fetch_company_dossier(company_name: str) -> dict:
                 result["logo_url"] = f"https://logo.clearbit.com/{domain_guess}"
 
     except Exception as e:
+        # Nicht cachen: ein transienter Netzwerkfehler wuerde sonst fuer
+        # die gesamte Prozesslaufzeit als "Ergebnis" fuer diese Firma
+        # zurueckgegeben, ununterscheidbar von einer echten Recherche.
         result["description"] = f"Recherche fehlgeschlagen: {e}"
+        return result
 
     _CACHE[company_name] = result
     return result

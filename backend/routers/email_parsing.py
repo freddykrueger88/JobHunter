@@ -24,15 +24,24 @@ class IMAPConfig(BaseModel):
 @router.post("/connect")
 async def test_connection(config: IMAPConfig):
     """Testet ob die IMAP-Verbindung funktioniert (kein Scan)."""
+    import imaplib
+    Imap = imaplib.IMAP4_SSL if config.use_ssl else imaplib.IMAP4
+    conn = None
     try:
-        import imaplib
-        Imap = imaplib.IMAP4_SSL if config.use_ssl else imaplib.IMAP4
         conn = Imap(config.host, config.port)
         conn.login(config.username, config.password)
-        conn.logout()
         return {"status": "ok", "message": "Verbindung erfolgreich"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Verbindung fehlgeschlagen: {e}")
+    finally:
+        # Ohne finally blieb die Socket-Verbindung offen, sobald login()
+        # fehlschlaegt (z.B. falsches Passwort) - conn.logout() stand
+        # bisher nur nach einem erfolgreichen Login.
+        if conn is not None:
+            try:
+                conn.logout()
+            except Exception:
+                pass
 
 
 @router.post("/scan")

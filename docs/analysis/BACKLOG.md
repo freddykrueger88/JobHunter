@@ -703,18 +703,12 @@ Security-Durchlauf in dieser Session bisher.
 
 ## Phase L - Neue Ideen (2026-08-27, Nutzerwunsch)
 
-- [ ] L.1 Kanban-Liste als druckbarer Nachweis fuer die Agentur fuer
+- [x] L.1 Kanban-Liste als druckbarer Nachweis fuer die Agentur fuer
       Arbeit: PDF-Export aller Bewerbungen OHNE Status "interessant"
       (nur tatsaechlich abgeschickte Bewerbungen zaehlen als Nachweis
-      gegenueber dem Amt). Ueberschneidet sich mit der bereits gebauten
-      PDF-Uebersicht aus dem Funktionsfaehigkeits-Audit vom 2026-08-27
-      (backend/services/pdf_overview.py, GET /api/export/pdf-overview) -
-      die hat bereits einen optionalen status-Query-Parameter, aber
-      aktuell nur als Ist-Gleich-Filter (status=X), kein Ausschluss-Filter
-      (status!=X) und keine Frontend-Bedienung dafuer (ExportImportPanel.tsx
-      ruft den Endpoint bisher immer ohne Parameter auf). Naechster
-      Schritt: Ausschluss-Filter im Endpoint ergaenzen (z.B.
-      exclude_status-Query-Param) + Bedienelement im Export-Panel
-      (Checkbox/Dropdown "Interessant ausschliessen" o.ae.), dann fertig -
-      kleinste sinnvolle Anschlussstelle im ganzen Projekt fuer diesen
-      Wunsch, keine neue Infrastruktur noetig.
+      gegenueber dem Amt). ERLEDIGT (2026-08-27): exclude_status-Param
+      in generate_overview_pdf/GET /api/export/pdf-overview ergaenzt,
+      Checkbox "Nur tatsaechliche Bewerbungen" in ExportImportPanel.tsx,
+      haengt bei Aktivierung ?exclude_status=interessant an den
+      Download-Link. Test extrahiert den PDF-Text via pdfminer und
+      prueft, dass die ausgeschlossene Firma nicht mehr vorkommt.

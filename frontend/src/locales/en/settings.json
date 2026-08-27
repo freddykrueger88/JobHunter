@@ -128,6 +128,13 @@
   "reminderLeadTimeMax": "30 days",
   "reminderLeadTimeAriaLabel": "Reminder lead time",
 
+  "burnoutTitle": "Burnout Early Warning",
+  "burnoutIntro": "Warns on the dashboard when you've sent many applications without success in a short time.",
+  "burnoutCountLabel": "Threshold: {{count}} applications",
+  "burnoutCountAriaLabel": "Number of applications for the burnout early warning",
+  "burnoutDaysLabel": "Time window: {{days}} days",
+  "burnoutDaysAriaLabel": "Time window for the burnout early warning",
+
   "exportButton": "Export data",
   "importButton": "Import data",
   "importing": "⏳ Importing…",

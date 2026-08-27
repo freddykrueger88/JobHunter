@@ -35,6 +35,8 @@ def _to_read(s: UserSettings) -> SettingsRead:
         hide_ausbildung=s.hide_ausbildung,
         reminder_default_days=s.reminder_default_days,
         weekly_goal=s.weekly_goal,
+        burnout_threshold_count=s.burnout_threshold_count,
+        burnout_threshold_days=s.burnout_threshold_days,
         onboarding_done=s.onboarding_done,
         has_adzuna_key=bool(s.adzuna_api_key_enc),
         has_linkedin_key=bool(s.linkedin_api_key_enc),
@@ -64,7 +66,8 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
     simple_fields = [
         "theme", "language", "ai_model", "ai_tone", "default_location",
         "default_radius_km", "hide_ausbildung", "reminder_default_days",
-        "weekly_goal", "color_blind_mode", "onboarding_done",
+        "weekly_goal", "burnout_threshold_count", "burnout_threshold_days",
+        "color_blind_mode", "onboarding_done",
         "smtp_host", "smtp_port", "smtp_user", "smtp_recipient",
         "webhook_type", "webhook_notify_new_jobs", "webhook_notify_status_change",
     ]

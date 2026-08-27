@@ -95,3 +95,33 @@ async def get_streak(db: AsyncSession = Depends(get_db)):
             break
 
     return {"streak": streak, "letzte_aktivitaet": dates[0].isoformat()}
+
+
+@router.get("/burnout-check")
+async def get_burnout_check(db: AsyncSession = Depends(get_db)):
+    """Burnout-Fruehwarner (#81, G.3.5): warnt, wenn in den letzten
+    burnout_threshold_days Tagen mindestens burnout_threshold_count
+    Bewerbungen abgeschickt wurden, ohne dass eine davon bisher zu einem
+    Interview oder einer Zusage gefuehrt hat. "interessant" (noch nicht
+    beworben) zaehlt bewusst nicht mit - es ist noch keine abgeschickte
+    Bewerbung, die erfolglos sein koennte."""
+    settings_result = await db.execute(select(UserSettings).where(UserSettings.id == 1))
+    s = settings_result.scalar_one_or_none()
+    threshold_count = s.burnout_threshold_count if s else 10
+    threshold_days = s.burnout_threshold_days if s else 14
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=threshold_days)
+    count_result = await db.execute(
+        select(func.count()).select_from(Application).where(
+            Application.created_at >= cutoff,
+            Application.status.in_(["beworben", "absage"]),
+        )
+    )
+    count = count_result.scalar() or 0
+
+    return {
+        "warnung": count >= threshold_count,
+        "anzahl": count,
+        "schwellenwert": threshold_count,
+        "tage": threshold_days,
+    }

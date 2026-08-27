@@ -1,0 +1,5 @@
+{
+  "title": "⚠️ Vielleicht Zeit für eine Pause?",
+  "message_one": "Du hast in den letzten {{days}} Tagen {{count}} Bewerbung ohne Erfolg abgeschickt – vielleicht lohnt sich eine kurze Pause oder ein Blick auf deine Strategie.",
+  "message_other": "Du hast in den letzten {{days}} Tagen {{count}} Bewerbungen ohne Erfolg abgeschickt – vielleicht lohnt sich eine kurze Pause oder ein Blick auf deine Strategie."
+}

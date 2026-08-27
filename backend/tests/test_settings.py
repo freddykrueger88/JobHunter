@@ -42,6 +42,16 @@ class TestUpdateSettings:
         res2 = await client.get("/api/settings/")
         assert res2.json()["weekly_goal"] == 8
 
+    async def test_updates_burnout_threshold(self, client: httpx.AsyncClient):
+        res = await client.patch("/api/settings/", json={
+            "burnout_threshold_count": 15, "burnout_threshold_days": 21,
+        })
+
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["burnout_threshold_count"] == 15
+        assert body["burnout_threshold_days"] == 21
+
     async def test_updates_simple_field(self, client: httpx.AsyncClient):
         res = await client.patch("/api/settings/", json={"theme": "light"})
 

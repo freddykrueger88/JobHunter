@@ -12,6 +12,7 @@ interface SettingsData {
   theme: string; language: string; ai_model: string; ai_tone: string
   default_location: string | null; default_radius_km: number
   hide_ausbildung: boolean; reminder_default_days: number
+  burnout_threshold_count: number; burnout_threshold_days: number
   has_adzuna_key: boolean; has_linkedin_key: boolean; has_francetravail_key: boolean
   smtp_host: string | null; smtp_port: number | null
   smtp_user: string | null; smtp_recipient: string | null
@@ -213,6 +214,8 @@ export default function Settings() {
   const [defaultRadius, setDefaultRadius]     = useState(25)
   const [hideAusbildung, setHideAusbildung]   = useState(true)
   const [reminderDays, setReminderDays]       = useState(7)
+  const [burnoutCount, setBurnoutCount]       = useState(10)
+  const [burnoutDays, setBurnoutDays]         = useState(14)
   const [showKeys, setShowKeys]               = useState<Record<string, boolean>>({})
   const [keys, setKeys]                       = useState<Record<string, string>>({
     adzuna_app_id: '', adzuna_api_key: '',
@@ -249,6 +252,8 @@ export default function Settings() {
       setDefaultRadius(remote.default_radius_km)
       setHideAusbildung(remote.hide_ausbildung)
       setReminderDays(remote.reminder_default_days)
+      setBurnoutCount(remote.burnout_threshold_count)
+      setBurnoutDays(remote.burnout_threshold_days)
       setSmtpHost(remote.smtp_host ?? '')
       setSmtpPort(remote.smtp_port ? String(remote.smtp_port) : '')
       setSmtpUser(remote.smtp_user ?? '')
@@ -295,12 +300,14 @@ export default function Settings() {
         default_radius_km: defaultRadius,
         hide_ausbildung: hideAusbildung,
         reminder_default_days: reminderDays,
+        burnout_threshold_count: burnoutCount,
+        burnout_threshold_days: burnoutDays,
         color_blind_mode: colorBlindMode,
       })
     }, AUTOSAVE_DELAY)
 
     return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current) }
-  }, [theme, colorBlindMode, aiModel, aiTone, defaultLocation, defaultRadius, hideAusbildung, reminderDays, i18n.language])
+  }, [theme, colorBlindMode, aiModel, aiTone, defaultLocation, defaultRadius, hideAusbildung, reminderDays, burnoutCount, burnoutDays, i18n.language])
 
   // ─── API-Keys: manuell speichern ────────────────────────────────────────
   const saveKeysMutation = useMutation({
@@ -658,6 +665,27 @@ export default function Settings() {
             className="w-full accent-blue-600" aria-label={t('reminderLeadTimeAriaLabel')}
           />
           <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{t('reminderLeadTimeMin')}</span><span>{t('reminderLeadTimeMax')}</span></div>
+        </div>
+      </Section>
+
+      {/* ── Burnout-Frühwarner ── */}
+      <Section title={`🧘 ${t('burnoutTitle')}`}>
+        <p className="text-xs text-gray-400 leading-relaxed">{t('burnoutIntro')}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm text-gray-500 block mb-1">{t('burnoutCountLabel', { count: burnoutCount })}</label>
+            <input type="range" min={3} max={30} step={1} value={burnoutCount}
+              onChange={e => setBurnoutCount(Number(e.target.value))}
+              className="w-full accent-orange-500" aria-label={t('burnoutCountAriaLabel')}
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-500 block mb-1">{t('burnoutDaysLabel', { days: burnoutDays })}</label>
+            <input type="range" min={3} max={60} step={1} value={burnoutDays}
+              onChange={e => setBurnoutDays(Number(e.target.value))}
+              className="w-full accent-orange-500" aria-label={t('burnoutDaysAriaLabel')}
+            />
+          </div>
         </div>
       </Section>
 

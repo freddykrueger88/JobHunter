@@ -6,6 +6,7 @@ import { Briefcase, XCircle, CheckCircle, MessageSquare, Star, Bell, BellOff } f
 import BadgesPanel from '../components/BadgesPanel'
 import StatsChart from '../components/StatsChart'
 import WeeklyGoalWidget from '../components/WeeklyGoalWidget'
+import BurnoutWarning from '../components/BurnoutWarning'
 
 interface DueReminder {
   id: number
@@ -56,6 +57,8 @@ export default function Dashboard() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
+
+      <BurnoutWarning />
 
       {/* Fällige Erinnerungen */}
       {(data?.due_reminders?.length ?? 0) > 0 && (

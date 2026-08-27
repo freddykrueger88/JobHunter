@@ -11,6 +11,8 @@ class SettingsRead(BaseModel):
     hide_ausbildung: bool
     reminder_default_days: int
     weekly_goal: int
+    burnout_threshold_count: int
+    burnout_threshold_days: int
     onboarding_done: bool
     # API-Keys werden NICHT im Klartext zurückgegeben
     has_adzuna_key: bool
@@ -40,6 +42,8 @@ class SettingsUpdate(BaseModel):
     hide_ausbildung: bool | None = None
     reminder_default_days: int | None = None
     weekly_goal: int | None = None
+    burnout_threshold_count: int | None = None
+    burnout_threshold_days: int | None = None
     color_blind_mode: str | None = None
     onboarding_done: bool | None = None
     # API-Keys im Klartext – werden beim Speichern verschlüsselt

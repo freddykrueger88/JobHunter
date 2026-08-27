@@ -24,6 +24,11 @@ class UserSettings(Base):
     reminder_default_days: Mapped[int] = mapped_column(default=7)
     # Wochenziel fuer WeeklyGoalWidget (Anzahl Bewerbungen/Woche)
     weekly_goal: Mapped[int] = mapped_column(default=5)
+    # Burnout-Fruehwarner (#81, G.3.5): Warnung, wenn in
+    # burnout_threshold_days Tagen burnout_threshold_count Bewerbungen
+    # ohne Erfolg (kein Interview/keine Zusage) abgeschickt wurden.
+    burnout_threshold_count: Mapped[int] = mapped_column(default=10)
+    burnout_threshold_days: Mapped[int] = mapped_column(default=14)
     # Onboarding-Wizard beim ersten Start bereits durchlaufen?
     onboarding_done: Mapped[bool] = mapped_column(Boolean, default=False)
     # API-Keys (Fernet-verschlüsselt)

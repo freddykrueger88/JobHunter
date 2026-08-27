@@ -1,0 +1,5 @@
+{
+  "title": "⚠️ Maybe time for a break?",
+  "message_one": "You've sent {{count}} application without success in the last {{days}} days – maybe a short break or a look at your strategy could help.",
+  "message_other": "You've sent {{count}} applications without success in the last {{days}} days – maybe a short break or a look at your strategy could help."
+}

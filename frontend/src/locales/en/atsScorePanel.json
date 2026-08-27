@@ -3,6 +3,8 @@
   "subtitle": "Keyword match: CV vs. job posting",
   "analyzing": "Analyzing…",
   "analyze": "Analyze",
+  "noCv": "No CV with extracted text available - please upload a CV first.",
+  "genericError": "Analysis failed. Please try again later.",
   "ampel": {
     "gruen": "Good",
     "gelb": "Needs improvement",

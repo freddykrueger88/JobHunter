@@ -171,3 +171,30 @@ async def analyze_rejection_endpoint(
         return await analyze_rejection(app_id, data.rejection_text, db, ai_client)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/{app_id}/ats-check")
+async def ats_check_endpoint(
+    app_id: int,
+    ai_client=Depends(get_ai_client),
+    db: AsyncSession = Depends(get_db),
+):
+    """ATS-Score: Keyword-Match des zuletzt hochgeladenen Lebenslaufs gegen
+    die Stellenbeschreibung dieser Bewerbung."""
+    from backend.models.cv import CVData
+    from backend.services.ats_scorer import full_ats_check
+
+    app = await db.get(Application, app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Bewerbung nicht gefunden")
+
+    job = await db.get(Job, app.job_id)
+    if not job or not job.description:
+        raise HTTPException(status_code=400, detail="Keine Stellenbeschreibung vorhanden")
+
+    cv_result = await db.execute(select(CVData).order_by(CVData.uploaded_at.desc()).limit(1))
+    cv = cv_result.scalar_one_or_none()
+    if not cv or not cv.raw_text:
+        raise HTTPException(status_code=400, detail="Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.")
+
+    return await full_ats_check(cv.raw_text, job.description, ai_client)

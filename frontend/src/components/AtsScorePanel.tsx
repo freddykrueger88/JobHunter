@@ -21,25 +21,28 @@ interface AtsResult {
 
 interface Props {
   applicationId: number
-  cvText: string
-  jobDescription: string
 }
 
-export default function AtsScorePanel({ applicationId, cvText, jobDescription }: Props) {
+export default function AtsScorePanel({ applicationId }: Props) {
   const { t } = useTranslation('atsScorePanel')
   const [result, setResult] = useState<AtsResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const run = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const { data } = await axios.post(`/api/applications/${applicationId}/ats-check`, {
-        cv_text: cvText,
-        job_description: jobDescription,
-      })
+      const { data } = await axios.post(`/api/applications/${applicationId}/ats-check`)
       setResult(data)
       setExpanded(true)
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response?.status === 400) {
+        setError(e.response.data?.detail ?? t('noCv'))
+      } else {
+        setError(t('genericError'))
+      }
     } finally {
       setLoading(false)
     }
@@ -66,6 +69,8 @@ export default function AtsScorePanel({ applicationId, cvText, jobDescription }:
           {loading ? t('analyzing') : t('analyze')}
         </button>
       </div>
+
+      {error && <p className="p-4 text-sm text-red-500">{error}</p>}
 
       {result && (
         <div className={clsx('p-4 space-y-4', ampelConfig[result.ampel].bg)}>

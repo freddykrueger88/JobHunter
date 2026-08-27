@@ -12,6 +12,7 @@ import CultureMatchPanel from '../components/CultureMatchPanel'
 import CalendarExportButton from '../components/CalendarExportButton'
 import CoverLetterQualityPanel from '../components/CoverLetterQualityPanel'
 import RejectionAnalysisPanel from '../components/RejectionAnalysisPanel'
+import AtsScorePanel from '../components/AtsScorePanel'
 import CoachChatDrawer from '../components/CoachChatDrawer'
 
 interface Application {
@@ -489,6 +490,9 @@ export default function Kanban() {
 
                 {/* Anschreiben-Bewertung */}
                 <CoverLetterQualityPanel applicationId={detailApp.id} />
+
+                {/* ATS-Score-Checker (CV vs. Stellenbeschreibung) */}
+                <AtsScorePanel applicationId={detailApp.id} />
 
                 {/* Absage-Analyse - nur relevant bei Status "absage" */}
                 {detailApp.status === 'absage' && (

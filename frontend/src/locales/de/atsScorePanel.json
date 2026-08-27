@@ -3,6 +3,8 @@
   "subtitle": "Keyword-Abgleich CV vs. Stelle",
   "analyzing": "Analysiere…",
   "analyze": "Analysieren",
+  "noCv": "Kein Lebenslauf mit Originaltext vorhanden - bitte zuerst einen CV hochladen.",
+  "genericError": "Analyse fehlgeschlagen. Bitte spaeter erneut versuchen.",
   "ampel": {
     "gruen": "Gut",
     "gelb": "Verbesserbar",

@@ -543,9 +543,16 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Verweis auf dieses Dokument (kein Code, keine Prioritaet gegenueber
       der eigentlichen Roadmap - alles v2.0+/"irgendwann", nichts davon
       ist aktuell in Arbeit)
-- [ ] G.3.1 (#88) Erweiterte Job-Filter - Benefit-Whitelist (Filter nach
+- [x] G.3.1 (#88) Erweiterte Job-Filter - Benefit-Whitelist (Filter nach
       gewuenschten Benefits) + Keyword-Blacklist (unerwuenschte Begriffe
-      ausblenden) bei der Stellensuche
+      ausblenden) bei der Stellensuche. ERLEDIGT (2026-08-27): GET
+      /api/jobs/ um benefit_keywords/blacklist_keywords erweitert
+      (komma-getrennte Freitext-Begriffe, Substring-Suche gegen Titel+
+      Beschreibung, case-insensitive). Bewusst nicht in UserSettings
+      persistiert, gleiches Muster wie der bestehende hideAusbildung-
+      Toggle (reiner Seiten-State in Jobs.tsx). Neuer einklappbarer
+      Filter-Bereich im Frontend, 500ms Debounce. 11 neue Tests. Commit
+      6e2e903.
 - [ ] G.3.2 (#84) Firmen-Blacklist - Firmen dauerhaft markieren/ausblenden,
       mit Grund+Datum, ex-/importierbar
 - [ ] G.3.3 (#83) Erfolgs-Timeline - Bewerbungsprozess pro Stelle als

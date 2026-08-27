@@ -703,14 +703,11 @@ noetig, nicht in einem Rutsch machbar.
       koennen, aehnlich dem Karriere.NRW-Fund. Stattdessen: Ort wird ins
       Freitext-Suchfeld eingemischt (von der API selbst so vorgesehen,
       live verifiziert). Commit e5b05b2.
-- [ ] I.1 (Teil 5, offen) weitere EU-Laender ausserhalb Deutschland/
-      Frankreich/Schweden: pro Land nationale/regionale/kommunale
-      Jobportale, die nicht in die EURES-Datenbank einspeisen. Noch keine
-      konkreten Kandidaten recherchiert (Niederlande: negativ, siehe
-      oben). Naechste Kandidaten nach Vermutung, noch nicht live geprueft:
-      Daenemark (jobnet.dk), Finnland (TE-palvelut), Polen (praca.gov.pl/
-      ePraca - erste Recherche fand keine klar dokumentierte API),
-      Belgien (regional: VDAB/FOREM/Actiris), Spanien (SEPE).
+- [ ] I.1 (Teil 5) weitere EU-Laender ausserhalb Deutschland/Frankreich/
+      Schweden - zurueckgestellt, siehe Phase M (ganz unten im Dokument)
+      fuer den RechercheStand und die Begruendung. Deutlich schwieriger
+      als die bisherigen 5 Quellen, kein Schnellgewinn erkennbar - auf
+      Nutzerwunsch (2026-08-27) fuer spaeter geparkt statt jetzt vertieft.
 - [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
 - [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
       Portal komplett eigenen Code braucht)
@@ -811,3 +808,48 @@ Security-Durchlauf in dieser Session bisher.
       haengt bei Aktivierung ?exclude_status=interessant an den
       Download-Link. Test extrahiert den PDF-Text via pdfminer und
       prueft, dass die ausgeschlossene Firma nicht mehr vorkommt.
+
+## Phase M - Niedrige Prioritaet / zurueckgestellt (2026-08-27, Nutzerwunsch: "ganz nach hinten")
+
+Themen, die recherchiert, aber bewusst zurueckgestellt wurden - kein
+Schnellgewinn erkennbar, deutlich mehr Aufwand/Unsicherheit als der
+Rest von Phase I.1. Auf Nutzerwunsch hierher verschoben statt aktiv
+weiterverfolgt, damit sie den Rest des Backlogs nicht blockieren.
+
+- [ ] M.1 Phase I.1 (Teil 5) - EU-Laender ausserhalb Deutschland/
+      Frankreich/Schweden. Recherche-Stand (2026-08-27), pro Land:
+      - **Daenemark** (jobnet.dk): offizieller "Jobnet webservice"
+        existiert, aber kein Self-Service wie francetravail.io - laut
+        offizieller Doku muss man sich an die Behoerde (Styrelsen for
+        Arbejdsmarked og Rekruttering, spoc@star.dk) wenden, mit
+        Entwicklungskosten fuer die Integration. Nicht automatisierbar
+        ohne manuellen Kontakt.
+      - **Finnland** (TE-palvelut): "Open Vacancies"-Service kann
+        technisch per API angebunden werden, aber Zugriffsrechte werden
+        vom KEHA-Center manuell vergeben ("granted") - ebenfalls kein
+        Self-Service.
+      - **Belgien** (VDAB, Region Flandern, groesste der 3 Regionen):
+        developer.vdab.be bietet eine dokumentierte Vacature-API, freier
+        Account-Aufbau moeglich, ABER Zugriff auf einzelne APIs braucht
+        eine Subscription-Freigabe - unklar ob automatisch oder manuell
+        geprueft, nicht live getestet (Account-Erstellung mit echten
+        Nutzerdaten waere noetig, wollte das nicht ungefragt anlegen).
+        Naehestes Muster zu France Travail, falls doch automatisch.
+      - **Spanien** (SEPE/Empleate): der klassische Empleate-Einstiegs-
+        pfad (empleate.gob.es) lieferte live einen Server-Fehler
+        ("no ha sido posible procesar la operacion solicitada"). Ein
+        oeffentlicher Solr-API-Zugang wird von Dritt-Scrapern erwaehnt,
+        aber die konkrete Endpunkt-URL/Doku dazu wurde nicht gefunden -
+        wuerde tieferes Reverse-Engineering brauchen.
+      - **Polen** (CBOP/ePraca, oferty.praca.gov.pl): moderne Angular-
+        SPA, keine offengelegte API im Haupt-JS-Bundle gefunden (nur die
+        Lazy-Load-Chunks nicht durchsucht) - dane.gov.pl als moeglicher
+        Fundort fuer einen offiziellen Datensatz noch nicht gezielt
+        durchsucht. Aehnlicher Aufwand wie service.bund.de, aber ohne
+        dessen RSS-Abkuerzung.
+      - **Naechster sinnvoller Schritt, falls spaeter wieder
+        aufgegriffen:** entweder (a) VDAB-Account anlegen und Freigabe-
+        Tempo live pruefen, (b) dane.gov.pl gezielt nach einem CBOP-
+        Datensatz/API durchsuchen, oder (c) die Lazy-Load-JS-Chunks der
+        beiden SPAs systematisch nach API-Calls durchsuchen. Keiner
+        dieser Schritte wurde bisher unternommen.

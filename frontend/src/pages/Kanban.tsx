@@ -24,6 +24,7 @@ interface Application {
   kanban_position: number
   applied_at: string | null
   interview_at: string | null
+  has_cover_letter: boolean
 }
 interface Job {
   id: number
@@ -473,7 +474,7 @@ export default function Kanban() {
                     applicationId={detailApp.id}
                     jobTitle={job?.title}
                     company={job?.company}
-                    hasCoverLetter={detailApp.status !== 'interessant'}
+                    hasCoverLetter={detailApp.has_cover_letter}
                     hasCV
                   />
                   {/* #62 – Bewerbungscoach (kontextbewusst) */}
@@ -488,7 +489,14 @@ export default function Kanban() {
 
                 {/* KI-Anschreiben generieren - war komplett ungeroutet, siehe BACKLOG */}
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
-                  <CoverLetter jobId={detailApp.job_id} applicationId={detailApp.id} />
+                  <CoverLetter
+                    jobId={detailApp.job_id}
+                    applicationId={detailApp.id}
+                    onGenerated={() => {
+                      qc.invalidateQueries({ queryKey: ['applications'] })
+                      setDetailApp(prev => prev ? { ...prev, has_cover_letter: true } : null)
+                    }}
+                  />
                 </div>
 
                 {/* #75/G.3.10 - Kultur-Match (Phase H.4) */}

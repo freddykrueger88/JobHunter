@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from backend.core.database import get_db
 from backend.models.application import Application
 from backend.models.job import Job
+from backend.models.cover_letter import CoverLetter
 from backend.models.history import HistoryEntry
 from backend.schemas.application import ApplicationBase, ApplicationRead
 from backend.services.auto_apply import build_application_zip
@@ -40,11 +41,14 @@ class FollowUpUpdate(BaseModel):
 async def list_applications(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Application).order_by(Application.created_at.desc()))
     apps = result.scalars().all()
+    cl_result = await db.execute(select(CoverLetter.application_id).distinct())
+    app_ids_with_cover_letter = {row[0] for row in cl_result.all()}
     out = []
     for a in apps:
         job = await db.get(Job, a.job_id)
         d = {c.name: getattr(a, c.name) for c in a.__table__.columns}
         d["job"] = {"title": job.title, "company": job.company, "city": job.city} if job else None
+        d["has_cover_letter"] = a.id in app_ids_with_cover_letter
         out.append(d)
     return out
 
@@ -69,8 +73,10 @@ async def get_application(app_id: int, db: AsyncSession = Depends(get_db)):
     if not app:
         raise HTTPException(status_code=404, detail="Nicht gefunden")
     job = await db.get(Job, app.job_id)
+    cl_result = await db.execute(select(CoverLetter.id).where(CoverLetter.application_id == app_id).limit(1))
     d = {c.name: getattr(app, c.name) for c in app.__table__.columns}
     d["job"] = {"title": job.title, "company": job.company, "city": job.city} if job else None
+    d["has_cover_letter"] = cl_result.scalar_one_or_none() is not None
     return d
 
 

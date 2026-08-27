@@ -28,3 +28,4 @@ class ApplicationRead(ApplicationBase):
     create/update geben die reine ORM-Instanz zurueck, ohne die job-Relation
     zu laden, deshalb dort ApplicationBase statt ApplicationRead."""
     job: ApplicationJobInfo | None = None
+    has_cover_letter: bool = False

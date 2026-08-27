@@ -6,7 +6,7 @@ import { Wand2, Copy, Download, FileDown, Loader2 } from 'lucide-react'
 
 const TONE_VALUES = ['formell', 'direkt', 'modern', 'kreativ'] as const
 
-export default function CoverLetter({ jobId, cvId, applicationId }: { jobId?: number; cvId?: number; applicationId?: number }) {
+export default function CoverLetter({ jobId, cvId, applicationId, onGenerated }: { jobId?: number; cvId?: number; applicationId?: number; onGenerated?: () => void }) {
   const { t } = useTranslation('coverLetter')
   const [tone, setTone] = useState('formell')
   const [template, setTemplate] = useState('')
@@ -26,6 +26,7 @@ export default function CoverLetter({ jobId, cvId, applicationId }: { jobId?: nu
     onSuccess: (res) => {
       setResult(res.data.content)
       setCoverLetterId(res.data.id)
+      onGenerated?.()
     },
   })
 

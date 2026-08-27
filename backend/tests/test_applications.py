@@ -16,6 +16,7 @@ import httpx
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.models.cover_letter import CoverLetter
 from backend.models.job import Job
 
 pytestmark = pytest.mark.asyncio
@@ -69,6 +70,35 @@ class TestListAndGet:
 
         assert res.status_code == 200, res.text
         assert res.json()[0]["job"]["city"] is None
+
+
+class TestHasCoverLetter:
+    """Bugfix-Sweep 2026-08-27: AutoApplyButton bekam bisher
+    hasCoverLetter aus dem Bewerbungsstatus geraten (status !==
+    'interessant') statt aus der Datenbank geprueft - zeigte faelschlich
+    'Anschreiben enthalten', obwohl nie eines generiert wurde. list/get
+    liefern jetzt has_cover_letter aus der cover_letters-Tabelle."""
+
+    async def test_false_when_no_cover_letter_exists(self, client: httpx.AsyncClient, db: AsyncSession):
+        job_id, app_id = await _create_job_and_application(client, db)
+        await client.patch(f"/api/applications/{app_id}", json={"status": "beworben"})
+
+        list_res = await client.get("/api/applications/")
+        get_res = await client.get(f"/api/applications/{app_id}")
+
+        assert list_res.json()[0]["has_cover_letter"] is False
+        assert get_res.json()["has_cover_letter"] is False
+
+    async def test_true_when_cover_letter_exists(self, client: httpx.AsyncClient, db: AsyncSession):
+        job_id, app_id = await _create_job_and_application(client, db)
+        db.add(CoverLetter(application_id=app_id, content="Sehr geehrte Damen und Herren..."))
+        await db.commit()
+
+        list_res = await client.get("/api/applications/")
+        get_res = await client.get(f"/api/applications/{app_id}")
+
+        assert list_res.json()[0]["has_cover_letter"] is True
+        assert get_res.json()["has_cover_letter"] is True
 
 
 class TestCreateAndUpdate:

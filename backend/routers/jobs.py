@@ -12,6 +12,7 @@ from backend.services.job_search.aggregator import search_all_sources
 from backend.services.culture_match import analyze_culture_match
 from backend.services.ai_client import get_ai_client
 from backend.models.cv import CVData
+from backend.routers.blocklist import get_blocked_company_terms
 import re
 
 router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
@@ -75,6 +76,10 @@ async def list_jobs(
             for kw in blacklist
         ]))
 
+    blocked_firmen = await get_blocked_company_terms(db)
+    if blocked_firmen:
+        q = q.where(and_(*[~Job.company.ilike(f"%{firma}%") for firma in blocked_firmen]))
+
     q = q.order_by(Job.created_at.desc())
     result = await db.execute(q)
     return result.scalars().all()
@@ -117,7 +122,10 @@ async def search_jobs(
 
     new_count = 0
     if save:
+        blocked_firmen = [f.lower() for f in await get_blocked_company_terms(db)]
         for rj in raw_jobs:
+            if blocked_firmen and rj.company and any(firma in rj.company.lower() for firma in blocked_firmen):
+                continue
             if rj.external_id:
                 exists = await db.execute(
                     select(Job).where(Job.external_id == rj.external_id, Job.source_portal == rj.source_portal)

@@ -1,0 +1,17 @@
+{
+  "title": "Company Blocklist",
+  "intro": "Permanently hide companies or recruiters – their job listings will no longer appear in search results and won't be saved on future searches.",
+  "newEntry": "New entry",
+  "firmaPlaceholder": "Company",
+  "firmaAriaLabel": "Company name",
+  "recruiterPlaceholder": "Recruiter (optional)",
+  "recruiterAriaLabel": "Recruiter name",
+  "grundPlaceholder": "Reason (optional)",
+  "grundAriaLabel": "Reason for blocking",
+  "addEntry": "Block",
+  "export": "Export",
+  "import": "Import",
+  "importSuccess": "{{imported}} imported, {{skipped}} skipped (already present)",
+  "deleteEntry": "Remove {{name}} from blocklist",
+  "empty": "No companies blocked yet."
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Firmen-Blocklist",
+  "intro": "Firmen oder Recruiter dauerhaft ausblenden – ihre Stellenangebote erscheinen nicht mehr in der Suche und werden bei neuen Suchen nicht mehr gespeichert.",
+  "newEntry": "Neuer Eintrag",
+  "firmaPlaceholder": "Firma",
+  "firmaAriaLabel": "Firmenname",
+  "recruiterPlaceholder": "Recruiter (optional)",
+  "recruiterAriaLabel": "Recruiter-Name",
+  "grundPlaceholder": "Grund (optional)",
+  "grundAriaLabel": "Grund für die Blockierung",
+  "addEntry": "Blockieren",
+  "export": "Exportieren",
+  "import": "Importieren",
+  "importSuccess": "{{imported}} importiert, {{skipped}} übersprungen (bereits vorhanden)",
+  "deleteEntry": "{{name}} von der Blocklist entfernen",
+  "empty": "Noch keine Firmen blockiert."
+}

@@ -1,7 +1,7 @@
-"""CRUD-Router fuer die Firmen-Blocklist."""
+"""CRUD-Router fuer die Firmen-Blocklist (#84, G.3.2)."""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from pydantic import BaseModel
 from typing import Optional
 from backend.core.database import get_db
@@ -30,6 +30,29 @@ async def add_to_blocklist(data: BlocklistCreate, db: AsyncSession = Depends(get
     return entry
 
 
+@router.post('/import')
+async def import_blocklist(entries: list[BlocklistCreate], db: AsyncSession = Depends(get_db)):
+    """Bulk-Import (#84) - z.B. eine zuvor exportierte Blocklist wieder
+    einspielen. Ueberspringt Eintraege, deren firma bereits (case-
+    insensitive, exakt) auf der Liste steht, statt Duplikate anzulegen."""
+    existing = await db.execute(select(Blocklist.firma))
+    existing_lower = {f.lower() for f in existing.scalars().all() if f}
+
+    imported = 0
+    skipped = 0
+    for data in entries:
+        if data.firma and data.firma.lower() in existing_lower:
+            skipped += 1
+            continue
+        db.add(Blocklist(**data.model_dump()))
+        if data.firma:
+            existing_lower.add(data.firma.lower())
+        imported += 1
+
+    await db.commit()
+    return {"imported": imported, "skipped": skipped}
+
+
 @router.delete('/{entry_id}', status_code=204)
 async def remove_from_blocklist(entry_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Blocklist).where(Blocklist.id == entry_id))
@@ -50,3 +73,11 @@ async def is_blocked(firma: str, db: AsyncSession) -> bool:
         )
     )
     return result.scalar_one_or_none() is not None
+
+
+async def get_blocked_company_terms(db: AsyncSession) -> list[str]:
+    """Alle gesetzten firma-Werte der Blocklist auf einmal (fuer
+    Substring-Abgleich gegen Job.company beim Listen/Speichern von
+    Stellen) - vermeidet eine Einzelabfrage pro Job wie is_blocked()."""
+    result = await db.execute(select(Blocklist.firma).where(Blocklist.firma.isnot(None)))
+    return [f for f in result.scalars().all() if f]

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X, SlidersHorizontal } from 'lucide-react'
+import { Search, EyeOff, ExternalLink, MapPin, Building2, Loader2, Camera, X, SlidersHorizontal, Ban } from 'lucide-react'
 import clsx from 'clsx'
 import ImageJobUpload from '../components/ImageJobUpload'
 import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
@@ -97,6 +97,14 @@ export default function Jobs() {
   const hideMutation = useMutation({
     mutationFn: (id: number) => axios.patch(`/api/jobs/${id}/hide`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['jobs'] }),
+  })
+
+  const blockCompanyMutation = useMutation({
+    mutationFn: (company: string) => axios.post('/api/blocklist/', { firma: company, grund: 'Über Jobs-Seite blockiert' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['jobs'] })
+      setSelectedJob(null)
+    },
   })
 
   return (
@@ -316,6 +324,17 @@ export default function Jobs() {
                 className="flex items-center gap-1.5 text-sm bg-gray-200 dark:bg-gray-700 px-3 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
               >
                 <EyeOff size={14} aria-hidden /> Ausblenden
+              </button>
+              <button
+                onClick={() => {
+                  if (window.confirm(`Alle Stellen von "${selectedJob.company}" dauerhaft ausblenden (auch bei zukünftigen Suchen)?`)) {
+                    blockCompanyMutation.mutate(selectedJob.company)
+                  }
+                }}
+                title="Firma auf die Blocklist setzen"
+                className="flex items-center gap-1.5 text-sm bg-gray-200 dark:bg-gray-700 px-3 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+              >
+                <Ban size={14} aria-hidden /> Firma blockieren
               </button>
             </div>
           </div>

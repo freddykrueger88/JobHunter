@@ -10,6 +10,7 @@ from backend.services.job_search.eures_scraper import EuresSource
 from backend.services.job_search.karriere_nrw import KarriereNrwSource
 from backend.services.job_search.service_bund import ServiceBundSource
 from backend.services.job_search.france_travail import FranceTravailSource
+from backend.services.job_search.arbetsformedlingen import ArbetsformedlingenSource
 from backend.core.crypto import decrypt
 
 log = logging.getLogger(__name__)
@@ -71,6 +72,12 @@ async def search_all_sources(
             decrypt(settings_row.francetravail_client_id_enc),
             decrypt(settings_row.francetravail_client_secret_enc),
         ))
+
+    # 9. Arbetsformedlingen (schwedische Arbeitsagentur, JobTech-Plattform).
+    #    Wieder zero-config wie Arbeitsagentur/EURES/Karriere.NRW/
+    #    service.bund.de - oeffentliche API, kein Nutzer-Key noetig.
+    if country_code == "SE":
+        sources.append(ArbetsformedlingenSource())
 
     log.info(
         "Aggregator: Suche '%s' in '%s' (%d km, Land %s) über %d Quelle(n)",

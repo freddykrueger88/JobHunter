@@ -138,3 +138,37 @@ class TestSearchAllSources:
             await search_all_sources("dev", "Berlin", 25, settings_row)
 
         ft_search.assert_not_called()
+
+    async def test_arbetsformedlingen_active_only_for_se(self):
+        settings_row = UserSettings(id=1)
+        af_search = AsyncMock(return_value=[RawJob(title="SE-Job", company="X", source_portal="arbetsformedlingen")])
+        with patch(
+            "backend.services.job_search.arbetsformedlingen.ArbetsformedlingenSource.search", new=af_search,
+        ), patch(
+            "backend.services.job_search.eures_scraper.EuresSource.search", new=AsyncMock(return_value=[]),
+        ):
+            results = await search_all_sources("dev", "Stockholm", 25, settings_row, country_code="SE")
+
+        af_search.assert_called_once()
+        portals = {r.source_portal for r in results}
+        assert "arbetsformedlingen" in portals
+
+    async def test_arbetsformedlingen_inactive_for_other_countries(self):
+        settings_row = UserSettings(id=1)
+        af_search = AsyncMock(return_value=[RawJob(title="SE-Job", company="X", source_portal="arbetsformedlingen")])
+        with patch(
+            "backend.services.job_search.arbetsformedlingen.ArbetsformedlingenSource.search", new=af_search,
+        ), patch(
+            "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.stepstone.StepStoneSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.service_bund.ServiceBundSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.eures_scraper.EuresSource.search", new=AsyncMock(return_value=[]),
+        ):
+            await search_all_sources("dev", "Berlin", 25, settings_row)
+
+        af_search.assert_not_called()

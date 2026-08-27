@@ -37,6 +37,7 @@ const portalBadgeColor: Record<string, string> = {
   karriere_nrw: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
   service_bund: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
   france_travail: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200',
+  arbetsformedlingen: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
   default: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
 }
 

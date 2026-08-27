@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.png" alt="JobHunter logo" width="420">
+</p>
+
 # 🎯 JobHunter
 
 > **Local, AI-powered job application manager** – Self-hosted, GDPR-compliant, no cloud required.

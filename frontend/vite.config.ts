@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'fonts/**/*'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo.png', 'fonts/**/*'],
       manifest: {
         name: 'JobHunter',
         short_name: 'JobHunter',

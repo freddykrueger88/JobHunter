@@ -32,7 +32,9 @@ export default function TopNav() {
         role="navigation"
         aria-label="Hauptnavigation"
       >
-        <span className="text-xl font-bold text-white select-none">🎯 JobHunter</span>
+        <NavLink to="/" className="shrink-0 flex items-center" aria-label="JobHunter – Startseite">
+          <img src="/logo.png" alt="JobHunter" className="h-8 w-auto" />
+        </NavLink>
 
         <ul className="flex flex-wrap gap-1" role="menubar">
           {navItems.map(({ to, icon: Icon, key }) => (

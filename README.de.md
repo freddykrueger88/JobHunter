@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.png" alt="JobHunter Logo" width="420">
+</p>
+
 # 🎯 JobHunter
 
 > **Lokale, KI-gestützte Bewerbungsverwaltung** – Self-hosted, DSGVO-konform, keine Cloud erforderlich.

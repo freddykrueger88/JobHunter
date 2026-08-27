@@ -9,6 +9,7 @@ from backend.services.job_search.linkedin import LinkedInSource
 from backend.services.job_search.eures_scraper import EuresSource
 from backend.services.job_search.karriere_nrw import KarriereNrwSource
 from backend.services.job_search.service_bund import ServiceBundSource
+from backend.services.job_search.france_travail import FranceTravailSource
 from backend.core.crypto import decrypt
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,16 @@ async def search_all_sources(
     #    Anders als Karriere.NRW: Orts-/Radius-Filter live nachweislich korrekt.
     if country_code == "DE":
         sources.append(ServiceBundSource())
+
+    # 8. France Travail (FR-Gegenstueck zur Arbeitsagentur, ~300.000
+    #    Stellen). Anders als alle bisherigen Quellen braucht sie eigene,
+    #    vom Nutzer selbst registrierte OAuth2-Zugangsdaten (wie Adzuna/
+    #    LinkedIn oben) - kein oeffentlicher Fest-Key verfuegbar.
+    if country_code == "FR" and getattr(settings_row, "francetravail_client_id_enc", None) and getattr(settings_row, "francetravail_client_secret_enc", None):
+        sources.append(FranceTravailSource(
+            decrypt(settings_row.francetravail_client_id_enc),
+            decrypt(settings_row.francetravail_client_secret_enc),
+        ))
 
     log.info(
         "Aggregator: Suche '%s' in '%s' (%d km, Land %s) über %d Quelle(n)",

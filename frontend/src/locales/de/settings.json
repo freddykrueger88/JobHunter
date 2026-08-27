@@ -97,6 +97,14 @@
   "saveKeysError": "Fehler – erneut versuchen",
   "saveKeysIdle": "Keys speichern",
 
+  "francetravailSectionLabel": "France Travail (optional, kostenlos)",
+  "francetravailIntro": "Französische Jobbörse (ex-Pôle Emploi), ~300.000 Stellen. Eigene, kostenlose Zugangsdaten nötig – nur relevant bei Suche in Frankreich.",
+  "francetravailClientIdLabel": "Client ID",
+  "francetravailClientIdPlaceholder": "Deine France-Travail Client ID",
+  "francetravailClientSecretLabel": "Client Secret",
+  "francetravailClientSecretPlaceholder": "Dein France-Travail Client Secret",
+  "francetravailKeyStored": "✅ France-Travail-Key hinterlegt",
+
   "linkedinHeading": "⚠️ LinkedIn – kein offizieller API-Key",
   "linkedinBody": "LinkedIn hat seine Job-API für Drittanbieter geschlossen. JobHunter sucht LinkedIn-Stellen direkt über die öffentliche Suche – kein Key erforderlich.",
   "linkedinOpenLink": "LinkedIn Jobs direkt öffnen",

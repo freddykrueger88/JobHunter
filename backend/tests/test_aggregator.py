@@ -81,3 +81,60 @@ class TestSearchAllSources:
             await search_all_sources("x", "y", 25, settings_row, country_code="FR")
 
         mock_init.assert_called_once_with(country_code="FR")
+
+    async def test_france_travail_active_only_for_fr_with_credentials(self):
+        settings_row = UserSettings(id=1)
+        settings_row.francetravail_client_id_enc = "enc-id"
+        settings_row.francetravail_client_secret_enc = "enc-secret"
+        with patch(
+            "backend.services.job_search.aggregator.decrypt", side_effect=lambda x: x.replace("enc-", "plain-"),
+        ), patch(
+            "backend.services.job_search.france_travail.FranceTravailSource.search",
+            new=AsyncMock(return_value=[RawJob(title="FR-Job", company="X", source_portal="france_travail")]),
+        ), patch(
+            "backend.services.job_search.eures_scraper.EuresSource.search",
+            new=AsyncMock(return_value=[]),
+        ):
+            results = await search_all_sources("dev", "Lyon", 25, settings_row, country_code="FR")
+
+        portals = {r.source_portal for r in results}
+        assert "france_travail" in portals
+
+    async def test_france_travail_inactive_without_credentials(self):
+        settings_row = UserSettings(id=1)
+        ft_search = AsyncMock(return_value=[RawJob(title="FR-Job", company="X", source_portal="france_travail")])
+        with patch(
+            "backend.services.job_search.france_travail.FranceTravailSource.search", new=ft_search,
+        ), patch(
+            "backend.services.job_search.eures_scraper.EuresSource.search",
+            new=AsyncMock(return_value=[]),
+        ):
+            results = await search_all_sources("dev", "Lyon", 25, settings_row, country_code="FR")
+
+        ft_search.assert_not_called()
+        portals = {r.source_portal for r in results}
+        assert "france_travail" not in portals
+
+    async def test_france_travail_inactive_for_de_even_with_credentials(self):
+        settings_row = UserSettings(id=1)
+        settings_row.francetravail_client_id_enc = "enc-id"
+        settings_row.francetravail_client_secret_enc = "enc-secret"
+        ft_search = AsyncMock(return_value=[RawJob(title="FR-Job", company="X", source_portal="france_travail")])
+        with patch(
+            "backend.services.job_search.aggregator.decrypt", side_effect=lambda x: x,
+        ), patch(
+            "backend.services.job_search.france_travail.FranceTravailSource.search", new=ft_search,
+        ), patch(
+            "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.stepstone.StepStoneSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.service_bund.ServiceBundSource.search", new=AsyncMock(return_value=[]),
+        ), patch(
+            "backend.services.job_search.eures_scraper.EuresSource.search", new=AsyncMock(return_value=[]),
+        ):
+            await search_all_sources("dev", "Berlin", 25, settings_row)
+
+        ft_search.assert_not_called()

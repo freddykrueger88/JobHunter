@@ -16,6 +16,7 @@ class SettingsRead(BaseModel):
     has_adzuna_key: bool
     has_linkedin_key: bool
     has_arbeitsagentur_key: bool
+    has_francetravail_key: bool
     smtp_host: str | None
     smtp_port: int | None
     smtp_user: str | None
@@ -43,6 +44,8 @@ class SettingsUpdate(BaseModel):
     linkedin_api_key: str | None = None
     arbeitsagentur_client_id: str | None = None
     arbeitsagentur_client_secret: str | None = None
+    francetravail_client_id: str | None = None
+    francetravail_client_secret: str | None = None
     smtp_host: str | None = None
     smtp_port: int | None = None
     smtp_user: str | None = None

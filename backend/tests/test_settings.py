@@ -27,6 +27,7 @@ class TestGetSettings:
         assert body["weekly_goal"] == 5
         assert "theme" in body
         assert "has_adzuna_key" in body
+        assert "has_francetravail_key" in body
 
 
 class TestUpdateSettings:
@@ -52,3 +53,17 @@ class TestUpdateSettings:
         assert res.status_code == 200, res.text
         assert res.json()["has_adzuna_key"] is True
         assert "secret-key-123" not in res.text
+
+    async def test_encrypts_francetravail_credentials(self, client: httpx.AsyncClient):
+        res = await client.patch("/api/settings/", json={
+            "francetravail_client_id": "ft-client-id-xyz",
+            "francetravail_client_secret": "ft-secret-abc",
+        })
+
+        assert res.status_code == 200, res.text
+        assert res.json()["has_francetravail_key"] is True
+        assert "ft-client-id-xyz" not in res.text
+        assert "ft-secret-abc" not in res.text
+
+        res2 = await client.get("/api/settings/")
+        assert res2.json()["has_francetravail_key"] is True

@@ -39,6 +39,7 @@ def _to_read(s: UserSettings) -> SettingsRead:
         has_adzuna_key=bool(s.adzuna_api_key_enc),
         has_linkedin_key=bool(s.linkedin_api_key_enc),
         has_arbeitsagentur_key=bool(s.arbeitsagentur_client_id_enc),
+        has_francetravail_key=bool(s.francetravail_client_id_enc),
         smtp_host=s.smtp_host,
         smtp_port=s.smtp_port,
         smtp_user=s.smtp_user,
@@ -77,6 +78,10 @@ async def update_settings(data: SettingsUpdate, db: AsyncSession = Depends(get_d
         s.arbeitsagentur_client_id_enc = encrypt(data.arbeitsagentur_client_id)
     if data.arbeitsagentur_client_secret:
         s.arbeitsagentur_client_secret_enc = encrypt(data.arbeitsagentur_client_secret)
+    if data.francetravail_client_id:
+        s.francetravail_client_id_enc = encrypt(data.francetravail_client_id)
+    if data.francetravail_client_secret:
+        s.francetravail_client_secret_enc = encrypt(data.francetravail_client_secret)
     if data.smtp_password:
         s.smtp_password_enc = encrypt(data.smtp_password)
     await db.commit()

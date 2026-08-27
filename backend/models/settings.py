@@ -32,6 +32,10 @@ class UserSettings(Base):
     linkedin_api_key_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     arbeitsagentur_client_id_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     arbeitsagentur_client_secret_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # France Travail (FR-Jobboerse, Phase I.1) - eigene OAuth2-Zugangsdaten
+    # noetig, kein oeffentlicher Fest-Key wie bei Arbeitsagentur.
+    francetravail_client_id_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    francetravail_client_secret_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     # SMTP fuer Erinnerungs-Mails (backend/services/reminder_mailer.py) -
     # Passwort verschluesselt wie die anderen Zugangsdaten oben.
     smtp_host: Mapped[str | None] = mapped_column(String(255), nullable=True)

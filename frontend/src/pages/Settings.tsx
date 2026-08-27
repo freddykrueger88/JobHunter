@@ -12,7 +12,7 @@ interface SettingsData {
   theme: string; language: string; ai_model: string; ai_tone: string
   default_location: string | null; default_radius_km: number
   hide_ausbildung: boolean; reminder_default_days: number
-  has_adzuna_key: boolean; has_linkedin_key: boolean
+  has_adzuna_key: boolean; has_linkedin_key: boolean; has_francetravail_key: boolean
   smtp_host: string | null; smtp_port: number | null
   smtp_user: string | null; smtp_recipient: string | null
   has_smtp_password: boolean
@@ -84,6 +84,7 @@ const TONES = ['formell', 'direkt', 'modern', 'kreativ']
 const API_LINKS: Record<string, string> = {
   adzuna: 'https://developer.adzuna.com/',
   linkedin: 'https://www.linkedin.com/jobs/search/',
+  francetravail: 'https://francetravail.io/inscription',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -213,6 +214,7 @@ export default function Settings() {
   const [showKeys, setShowKeys]               = useState<Record<string, boolean>>({})
   const [keys, setKeys]                       = useState<Record<string, string>>({
     adzuna_app_id: '', adzuna_api_key: '',
+    francetravail_client_id: '', francetravail_client_secret: '',
   })
   const [saveStatus, setSaveStatus]           = useState<SaveStatus>('idle')
   const [smtpHost, setSmtpHost]               = useState('')
@@ -302,7 +304,7 @@ export default function Settings() {
       setKeysSaveStatus('saved')
       // Zuerst Feedback zeigen, DANN Felder leeren
       setTimeout(() => {
-        setKeys({ adzuna_app_id: '', adzuna_api_key: '' })
+        setKeys({ adzuna_app_id: '', adzuna_api_key: '', francetravail_client_id: '', francetravail_client_secret: '' })
         setKeysSaveStatus('idle')
       }, 1500)
     },
@@ -384,7 +386,8 @@ export default function Settings() {
   }
 
   // Button ist sichtbar solange Keys eingegeben ODER Feedback läuft
-  const showKeysButton = keys.adzuna_app_id !== '' || keys.adzuna_api_key !== '' || keysSaveStatus !== 'idle'
+  const showKeysButton = keys.adzuna_app_id !== '' || keys.adzuna_api_key !== ''
+    || keys.francetravail_client_id !== '' || keys.francetravail_client_secret !== '' || keysSaveStatus !== 'idle'
 
   return (
     <div className="max-w-2xl">
@@ -544,6 +547,17 @@ export default function Settings() {
             <ApiKeyInput id="adzuna_api_key" label={t('apiKeyLabel')} placeholder={t('apiKeyPlaceholder')} />
             {remote?.has_adzuna_key && keys.adzuna_app_id === '' && keys.adzuna_api_key === '' && keysSaveStatus === 'idle' && (
               <p className="text-xs text-green-600 dark:text-green-400">{t('adzunaKeyStored')}</p>
+            )}
+          </div>
+
+          {/* France Travail */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('francetravailSectionLabel')}</p>
+            <p className="text-xs text-gray-400 leading-relaxed">{t('francetravailIntro')}</p>
+            <ApiKeyInput id="francetravail_client_id" label={t('francetravailClientIdLabel')} placeholder={t('francetravailClientIdPlaceholder')} link={API_LINKS.francetravail} />
+            <ApiKeyInput id="francetravail_client_secret" label={t('francetravailClientSecretLabel')} placeholder={t('francetravailClientSecretPlaceholder')} />
+            {remote?.has_francetravail_key && keys.francetravail_client_id === '' && keys.francetravail_client_secret === '' && keysSaveStatus === 'idle' && (
+              <p className="text-xs text-green-600 dark:text-green-400">{t('francetravailKeyStored')}</p>
             )}
             {showKeysButton && (
               <button

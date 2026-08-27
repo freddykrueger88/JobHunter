@@ -10,6 +10,8 @@
   "templateLabel": "Vorlage (optional) – Platzhalter wie {{placeholder}} werden ersetzt",
   "templatePlaceholder": "Vorlage hier einfügen oder leer lassen für automatische Erstellung...",
   "templateAriaLabel": "Anschreiben-Vorlage",
+  "templateLibraryAriaLabel": "Vorlage aus Bibliothek wählen",
+  "templateLibraryPlaceholder": "📚 Oder Vorlage aus Bibliothek wählen…",
   "generating": "KI generiert...",
   "generate": "Anschreiben erstellen",
   "resultLabel": "Generiertes Anschreiben",

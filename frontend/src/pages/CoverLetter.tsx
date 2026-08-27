@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { Wand2, Copy, Download, FileDown, Loader2 } from 'lucide-react'
 
 const TONE_VALUES = ['formell', 'direkt', 'modern', 'kreativ'] as const
+
+interface DefaultTemplate { name: string; category: string; sprache: string; body: string }
 
 export default function CoverLetter({ jobId, cvId, applicationId, onGenerated }: { jobId?: number; cvId?: number; applicationId?: number; onGenerated?: () => void }) {
   const { t } = useTranslation('coverLetter')
@@ -14,6 +16,12 @@ export default function CoverLetter({ jobId, cvId, applicationId, onGenerated }:
   const [coverLetterId, setCoverLetterId] = useState<number | null>(null)
   const [copied, setCopied] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
+
+  const { data: defaultTemplates = [] } = useQuery<DefaultTemplate[]>({
+    queryKey: ['cover-letter-default-templates'],
+    queryFn: () => axios.get('/api/cover-letter-templates/defaults').then(r => r.data),
+    staleTime: Infinity,
+  })
 
   const generateMutation = useMutation({
     mutationFn: () => axios.post('/api/ai/generate-cover-letter', {
@@ -98,6 +106,22 @@ export default function CoverLetter({ jobId, cvId, applicationId, onGenerated }:
         <label className="text-sm text-gray-500 block mb-1">
           {t('templateLabel', { placeholder: '{{Ansprechpartner}}' })}
         </label>
+        {defaultTemplates.length > 0 && (
+          <select
+            className="w-full mb-2 text-sm px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value=""
+            onChange={e => {
+              const picked = defaultTemplates.find(dt => dt.name === e.target.value)
+              if (picked) setTemplate(picked.body)
+            }}
+            aria-label={t('templateLibraryAriaLabel')}
+          >
+            <option value="">{t('templateLibraryPlaceholder')}</option>
+            {defaultTemplates.map(dt => (
+              <option key={dt.name} value={dt.name}>{dt.name}</option>
+            ))}
+          </select>
+        )}
         <textarea
           className="w-full h-28 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
           placeholder={t('templatePlaceholder')}

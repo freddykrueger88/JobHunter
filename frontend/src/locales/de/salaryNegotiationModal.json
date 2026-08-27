@@ -17,5 +17,14 @@
   "generalTips": "Allgemeine Tipps:",
   "introPrefix": "KI generiert 3 Verhandlungsszenarien für",
   "desiredSalaryLabel": "Gehaltswunsch (EUR brutto/Jahr)",
-  "desiredSalaryPlaceholder": "z.B. 55000"
+  "desiredSalaryPlaceholder": "z.B. 55000",
+  "nettoCalculator": "Netto-Brutto-Rechner",
+  "taxClassAriaLabel": "Steuerklasse wählen",
+  "taxClass": "Steuerklasse {{class}}",
+  "hasChildren": "Kinder",
+  "calculating": "Berechne…",
+  "calculate": "Berechnen",
+  "netMonthly": "Netto/Monat",
+  "socialSecurity": "Sozialversicherung",
+  "incomeTax": "Lohnsteuer"
 }

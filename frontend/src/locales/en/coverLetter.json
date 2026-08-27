@@ -10,6 +10,8 @@
   "templateLabel": "Template (optional) – placeholders like {{placeholder}} will be replaced",
   "templatePlaceholder": "Paste a template here, or leave empty for automatic generation...",
   "templateAriaLabel": "Cover letter template",
+  "templateLibraryAriaLabel": "Choose a template from the library",
+  "templateLibraryPlaceholder": "📚 Or choose a template from the library…",
   "generating": "AI is generating...",
   "generate": "Generate Cover Letter",
   "resultLabel": "Generated Cover Letter",

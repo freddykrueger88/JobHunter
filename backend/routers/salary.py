@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from backend.services.ai_client import get_ai_client
@@ -27,3 +29,22 @@ async def negotiate(data: NegotiationRequest, ai_client=Depends(get_ai_client)):
         gehalt_anzeige_max=data.gehalt_anzeige_max,
         ai_client=ai_client,
     )
+
+
+class NettoRequest(BaseModel):
+    brutto_jaehrlich: float
+    steuerklasse: int = 1
+    hat_kinder: bool = False
+
+
+@router.post("/calculate-netto")
+async def calculate_netto(data: NettoRequest):
+    """Vereinfachter Netto-Brutto-Rechner (lokal, keine externen Calls)."""
+    from backend.services.salary_calculator import berechne_netto
+
+    result = berechne_netto(
+        brutto_jaehrlich=data.brutto_jaehrlich,
+        steuerklasse=data.steuerklasse,
+        hat_kinder=data.hat_kinder,
+    )
+    return asdict(result)

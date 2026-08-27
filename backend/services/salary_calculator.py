@@ -34,7 +34,7 @@ class NettoErgebnis:
 
 def berechne_netto(
     brutto_jaehrlich: float,
-    steuerklasse: SteuerklassE = 1,
+    steuerklasse: Steuerklasse = 1,
     hat_kinder: bool = False,
 ) -> NettoErgebnis:
     brutto_m = brutto_jaehrlich / 12

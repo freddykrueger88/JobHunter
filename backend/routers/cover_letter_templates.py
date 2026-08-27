@@ -71,6 +71,16 @@ async def list_placeholders():
     ]
 
 
+@router.get("/defaults")
+async def list_default_templates():
+    """Vorgefertigte Anschreiben-Vorlagen nach Branche (Freitext, keine
+    DOCX-Datei - als Startpunkt fuer das Vorlage-Feld bei der KI-
+    Anschreiben-Generierung)."""
+    from backend.services.default_templates import DEFAULT_TEMPLATES
+
+    return DEFAULT_TEMPLATES
+
+
 @router.post("/upload", status_code=201)
 async def upload_template(
     file: UploadFile = File(...),

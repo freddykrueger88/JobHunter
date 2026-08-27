@@ -5,8 +5,18 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import axios from 'axios'
-import { X, TrendingUp, Copy, Check } from 'lucide-react'
+import { X, TrendingUp, Copy, Check, Calculator, ChevronDown, ChevronUp } from 'lucide-react'
 import { formatCurrencyEur } from '../lib/formatDate'
+
+interface NettoResult {
+  brutto_jaehrlich: number
+  brutto_monatlich: number
+  netto_monatlich: number
+  netto_jaehrlich: number
+  sv_monatlich: number
+  lohnsteuer_monatlich: number
+  steuerklasse: number
+}
 
 interface Szenario {
   typ: 'konservativ' | 'realistisch' | 'optimistisch'
@@ -57,6 +67,12 @@ export default function SalaryNegotiationModal(props: Props) {
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'email' | 'telefon'>('email')
 
+  const [showNetto, setShowNetto] = useState(false)
+  const [steuerklasse, setSteuerklasse] = useState(1)
+  const [hatKinder, setHatKinder] = useState(false)
+  const [nettoResult, setNettoResult] = useState<NettoResult | null>(null)
+  const [nettoLoading, setNettoLoading] = useState(false)
+
   const run = async () => {
     setLoading(true)
     try {
@@ -70,6 +86,20 @@ export default function SalaryNegotiationModal(props: Props) {
       setResult(data)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const runNetto = async () => {
+    setNettoLoading(true)
+    try {
+      const { data } = await axios.post('/api/salary/calculate-netto', {
+        brutto_jaehrlich: gehaltWunsch,
+        steuerklasse,
+        hat_kinder: hatKinder,
+      })
+      setNettoResult(data)
+    } finally {
+      setNettoLoading(false)
     }
   }
 
@@ -105,6 +135,55 @@ export default function SalaryNegotiationModal(props: Props) {
                 className="px-6 py-2 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 disabled:opacity-50 transition-colors">
                 {loading ? t('generating') : t('generate')}
               </button>
+
+              {/* Netto-Brutto-Rechner */}
+              <div className="max-w-xs mx-auto mt-6 text-left border-t border-gray-100 dark:border-gray-700 pt-4">
+                <button
+                  onClick={() => setShowNetto(v => !v)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  aria-expanded={showNetto}
+                >
+                  <Calculator size={13} aria-hidden />
+                  {t('nettoCalculator')}
+                  {showNetto ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                </button>
+
+                {showNetto && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex gap-2">
+                      <select
+                        value={steuerklasse}
+                        onChange={e => setSteuerklasse(Number(e.target.value))}
+                        className="flex-1 text-sm px-2 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:outline-none"
+                        aria-label={t('taxClassAriaLabel')}
+                      >
+                        {[1, 2, 3, 4, 5, 6].map(k => (
+                          <option key={k} value={k}>{t('taxClass', { class: k })}</option>
+                        ))}
+                      </select>
+                      <label className="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap">
+                        <input type="checkbox" checked={hatKinder} onChange={e => setHatKinder(e.target.checked)} />
+                        {t('hasChildren')}
+                      </label>
+                    </div>
+                    <button
+                      onClick={runNetto}
+                      disabled={nettoLoading || !gehaltWunsch}
+                      className="w-full text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                    >
+                      {nettoLoading ? t('calculating') : t('calculate')}
+                    </button>
+
+                    {nettoResult && (
+                      <div className="text-xs bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-1">
+                        <p className="flex justify-between"><span className="text-gray-500">{t('netMonthly')}</span> <strong>{formatCurrencyEur(nettoResult.netto_monatlich, i18n.language)}</strong></p>
+                        <p className="flex justify-between text-gray-400"><span>{t('socialSecurity')}</span> <span>{formatCurrencyEur(nettoResult.sv_monatlich, i18n.language)}</span></p>
+                        <p className="flex justify-between text-gray-400"><span>{t('incomeTax')}</span> <span>{formatCurrencyEur(nettoResult.lohnsteuer_monatlich, i18n.language)}</span></p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

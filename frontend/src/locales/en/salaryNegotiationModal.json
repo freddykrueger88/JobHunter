@@ -17,5 +17,14 @@
   "generalTips": "General Tips:",
   "introPrefix": "AI is generating 3 negotiation scenarios for",
   "desiredSalaryLabel": "Desired salary (EUR gross/year)",
-  "desiredSalaryPlaceholder": "e.g. 55000"
+  "desiredSalaryPlaceholder": "e.g. 55000",
+  "nettoCalculator": "Net/Gross Calculator",
+  "taxClassAriaLabel": "Select tax class",
+  "taxClass": "Tax class {{class}}",
+  "hasChildren": "Children",
+  "calculating": "Calculating…",
+  "calculate": "Calculate",
+  "netMonthly": "Net/month",
+  "socialSecurity": "Social security",
+  "incomeTax": "Income tax"
 }

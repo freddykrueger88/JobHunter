@@ -9,6 +9,7 @@ import WeeklyGoalWidget from '../components/WeeklyGoalWidget'
 import BurnoutWarning from '../components/BurnoutWarning'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import ResponseRatePanel from '../components/ResponseRatePanel'
+import RejectionInsights from '../components/RejectionInsights'
 
 interface DueReminder {
   id: number
@@ -119,6 +120,11 @@ export default function Dashboard() {
       {/* Ruecklaufquoten */}
       <div className="mb-8">
         <ResponseRatePanel />
+      </div>
+
+      {/* Absagen-Muster */}
+      <div className="mb-8">
+        <RejectionInsights />
       </div>
 
       {/* Abzeichen */}

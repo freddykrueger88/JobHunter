@@ -1,0 +1,8 @@
+{
+  "title": "Absagen-Muster",
+  "notEnoughData_one": "Erst {{count}} Absage bisher - für eine verlässliche Analyse braucht es mindestens 10.",
+  "notEnoughData_other": "Erst {{count}} Absagen bisher - für eine verlässliche Analyse braucht es mindestens 10.",
+  "noPatterns": "Keine auffälligen Muster in deinen Absagen erkennbar.",
+  "vs": "vs.",
+  "recommendations": "Empfehlungen"
+}

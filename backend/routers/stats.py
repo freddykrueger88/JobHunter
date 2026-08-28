@@ -16,6 +16,7 @@ from backend.models.application import Application
 from backend.models.settings import UserSettings
 from backend.services.response_rate_analyzer import get_response_rate_analysis
 from backend.services.market_trends import get_market_trends
+from backend.services.rejection_pattern import get_rejection_patterns
 
 router = APIRouter(prefix="/api/stats", tags=["Statistik"])
 
@@ -175,3 +176,11 @@ async def get_market_trends_stats(
     identisch zu den Filtern in routers/jobs.py (gleiche ILIKE-
     Substring-Semantik)."""
     return await get_market_trends(db, city=city, postal_code=postal_code, days=days)
+
+
+@router.get("/rejection-patterns")
+async def get_rejection_patterns_stats(db: AsyncSession = Depends(get_db)):
+    """Absagen-Analyse (#73, G.3.12): siehe services/rejection_pattern.py
+    fuer die verwendeten Signale (Skill-Gap/ATS/Senioritaet) und die
+    Mindeststichprobe."""
+    return await get_rejection_patterns(db)

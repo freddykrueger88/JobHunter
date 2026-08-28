@@ -1,0 +1,8 @@
+{
+  "title": "Rejection Patterns",
+  "notEnoughData_one": "Only {{count}} rejection so far - a reliable analysis needs at least 10.",
+  "notEnoughData_other": "Only {{count}} rejections so far - a reliable analysis needs at least 10.",
+  "noPatterns": "No notable patterns found in your rejections.",
+  "vs": "vs.",
+  "recommendations": "Recommendations"
+}

@@ -18,3 +18,5 @@ class CompanyDossier(BaseModel):
     logo_url: str | None = None
     warning: str | None = None
     source: str
+    kununu_search_url: str | None = None
+    glassdoor_search_url: str | None = None

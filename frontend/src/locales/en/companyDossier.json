@@ -10,5 +10,8 @@
   "employees": "{{value}} employees",
   "wikipedia": "Wikipedia",
   "website": "Website",
+  "kununu": "Kununu",
+  "glassdoor": "Glassdoor",
+  "ratingsHint": "Kununu/Glassdoor have no free API - these buttons search the respective site via Google.",
   "source": "ℹ️ Source: {{source}}"
 }

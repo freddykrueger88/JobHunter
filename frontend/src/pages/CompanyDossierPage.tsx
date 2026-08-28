@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import axios from 'axios'
-import { Building2, Globe, Users, CalendarDays, ExternalLink, Search, AlertTriangle } from 'lucide-react'
+import { Building2, Globe, Users, CalendarDays, ExternalLink, Search, AlertTriangle, Star } from 'lucide-react'
 
 interface Dossier {
   company: string
@@ -15,6 +15,8 @@ interface Dossier {
   logo_url: string | null
   warning: string | null
   source: string
+  kununu_search_url: string | null
+  glassdoor_search_url: string | null
 }
 
 export default function CompanyDossierPage() {
@@ -152,7 +154,30 @@ export default function CompanyDossierPage() {
                   {t('website')}
                 </a>
               )}
+              {dossier.kununu_search_url && (
+                <a
+                  href={dossier.kununu_search_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <Star size={12} aria-hidden />
+                  {t('kununu')}
+                </a>
+              )}
+              {dossier.glassdoor_search_url && (
+                <a
+                  href={dossier.glassdoor_search_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <Star size={12} aria-hidden />
+                  {t('glassdoor')}
+                </a>
+              )}
             </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{t('ratingsHint')}</p>
 
             <p className="text-xs text-gray-300 dark:text-gray-500 pt-2">{t('source', { source: dossier.source })}</p>
           </div>

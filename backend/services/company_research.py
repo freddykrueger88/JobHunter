@@ -23,6 +23,16 @@ async def fetch_company_dossier(company_name: str) -> dict:
         "logo_url": None,
         "warning": None,
         "source": "Wikipedia (lokal gecacht)",
+        # Kununu/Glassdoor bieten keine kostenlose oeffentliche API (Stand
+        # 2026-08-28, live recherchiert) - Glassdoor seit 2024 nur noch
+        # Enterprise-Vertraege, Kununu nur ueber kostenpflichtige
+        # Dritt-Scraper, die selbst gegen deren ToS verstossen. Statt einen
+        # ungeprueften internen Such-Parameter dieser Portale zu raten (mit
+        # dem Risiko eines still leeren Ergebnisses wie zuvor bei
+        # Karriere.NRWs `ort`), verlinken wir ueber Googles `site:`-Suche -
+        # syntaktisch garantiert korrekt, kein Scraping, keine Kosten.
+        "kununu_search_url": f"https://www.google.com/search?q={quote('site:kununu.com ' + company_name)}",
+        "glassdoor_search_url": f"https://www.google.com/search?q={quote('site:glassdoor.com ' + company_name)}",
     }
 
     try:

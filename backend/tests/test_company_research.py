@@ -59,3 +59,16 @@ class TestFetchCompanyDossier:
 
         assert company in _CACHE
         assert _CACHE[company] is result
+
+    async def test_rating_portal_links_always_present(self):
+        """Kununu/Glassdoor haben keine kostenlose API - stattdessen
+        Google-`site:`-Suchlinks, die unabhaengig vom Wikipedia-Ergebnis
+        (auch bei Netzwerkfehler) immer gesetzt sein muessen."""
+        company = "Testfirma Ratings XYZ"
+        _CACHE.pop(company, None)
+
+        with patch("httpx.AsyncClient", return_value=_mock_http_client(get_side_effect=ConnectionError("boom"))):
+            result = await fetch_company_dossier(company)
+
+        assert result["kununu_search_url"] == "https://www.google.com/search?q=site%3Akununu.com%20Testfirma%20Ratings%20XYZ"
+        assert result["glassdoor_search_url"] == "https://www.google.com/search?q=site%3Aglassdoor.com%20Testfirma%20Ratings%20XYZ"

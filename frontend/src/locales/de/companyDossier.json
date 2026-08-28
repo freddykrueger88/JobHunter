@@ -10,5 +10,8 @@
   "employees": "{{value}} Mitarbeiter",
   "wikipedia": "Wikipedia",
   "website": "Website",
+  "kununu": "Kununu",
+  "glassdoor": "Glassdoor",
+  "ratingsHint": "Kununu/Glassdoor bieten keine kostenlose API - die Buttons führen zur Google-Suche auf dem jeweiligen Portal.",
   "source": "ℹ️ Quelle: {{source}}"
 }

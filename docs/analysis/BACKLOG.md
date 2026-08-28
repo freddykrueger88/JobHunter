@@ -850,15 +850,26 @@ noetig, nicht in einem Rutsch machbar.
       client.post-Mocks weiter greifen). Volle Suite unveraendert
       309/309 gruen, live end-to-end verifiziert. Commit 427efc8.
       **Nebenbefund beim Live-Test (nicht vom Refactor verursacht, mit
-      rohem httpx ohne jeden JobHunter-Code reproduziert):
-      ArbeitsagenturSource bekommt aktuell HTTP 403 von der
-      Bundesagentur-API (vorher HTTP 200) - weder User-Agent-Aenderung
-      noch die Request-Parameter selbst sind die Ursache, genaue Ursache
-      nicht weiter untersucht (koennte IP-Block/Rate-Limit/neue
-      Auth-Anforderung sein). Eine der zentralen zero-config-DE-Quellen
-      ist damit aktuell ausgefallen. Separates Thema von I.3, noch nicht
-      behoben - eigene Recherche noetig, aehnlich der Wikipedia-User-
-      Agent-Session zuvor.**
+      rohem httpx ohne jeden JobHunter-Code reproduziert): ArbeitsagenturSource
+      bekam HTTP 403 von der Bundesagentur-API. BEHOBEN, siehe eigener
+      Eintrag direkt unten.**
+- [x] I.2 (Nebenbefund) ArbeitsagenturSource-403 geklaert und behoben
+      (2026-08-28, auf Nutzerwunsch vor der Laender-Priorisierung selbst
+      vorgezogen). Ursache recherchiert statt geraten: die alte
+      pc/v4/jobs-Route liefert seit kurzem 403 (live reproduziert, auch
+      via WebFetch von komplett anderer Infrastruktur aus - kein
+      IP-Block dieses Hosts). Aktuelle OpenAPI-Spec
+      (github.com/bundesAPI/jobsuche-api) zeigte: Umzug auf pc/v6/jobs
+      mit substanziell anderem Response-Schema (nicht nur umbenannt) -
+      jedes Feld live gegen echte Daten nachverifiziert. Stellen-
+      beschreibung ist im v6-Suchergebnis nicht mehr enthalten, wird
+      jetzt pro Treffer parallel per pc/v4/jobdetails/{base64(refnr)}
+      nachgeladen. Die menschenlesbare Detailseite wurde per WebFetch
+      echt geladen und inhaltlich bestaetigt (nicht nur plausibel
+      konstruiert wie bei anderen Quellen). 8 neue Tests, volle Suite
+      317/317 gruen, live end-to-end ueber den echten Aggregator-
+      Endpunkt verifiziert (25 echte Treffer inkl. Beschreibung/URL/
+      Koordinaten). Commit eb7f4ce.
 - [ ] I.4 Rollout Land fuer Land - haengt an I.2 (Prioritaet), noch nicht
       begonnen.
 

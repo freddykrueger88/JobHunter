@@ -602,14 +602,16 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       (?search=) auf Liste UND PDF-Export, reportlab-basierter PDF-Export
       (Fliesstext statt Tabelle). Neue Seite /diary mit Inline-Bearbeiten.
       12 neue Tests. Live end-to-end verifiziert. Commit 5f34539.
-      NEBENFUND (nicht behoben, ausserhalb des Feature-Umfangs): `alembic
-      check` zeigt umfangreiche Nullability-Drift ueber fast alle
-      bestehenden Tabellen (server_default vs. Python-seitigem default
-      in den Modellen) - voellig unabhaengig von diesem Feature
-      (diary_entries selbst ist sauber), aber ein eigener Aufraeum-
-      Durchgang waere sinnvoll, bevor der naechste `alembic revision
-      --autogenerate` versehentlich Dutzende falsche NOT-NULL-Aenderungen
-      vorschlaegt.
+      NEBENFUND, BEHOBEN (2026-08-28, eigene Session): `alembic check`
+      zeigte umfangreiche Nullability-Drift ueber fast alle bestehenden
+      Tabellen (Modelle deklarieren NOT NULL, urspruengliche Migrationen
+      hatten nie explizit nullable=False gesetzt). Vor dem Fix live
+      geprueft: 0 NULL-Werte in allen 30 betroffenen Spalten, gefahrlose
+      Migration. Separat entdeckt+behoben: `ix_followups_erledigt_
+      faellig_am` existierte real in der DB (Migration 0002), fehlte
+      aber im Modell - dort ergaenzt statt den echten Index versehentlich
+      per Autogenerate zu loeschen. Migration 0019, `alembic check` laeuft
+      jetzt clean. Commit 07288d5.
 - [x] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)
       fuer Bewerbungsaktivitaet. ERLEDIGT (2026-08-28): neuer Endpoint
       GET /api/stats/activity-heatmap (ein Eintrag pro Tag inkl. 0er,

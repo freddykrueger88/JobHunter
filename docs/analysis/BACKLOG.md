@@ -1004,13 +1004,17 @@ weiterverfolgt, damit sie den Rest des Backlogs nicht blockieren.
         technisch per API angebunden werden, aber Zugriffsrechte werden
         vom KEHA-Center manuell vergeben ("granted") - ebenfalls kein
         Self-Service.
-      - **Belgien** (VDAB, Region Flandern, groesste der 3 Regionen):
-        developer.vdab.be bietet eine dokumentierte Vacature-API, freier
-        Account-Aufbau moeglich, ABER Zugriff auf einzelne APIs braucht
-        eine Subscription-Freigabe - unklar ob automatisch oder manuell
-        geprueft, nicht live getestet (Account-Erstellung mit echten
-        Nutzerdaten waere noetig, wollte das nicht ungefragt anlegen).
-        Naehestes Muster zu France Travail, falls doch automatisch.
+      - **Belgien** (VDAB, Region Flandern, groesste der 3 Regionen) -
+        VERTIEFT recherchiert (2026-08-28): Account-Erstellung auf
+        developer.vdab.be ist zwar kostenlos/self-service, aber laut
+        VDABs eigener Doku (extranet.vdab.be/api-center-excellence-coe)
+        sind Daten mit Nutzungsbeschraenkungen wie Vacatures NICHT frei
+        zugaenglich - noetig ist ein "kennismakingsgesprek"
+        (Kennenlerngespraech) mit VDABs API Center of Excellence, bevor
+        ueberhaupt eine Subscription moeglich ist. Kein Self-Service-
+        Muster wie France Travail, sondern ein mehrstufiger Prozess mit
+        echtem Termin - Nutzerentscheidung (2026-08-28, AskUserQuestion):
+        angesichts dessen nicht verfolgt, kein Konto angelegt.
       - **Spanien** (SEPE/Empleate): der klassische Empleate-Einstiegs-
         pfad (empleate.gob.es) lieferte live einen Server-Fehler
         ("no ha sido posible procesar la operacion solicitada"). Ein
@@ -1037,9 +1041,15 @@ weiterverfolgt, damit sie den Rest des Backlogs nicht blockieren.
         unbekanntes Datei-Format obendrauf - schlechter als der
         urspruengliche "aehnlich wie service.bund.de"-Vergleich
         vermuten liess. Kein Schnellgewinn, nicht weiter verfolgt.
-      - **Naechster sinnvoller Schritt, falls spaeter wieder
-        aufgegriffen:** (b) und (c) fuer Polen sind jetzt erledigt (siehe
-        oben, beide Wege gepruefte Sackgassen). Einzig verbleibende
-        Option: (a) VDAB-Account fuer Belgien anlegen und Freigabe-Tempo
-        live pruefen - noch nicht unternommen (echter Account mit den
-        eigenen Nutzerdaten noetig, bisher nicht ungefragt angelegt).
+      - **Stand (2026-08-28): alle 5 in Phase M gelisteten Laender sind
+        jetzt konkret recherchiert, keines bietet einen Schnellgewinn.**
+        Daenemark/Finnland/Belgien brauchen alle einen manuellen
+        Freigabeprozess mit der jeweiligen Behoerde (kein Self-Service),
+        Polen zusaetzlich SOAP statt REST/JSON, Spanien einen Server-
+        Fehler auf dem Standard-Einstiegspfad. Naechster sinnvoller
+        Schritt waere nur noch: (a) einen der Behoerden-Kontakte/
+        Freigabeprozesse tatsaechlich anstossen und abwarten (Wochen,
+        nicht Session-Dauer), oder (b) ein bisher komplett unrecherchiertes
+        Land pruefen (z.B. Italien, Portugal, Niederlande-Nachfolger o.ae.
+        - noch nicht angeschaut). Explizit NICHT von selbst weiter
+        vertiefen, ohne dass der Nutzer das priorisiert.

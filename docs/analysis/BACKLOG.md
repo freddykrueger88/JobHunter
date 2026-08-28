@@ -879,6 +879,20 @@ Security-Durchlauf in dieser Session bisher.
       haengt bei Aktivierung ?exclude_status=interessant an den
       Download-Link. Test extrahiert den PDF-Text via pdfminer und
       prueft, dass die ausgeschlossene Firma nicht mehr vorkommt.
+- [x] L.2 Company Check um Bewertungsportale (Kununu, Glassdoor u.ae.)
+      erweitern. ERLEDIGT (2026-08-28): live recherchiert - beide bieten
+      keine kostenlose oeffentliche API (Glassdoor seit 2024 nur noch
+      Enterprise-Vertraege, Kununu nur ueber kostenpflichtige
+      Dritt-Scraper gegen deren eigene ToS). Per Nutzerentscheidung
+      (AskUserQuestion) auf Direktlinks statt Scraper/API festgelegt:
+      neue Felder kununu_search_url/glassdoor_search_url in
+      CompanyDossier, gebaut als Google-`site:`-Suchlinks statt eines
+      ungeprueft geratenen internen Suchparameters (Risiko eines still
+      leeren Ergebnisses wie zuvor bei Karriere.NRWs `ort`). Zwei neue
+      Buttons in CompanyDossierPage.tsx. Nebenbefund beim Verifizieren:
+      Wikipedia-API der Firmen-Recherche lieferte wegen fehlendem
+      User-Agent nur noch 403 (Wikimedia-Policy-Aenderung) - separat
+      gefixt, live gegen die echte API bestaetigt.
 
 ## Phase M - Niedrige Prioritaet / zurueckgestellt (2026-08-27, Nutzerwunsch: "ganz nach hinten")
 

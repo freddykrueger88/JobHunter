@@ -1,0 +1,12 @@
+{
+  "title": "Industry Radar",
+  "subtitle": "How demand across industries has changed over the last 30 days",
+  "cityPlaceholder": "Filter by city (optional)",
+  "postalCodePlaceholder": "Filter by postal code (optional)",
+  "noData": "Not enough jobs in the selected period/filter for an analysis yet.",
+  "topGrowing": "Growing the most",
+  "topShrinking": "Shrinking the most",
+  "allBranches": "All industries (last {{days}} days)",
+  "new": "new",
+  "methodHint": "Industry assignment uses simple multi-language keyword matching on the job title/text, not an official classification - it can be wrong for ambiguous titles."
+}

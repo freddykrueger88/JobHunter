@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   LayoutDashboard, Search, KanbanSquare, History, Settings, Bell, Bot, FileText,
-  User, Radar, Mic, Building2, Ban, BookOpen, ChevronDown,
+  User, Radar, Mic, Building2, Ban, BookOpen, ChevronDown, TrendingUp,
 } from 'lucide-react'
 import clsx from 'clsx'
 import CoachChatDrawer from './CoachChatDrawer'
@@ -29,6 +29,7 @@ const toolItems = [
   { to: '/diary',                icon: BookOpen,  key: 'diary' },
   { to: '/blocklist',           icon: Ban,       key: 'blocklist' },
   { to: '/history',             icon: History,   key: 'history' },
+  { to: '/branchen-radar',      icon: TrendingUp, key: 'branchenRadar' },
 ]
 
 const accountItems = [

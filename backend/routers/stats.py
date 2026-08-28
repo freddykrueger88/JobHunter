@@ -15,6 +15,7 @@ from backend.core.database import get_db
 from backend.models.application import Application
 from backend.models.settings import UserSettings
 from backend.services.response_rate_analyzer import get_response_rate_analysis
+from backend.services.market_trends import get_market_trends
 
 router = APIRouter(prefix="/api/stats", tags=["Statistik"])
 
@@ -160,3 +161,17 @@ async def get_response_rates(db: AsyncSession = Depends(get_db)):
     services/response_rate_analyzer.py fuer die Definitionen von
     "beantwortet"/Bezugsdatum/Laengen-Buckets."""
     return await get_response_rate_analysis(db)
+
+
+@router.get("/market-trends")
+async def get_market_trends_stats(
+    city: str | None = None,
+    postal_code: str | None = None,
+    days: int = 30,
+    db: AsyncSession = Depends(get_db),
+):
+    """Branchen-Radar (#76, G.3.9): siehe services/market_trends.py fuer
+    die Branchen-Klassifikation und Trend-Definition. city/postal_code
+    identisch zu den Filtern in routers/jobs.py (gleiche ILIKE-
+    Substring-Semantik)."""
+    return await get_market_trends(db, city=city, postal_code=postal_code, days=days)

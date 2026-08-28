@@ -32,6 +32,7 @@ const Onboarding = lazy(() => import('./pages/Onboarding'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Blocklist = lazy(() => import('./pages/Blocklist'))
 const Diary = lazy(() => import('./pages/Diary'))
+const BranchenRadar = lazy(() => import('./pages/BranchenRadar'))
 
 function RouteFallback() {
   const { t } = useTranslation('common')
@@ -86,6 +87,7 @@ function AppInner() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/blocklist" element={<Blocklist />} />
               <Route path="/diary" element={<Diary />} />
+              <Route path="/branchen-radar" element={<BranchenRadar />} />
             </Routes>
           )}
         </Suspense>

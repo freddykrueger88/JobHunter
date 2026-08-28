@@ -1,0 +1,12 @@
+{
+  "title": "Branchen-Radar",
+  "subtitle": "Wie sich die Nachfrage nach Branchen in den letzten 30 Tagen verändert hat",
+  "cityPlaceholder": "Stadt filtern (optional)",
+  "postalCodePlaceholder": "PLZ filtern (optional)",
+  "noData": "Noch keine Jobs im gewählten Zeitraum/Filter für eine Auswertung.",
+  "topGrowing": "Am stärksten wachsend",
+  "topShrinking": "Am stärksten schrumpfend",
+  "allBranches": "Alle Branchen (letzte {{days}} Tage)",
+  "new": "neu",
+  "methodHint": "Branchen-Zuordnung erfolgt über eine einfache mehrsprachige Stichwort-Erkennung im Jobtitel/-text, keine amtliche Klassifikation - kann bei uneindeutigen Titeln danebenliegen."
+}

@@ -6,7 +6,7 @@ als X-API-Key Header (dokumentiert auf https://jobsuche.api.bund.dev/).
 """
 import httpx
 import logging
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_get
 from datetime import datetime
 
 log = logging.getLogger(__name__)
@@ -35,24 +35,11 @@ class ArbeitsagenturSource(BaseJobSource):
             "page": 1,
             "angebotsart": 1,  # 1 = Arbeit, 4 = Ausbildung
         }
-        try:
-            async with httpx.AsyncClient() as client:
-                r = await client.get(BASE_URL, params=params, headers=headers, timeout=15)
-                r.raise_for_status()
-                data = r.json()
-        except httpx.TimeoutException:
-            log.error("ArbeitsagenturSource: Timeout beim Abrufen der Jobs")
+        async with httpx.AsyncClient() as client:
+            r = await safe_get(client, BASE_URL, "ArbeitsagenturSource", params=params, headers=headers, timeout=15)
+        if r is None:
             return []
-        except httpx.HTTPStatusError as e:
-            log.error(
-                "ArbeitsagenturSource: HTTP %s – %s",
-                e.response.status_code,
-                e.response.text[:200],
-            )
-            return []
-        except Exception as e:
-            log.exception("ArbeitsagenturSource: Unerwarteter Fehler: %s", e)
-            return []
+        data = r.json()
 
         results = []
         for item in data.get("stellenangebote", []):

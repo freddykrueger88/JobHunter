@@ -30,7 +30,7 @@ from datetime import datetime
 
 import httpx
 
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_get
 
 log = logging.getLogger(__name__)
 
@@ -57,20 +57,11 @@ class KarriereNrwSource(BaseJobSource):
         if keywords:
             params["text"] = keywords
 
-        try:
-            async with httpx.AsyncClient(timeout=15) as client:
-                r = await client.get(SEARCH_URL, params=params, headers={"Accept": "application/json"})
-                r.raise_for_status()
-                data = r.json()
-        except httpx.TimeoutException:
-            log.error("KarriereNrwSource: Timeout")
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await safe_get(client, SEARCH_URL, "KarriereNrwSource", params=params, headers={"Accept": "application/json"})
+        if r is None:
             return []
-        except httpx.HTTPStatusError as e:
-            log.error("KarriereNrwSource: HTTP %s", e.response.status_code)
-            return []
-        except Exception as e:
-            log.exception("KarriereNrwSource: Unerwarteter Fehler: %s", e)
-            return []
+        data = r.json()
 
         results: list[RawJob] = []
         for item in data.get("items", []):

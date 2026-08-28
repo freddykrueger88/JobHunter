@@ -5,7 +5,7 @@ import httpx
 import logging
 from bs4 import BeautifulSoup
 from datetime import datetime
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_get
 
 log = logging.getLogger(__name__)
 
@@ -27,20 +27,11 @@ class StepStoneSource(BaseJobSource):
             "radius": radius_km,
             "of": 0,
         }
-        try:
-            async with httpx.AsyncClient(follow_redirects=True, timeout=20) as client:
-                r = await client.get(BASE_URL, params=params, headers=HEADERS)
-                r.raise_for_status()
-                html = r.text
-        except httpx.TimeoutException:
-            log.error("StepStoneSource: Timeout")
+        async with httpx.AsyncClient(follow_redirects=True, timeout=20) as client:
+            r = await safe_get(client, BASE_URL, "StepStoneSource", params=params, headers=HEADERS)
+        if r is None:
             return []
-        except httpx.HTTPStatusError as e:
-            log.error("StepStoneSource: HTTP %s", e.response.status_code)
-            return []
-        except Exception as e:
-            log.exception("StepStoneSource: Unerwarteter Fehler: %s", e)
-            return []
+        html = r.text
 
         results = self._parse(html)
         log.info("StepStoneSource: %d Jobs gefunden für '%s' in '%s'", len(results), keywords, location)

@@ -4,7 +4,7 @@ API-Key (LinkedIn App OAuth2) in den Einstellungen hinterlegen.
 """
 import httpx
 from datetime import datetime, timezone
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_get
 
 BASE_URL = "https://api.linkedin.com/v2/jobSearch"
 TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
@@ -29,13 +29,11 @@ class LinkedInSource(BaseJobSource):
             "count": 25,
             "start": 0,
         }
-        try:
-            async with httpx.AsyncClient(timeout=15) as client:
-                r = await client.get(BASE_URL, headers=headers, params=params)
-                r.raise_for_status()
-                data = r.json()
-        except Exception:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await safe_get(client, BASE_URL, "LinkedInSource", headers=headers, params=params)
+        if r is None:
             return []
+        data = r.json()
 
         results = []
         for item in data.get("elements", []):

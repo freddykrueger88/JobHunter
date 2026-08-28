@@ -34,7 +34,7 @@ from pathlib import Path
 
 import httpx
 
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_post
 
 log = logging.getLogger(__name__)
 
@@ -114,24 +114,15 @@ class EuresSource(BaseJobSource):
             "requestLanguage": self.lang,
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=15) as client:
-                r = await client.post(
-                    EURES_SEARCH_URL,
-                    json=payload,
-                    headers={"Accept": "application/json", "Content-Type": "application/json"},
-                )
-                r.raise_for_status()
-                data = r.json()
-        except httpx.TimeoutException:
-            log.error("EuresSource: Timeout")
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await safe_post(
+                client, EURES_SEARCH_URL, "EuresSource",
+                json=payload,
+                headers={"Accept": "application/json", "Content-Type": "application/json"},
+            )
+        if r is None:
             return []
-        except httpx.HTTPStatusError as e:
-            log.error("EuresSource: HTTP %s", e.response.status_code)
-            return []
-        except Exception as e:
-            log.exception("EuresSource: Unerwarteter Fehler: %s", e)
-            return []
+        data = r.json()
 
         results: list[RawJob] = []
         for jv in data.get("jvs", []):

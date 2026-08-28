@@ -2,7 +2,7 @@
    Registrierung: https://developer.adzuna.com/
 """
 import httpx
-from backend.services.job_search.base import BaseJobSource, RawJob
+from backend.services.job_search.base import BaseJobSource, RawJob, safe_get
 from datetime import datetime
 
 BASE_URL = "https://api.adzuna.com/v1/api/jobs/de/search/1"
@@ -25,13 +25,11 @@ class AdzunaSource(BaseJobSource):
             "results_per_page": 20,
             "content-type": "application/json",
         }
-        try:
-            async with httpx.AsyncClient() as client:
-                r = await client.get(BASE_URL, params=params, timeout=15)
-                r.raise_for_status()
-                data = r.json()
-        except Exception:
+        async with httpx.AsyncClient() as client:
+            r = await safe_get(client, BASE_URL, "AdzunaSource", params=params, timeout=15)
+        if r is None:
             return []
+        data = r.json()
 
         results = []
         for item in data.get("results", []):

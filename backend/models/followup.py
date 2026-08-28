@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, Text, Boolean, ForeignKey
+from sqlalchemy import DateTime, Text, Boolean, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from backend.core.database import Base
@@ -6,6 +6,14 @@ from backend.core.database import Base
 
 class FollowUp(Base):
     __tablename__ = "followups"
+    # Index existierte bereits real in der DB (Migration 0002, "effiziente
+    # Ampel-Abfragen: WHERE erledigt = false ORDER BY faellig_am") aber war
+    # hier im Modell nie nachgetragen - alembic check wollte ihn deshalb
+    # faelschlich als "entfernt" markieren. Nachgetragen statt den echten,
+    # weiterhin gebrauchten Index zu loeschen.
+    __table_args__ = (
+        Index("ix_followups_erledigt_faellig_am", "erledigt", "faellig_am"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     application_id: Mapped[int] = mapped_column(ForeignKey("applications.id", ondelete="CASCADE"), nullable=False, index=True)

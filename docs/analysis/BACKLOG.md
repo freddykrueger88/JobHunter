@@ -670,8 +670,21 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       "Jan/Feb Hochsaison"-Pauschalaussage bewusst NICHT uebernommen -
       unbelegt, kein Bezug zu eigenen Daten. 5 neue Tests, live
       end-to-end verifiziert. Commit 975a6ac.
-- [ ] G.3.12 (#73) Absagen-Analyse - Muster in erhaltenen Absagen
-      erkennen, konkrete Empfehlungen ableiten
+- [x] G.3.12 (#73) Absagen-Analyse - Muster in erhaltenen Absagen
+      erkennen, konkrete Empfehlungen ableiten. ERLEDIGT (2026-08-28):
+      kein absage_text-Feld vorhanden (siehe rejection_analyzer.py) und
+      KI-Call pro Absage aus Performance-Gruenden verworfen - stattdessen
+      backend/services/rejection_pattern.py: deterministische Korrelation
+      gegen bereits vorhandene Signale (Skill-Gap-Score, ATS-Score,
+      Senioritaets-Abgleich Stellentitel vs. UserProfile.erfahrungsjahre
+      per mehrsprachiger Keyword-Klassifikation - genau das Issue-Beispiel
+      "Senior-Stellen mit Junior-Profil"). Neues RejectionInsights.tsx im
+      Dashboard, Gate bei <10 Absagen wie im Issue gefordert. 10 neue
+      Tests, live end-to-end mit 6 Wegwerf-Bewerbungen verifiziert.
+      Commit de718fd.
+
+**G.3.1-G.3.12 damit vollstaendig abgearbeitet** (G.3.10 stellte sich als
+bereits erledigt heraus, Checkbox nur nachgetragen, siehe H.4 oben).
 - [ ] G.3.13 (#67) Kommunale Jobportale (Staedte/Gemeinden/Behoerden/
       Unis) durchsuchen - TEIL der grossen EU-Jobboersen-Vision des
       Nutzers (siehe Phase I), nicht separat umsetzen

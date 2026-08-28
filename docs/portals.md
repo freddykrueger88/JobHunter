@@ -13,7 +13,7 @@ JobHunter searches multiple portals in parallel and deduplicates results.
 | Portal | Adapter | Coverage | Key required? | Method | Status |
 |--------|---------|----------|--------------|---------|--------|
 | Bundesagentur für Arbeit | `arbeitsagentur.py` | 🇩🇪 Germany | ❌ No | Official REST API | ✅ Active |
-| StepStone | `stepstone.py` | 🇩🇪 Germany | ❌ No | HTML scraping | ✅ Active |
+| StepStone | *(removed)* | 🇩🇪 Germany | — | HTML scraping | ❌ Removed 2026-08-28 |
 | Adzuna | `adzuna.py` | 🇩🇪 Germany | ✅ Yes (free) | REST API | ✅ With key |
 | LinkedIn | `linkedin.py` | 🇩🇪 Germany | ✅ Yes (OAuth2) | REST API | ✅ With key |
 | EURES | `eures_scraper.py` | 🇪🇺 EU-wide (31 countries, country picker) | ❌ No | Official REST API | ✅ Active |
@@ -23,17 +23,14 @@ JobHunter searches multiple portals in parallel and deduplicates results.
 | Arbetsförmedlingen | `arbetsformedlingen.py` | 🇸🇪 Sweden | ❌ No | Official REST API (JobTech) | ✅ Active |
 
 ## Bundesagentur für Arbeit
-- **API**: https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs
+- **API**: https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v6/jobs
 - **Cost**: Free, public
 - **Registration**: Optional (higher rate limit with Client ID)
-- **Note**: Official government source, very reliable
+- **Note**: Official government source, very reliable. Migrated from `pc/v4/jobs` to `pc/v6/jobs` on 2026-08-28 after the old endpoint started returning 403 — response schema changed substantially, see `arbeitsagentur.py` module docstring.
 
-## StepStone
-- **Method**: HTML scraping (no official API)
-- **Cost**: Free
-- **Rate limit**: Max. 1 request/search, User-Agent is set
-- **Note**: For personal use only. Selector paths may change on StepStone updates – update `stepstone.py` accordingly.
-- **Robots.txt**: `/jobs` is not blocked (as of May 2026)
+## StepStone (removed 2026-08-28)
+- **Method**: was HTML scraping (no official API)
+- **Removed because**: stepstone.de now serves an active Akamai bot-protection challenge in front of search results, and its `robots.txt` explicitly disallows the request pattern this scraper used (`Disallow: /jobs/*?q*&*`). Both together mean automated access is no longer tolerated, unlike this project's other sources which all use APIs their providers intend for machine access. Deliberately not worked around — see project history for the decision. Code removed, still in git history if StepStone ever opens a real API.
 
 ## Adzuna
 - **API**: https://api.adzuna.com/v1/api/jobs/de/search/
@@ -103,7 +100,7 @@ JobHunter durchsucht mehrere Portale parallel und dedupliziert die Ergebnisse.
 | Portal | Adapter | Abdeckung | Key nötig? | Methode | Status |
 |--------|---------|-----------|-----------|---------|--------|
 | Bundesagentur für Arbeit | `arbeitsagentur.py` | 🇩🇪 Deutschland | ❌ Nein | Offizielle REST-API | ✅ Aktiv |
-| StepStone | `stepstone.py` | 🇩🇪 Deutschland | ❌ Nein | HTML-Scraping | ✅ Aktiv |
+| StepStone | *(entfernt)* | 🇩🇪 Deutschland | — | HTML-Scraping | ❌ Entfernt 2026-08-28 |
 | Adzuna | `adzuna.py` | 🇩🇪 Deutschland | ✅ Ja (kostenlos) | REST-API | ✅ Mit Key |
 | LinkedIn | `linkedin.py` | 🇩🇪 Deutschland | ✅ Ja (OAuth2) | REST-API | ✅ Mit Key |
 | EURES | `eures_scraper.py` | 🇪🇺 EU-weit (31 Länder, Länderauswahl) | ❌ Nein | Offizielle REST-API | ✅ Aktiv |
@@ -115,11 +112,11 @@ JobHunter durchsucht mehrere Portale parallel und dedupliziert die Ergebnisse.
 ## Bundesagentur für Arbeit
 - Kostenlos, öffentlich – sehr zuverlässig
 - Registrierung optional (höheres Rate-Limit)
+- API-Endpoint am 2026-08-28 von `pc/v4/jobs` auf `pc/v6/jobs` migriert, nachdem der alte Endpoint 403 zurückgab - Response-Schema hat sich dabei deutlich geändert
 
-## StepStone
-- HTML-Scraping, kein offizielles API
-- Nur für persönlichen Gebrauch
-- Robots.txt: `/jobs` nicht gesperrt (Stand Mai 2026)
+## StepStone (entfernt 2026-08-28)
+- War HTML-Scraping, kein offizielles API
+- **Entfernt, weil**: stepstone.de schaltet inzwischen eine aktive Akamai-Bot-Schutzmauer vor die Suchergebnisse, und die `robots.txt` verbietet inzwischen explizit das genutzte Anfrage-Muster (`Disallow: /jobs/*?q*&*`). Beides zusammen bedeutet: automatisierter Zugriff wird nicht mehr geduldet, anders als bei den übrigen Quellen dieses Projekts, deren APIs von den Anbietern selbst für maschinellen Zugriff gedacht sind. Bewusst nicht umgangen. Code bleibt in der Git-Historie erhalten.
 
 ## Adzuna
 - Kostenlos mit Registrierung (1000 Anfragen/Tag)

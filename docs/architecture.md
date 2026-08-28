@@ -96,7 +96,7 @@ Frontend POST /api/jobs/search
     ↓
 Backend: aggregator.py calls all active portal adapters in parallel
     ↓
-Arbeitsagentur API + StepStone scraper + Adzuna API + LinkedIn API
+Arbeitsagentur API + Adzuna API + LinkedIn API + EURES + more (see docs/portals.md for the full, current list)
     ↓
 Duplicate detection (rapidfuzz)
     ↓

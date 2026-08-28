@@ -4,7 +4,6 @@ import logging
 from backend.services.job_search.base import RawJob
 from backend.services.job_search.arbeitsagentur import ArbeitsagenturSource
 from backend.services.job_search.adzuna import AdzunaSource
-from backend.services.job_search.stepstone import StepStoneSource
 from backend.services.job_search.linkedin import LinkedInSource
 from backend.services.job_search.eures_scraper import EuresSource
 from backend.services.job_search.karriere_nrw import KarriereNrwSource
@@ -31,9 +30,16 @@ async def search_all_sources(
     if country_code == "DE":
         sources.append(ArbeitsagenturSource())
 
-    # 2. StepStone (immer aktiv, kein Key nötig, ebenfalls DE-fokussiert)
-    if country_code == "DE":
-        sources.append(StepStoneSource())
+    # StepStone (HTML-Scraper) 2026-08-28 entfernt: stepstone.de hat eine
+    # aktive Akamai-Bot-Schutzmauer vor die Suchergebnisse geschaltet
+    # (JS-Challenge-Interstitial) UND robots.txt verbietet inzwischen
+    # explizit das genutzte Anfrage-Muster (/jobs?q=*&*). Beides zusammen
+    # signalisiert klar, dass automatisierter Zugriff nicht mehr geduldet
+    # ist - anders als die dokumentierten APIs der uebrigen Quellen. Live
+    # verifiziert (docker logs zeigten 0 Ergebnisse, Rohantwort war die
+    # Akamai-Challenge-Seite). Nutzerentscheidung: nicht versuchen zu
+    # umgehen, Quelle sauber abschalten statt sie umzubauen. Code-Historie
+    # in Git erhalten (siehe Commit dieser Aenderung).
 
     # 3. Adzuna (nur mit Keys)
     if getattr(settings_row, "adzuna_app_id_enc", None) and getattr(settings_row, "adzuna_api_key_enc", None):

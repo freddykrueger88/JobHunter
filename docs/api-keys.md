@@ -14,7 +14,7 @@ All keys are stored **AES-256 encrypted** in the local database – never in pla
 | Portal | Required? | Cost | What it unlocks |
 |---|---|---|---|
 | Bundesagentur für Arbeit | ❌ No | Free | Works without key (higher rate limit with key) |
-| StepStone | ❌ No | Free | Works via scraping |
+| StepStone | — | — | Removed 2026-08-28 (active bot protection + robots.txt disallow) |
 | **Adzuna** | Optional | Free | Millions of jobs worldwide (Indeed, Monster, etc.) |
 | **LinkedIn** | Optional | Free* | LinkedIn jobs directly |
 | EURES, Karriere.NRW, service.bund.de, Arbetsförmedlingen | ❌ No | Free | Work without a key, see [docs/portals.md](portals.md) |
@@ -128,7 +128,7 @@ Alle Keys werden **AES-256-verschlüsselt** in der lokalen Datenbank gespeichert
 | Portal | Pflicht? | Kosten | Was es freischaltet |
 |---|---|---|---|
 | Bundesagentur für Arbeit | ❌ Nein | Kostenlos | Funktioniert ohne Key (höheres Rate-Limit mit Key) |
-| StepStone | ❌ Nein | Kostenlos | Funktioniert via Scraping |
+| StepStone | — | — | Entfernt 2026-08-28 (aktive Bot-Schutzmauer + robots.txt-Sperre) |
 | **Adzuna** | Optional | Kostenlos | Millionen Jobs weltweit |
 | **LinkedIn** | Optional | Kostenlos* | LinkedIn-Jobs direkt |
 | EURES, Karriere.NRW, service.bund.de, Arbetsförmedlingen | ❌ Nein | Kostenlos | Funktionieren ohne Key, siehe [docs/portals.md](portals.md) |

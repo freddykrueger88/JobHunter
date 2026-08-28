@@ -170,7 +170,7 @@ export default function Jobs() {
           </div>
           {countryCode !== 'DE' && (
             <p className="text-xs text-gray-400">
-              EU-weite Suche über EURES in {euresCountries.find(c => c.code === countryCode)?.name ?? countryCode}. Ort und Radius gelten nur für die deutschen Portale (Arbeitsagentur, StepStone) und werden hier ignoriert.
+              EU-weite Suche über EURES in {euresCountries.find(c => c.code === countryCode)?.name ?? countryCode}. Ort und Radius gelten nur für die deutschen Portale und werden hier ignoriert.
             </p>
           )}
           <div className="flex items-center justify-between">

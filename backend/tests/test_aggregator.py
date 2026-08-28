@@ -2,10 +2,15 @@
 Tests fuer backend/services/job_search/aggregator.py.
 
 Phase I.1: EuresSource ist jetzt immer als Quelle registriert (deckt EU-
-weite Suche ab). Arbeitsagentur/StepStone sind Deutschland-spezifische
-Scraper und werden nur noch aktiviert, wenn country_code=="DE" (Default,
-identisch zum bisherigen Verhalten) - sonst wuerden bei einer expliziten
-Auslandssuche (z.B. "AT") irrefuehrende deutsche Treffer mit einlaufen.
+weite Suche ab). Arbeitsagentur/Karriere.NRW/service.bund.de sind
+Deutschland-spezifisch und werden nur noch aktiviert, wenn
+country_code=="DE" (Default, identisch zum bisherigen Verhalten) -
+sonst wuerden bei einer expliziten Auslandssuche (z.B. "AT")
+irrefuehrende deutsche Treffer mit einlaufen.
+
+StepStone (HTML-Scraper) 2026-08-28 aus dem Aggregator entfernt - aktive
+Akamai-Bot-Schutzmauer + robots.txt verbietet inzwischen explizit das
+genutzte Anfrage-Muster, siehe aggregator.py.
 """
 from __future__ import annotations
 
@@ -26,9 +31,6 @@ class TestSearchAllSources:
         with patch(
             "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search",
             new=AsyncMock(return_value=[RawJob(title="AA-Job", company="X", source_portal="arbeitsagentur")]),
-        ), patch(
-            "backend.services.job_search.stepstone.StepStoneSource.search",
-            new=AsyncMock(return_value=[]),
         ), patch(
             "backend.services.job_search.karriere_nrw.KarriereNrwSource.search",
             new=AsyncMock(return_value=[RawJob(title="NRW-Job", company="Z", source_portal="karriere_nrw")]),
@@ -127,8 +129,6 @@ class TestSearchAllSources:
         ), patch(
             "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=AsyncMock(return_value=[]),
         ), patch(
-            "backend.services.job_search.stepstone.StepStoneSource.search", new=AsyncMock(return_value=[]),
-        ), patch(
             "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=AsyncMock(return_value=[]),
         ), patch(
             "backend.services.job_search.service_bund.ServiceBundSource.search", new=AsyncMock(return_value=[]),
@@ -160,8 +160,6 @@ class TestSearchAllSources:
             "backend.services.job_search.arbetsformedlingen.ArbetsformedlingenSource.search", new=af_search,
         ), patch(
             "backend.services.job_search.arbeitsagentur.ArbeitsagenturSource.search", new=AsyncMock(return_value=[]),
-        ), patch(
-            "backend.services.job_search.stepstone.StepStoneSource.search", new=AsyncMock(return_value=[]),
         ), patch(
             "backend.services.job_search.karriere_nrw.KarriereNrwSource.search", new=AsyncMock(return_value=[]),
         ), patch(

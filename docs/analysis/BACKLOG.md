@@ -833,10 +833,34 @@ noetig, nicht in einem Rutsch machbar.
       fuer den RechercheStand und die Begruendung. Deutlich schwieriger
       als die bisherigen 5 Quellen, kein Schnellgewinn erkennbar - auf
       Nutzerwunsch (2026-08-27) fuer spaeter geparkt statt jetzt vertieft.
-- [ ] I.2 Priorisierung (welche Laender/Portale als naechstes)
-- [ ] I.3 Generisches Scraper-/Connector-Framework (damit nicht jedes
-      Portal komplett eigenen Code braucht)
-- [ ] I.4 Rollout Land fuer Land
+- [ ] I.2 Priorisierung (welche Laender/Portale als naechstes) - braucht
+      eine Produktentscheidung des Nutzers, nicht allein am Schreibtisch
+      loesbar.
+- [x] I.3 Generisches Scraper-/Connector-Framework. ERLEDIGT (2026-08-28):
+      base.py/RawJob/aggregator.py WAREN bereits der eigentliche generische
+      Rahmen (jede neue Quelle braucht nur search() -> list[RawJob] plus
+      eine Zeile im Aggregator, das war schon 5x erfolgreich der Fall) -
+      ein neues Plugin-System waere premature gewesen. Eine echte,
+      messbare Duplikation gab es trotzdem: der Timeout/HTTP-Fehler-
+      try/except-Block war Zeichen fuer Zeichen identisch in 7 von 9
+      Quellen. Extrahiert als safe_get/safe_post in base.py, alle 9
+      Quellen (auch die 2 aelteren mit nur pauschalem except Exception)
+      darauf umgestellt. Kein Test musste angepasst werden (zwei duenne
+      Wrapper statt client.request(), damit die bestehenden client.get/
+      client.post-Mocks weiter greifen). Volle Suite unveraendert
+      309/309 gruen, live end-to-end verifiziert. Commit 427efc8.
+      **Nebenbefund beim Live-Test (nicht vom Refactor verursacht, mit
+      rohem httpx ohne jeden JobHunter-Code reproduziert):
+      ArbeitsagenturSource bekommt aktuell HTTP 403 von der
+      Bundesagentur-API (vorher HTTP 200) - weder User-Agent-Aenderung
+      noch die Request-Parameter selbst sind die Ursache, genaue Ursache
+      nicht weiter untersucht (koennte IP-Block/Rate-Limit/neue
+      Auth-Anforderung sein). Eine der zentralen zero-config-DE-Quellen
+      ist damit aktuell ausgefallen. Separates Thema von I.3, noch nicht
+      behoben - eigene Recherche noetig, aehnlich der Wikipedia-User-
+      Agent-Session zuvor.**
+- [ ] I.4 Rollout Land fuer Land - haengt an I.2 (Prioritaet), noch nicht
+      begonnen.
 
 ## Phase J - Aufklaerung "uncommittete Nutzerdateien" (2026-08-25)
 

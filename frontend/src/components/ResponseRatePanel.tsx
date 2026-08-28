@@ -22,6 +22,8 @@ interface ResponseRateData {
   by_portal: RateEntry[]
   by_weekday: RateEntry[]
   by_cover_letter_length: RateEntry[]
+  by_hour: RateEntry[]
+  by_days_until_applied: RateEntry[]
   empfehlungen: string[]
 }
 
@@ -54,6 +56,8 @@ export default function ResponseRatePanel() {
   const byPortal = data.by_portal.filter(e => e.total > 0)
   const byWeekday = data.by_weekday.filter(e => e.total > 0)
   const byLength = data.by_cover_letter_length.filter(e => e.total > 0)
+  const byHour = data.by_hour.filter(e => e.total > 0)
+  const byDaysUntil = data.by_days_until_applied.filter(e => e.total > 0)
 
   if (byPortal.length === 0) {
     return (
@@ -92,6 +96,20 @@ export default function ResponseRatePanel() {
         <div className="space-y-1.5">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('byLength')}</p>
           {byLength.map(e => <RateBar key={e.key} entry={e} label={e.label ?? String(e.key)} />)}
+        </div>
+      )}
+
+      {byHour.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('byHour')}</p>
+          {byHour.map(e => <RateBar key={e.key} entry={e} label={e.label ?? String(e.key)} />)}
+        </div>
+      )}
+
+      {byDaysUntil.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('byDaysUntilApplied')}</p>
+          {byDaysUntil.map(e => <RateBar key={e.key} entry={e} label={e.label ?? String(e.key)} />)}
         </div>
       )}
 

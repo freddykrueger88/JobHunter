@@ -8,6 +8,7 @@ import ImageJobUpload from '../components/ImageJobUpload'
 import DuplicateJobsPanel from '../components/DuplicateJobsPanel'
 import JobAnalysisPanel from '../components/JobAnalysisPanel'
 import GhostJobBadge from '../components/GhostJobBadge'
+import TimingHintBadge from '../components/TimingHintBadge'
 
 interface GhostJobResult {
   ghost_score: number
@@ -26,8 +27,16 @@ interface Job {
   source_portal: string | null
   job_type: string | null
   is_hidden: boolean
+  published_at: string | null
   created_at: string
   ghost_job: GhostJobResult
+}
+
+interface DaysUntilEntry {
+  key: string
+  total: number
+  beantwortet: number
+  quote: number
 }
 
 const portalBadgeColor: Record<string, string> = {
@@ -85,6 +94,14 @@ export default function Jobs() {
     queryKey: ['eures-countries'],
     queryFn: () => axios.get('/api/jobs/eures-countries').then(r => r.data),
     staleTime: Infinity,
+  })
+
+  // Gleicher Query-Key wie ResponseRatePanel.tsx (Dashboard) - React
+  // Query dedupliziert/teilt den Cache automatisch, kein Extra-Request
+  // noetig wenn beide Seiten in derselben Session besucht werden.
+  const { data: responseRates } = useQuery<{ by_days_until_applied: DaysUntilEntry[] }>({
+    queryKey: ['response-rates'],
+    queryFn: () => axios.get('/api/stats/response-rates').then(r => r.data),
   })
 
   const searchMutation = useMutation({
@@ -269,6 +286,11 @@ export default function Jobs() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <GhostJobBadge result={job.ghost_job} />
+                  <TimingHintBadge
+                    publishedAt={job.published_at}
+                    createdAt={job.created_at}
+                    byDaysUntilApplied={responseRates?.by_days_until_applied}
+                  />
                   {job.source_portal && (
                     <span className={clsx('text-xs px-2 py-0.5 rounded-full font-medium',
                       portalBadgeColor[job.source_portal] ?? portalBadgeColor.default)}>

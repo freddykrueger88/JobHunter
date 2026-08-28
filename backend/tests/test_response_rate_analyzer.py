@@ -16,8 +16,8 @@ from backend.services.response_rate_analyzer import get_response_rate_analysis
 pytestmark = pytest.mark.asyncio
 
 
-async def _job(db: AsyncSession, source_portal: str | None) -> Job:
-    job = Job(title="Testjob", company="Testfirma", source_portal=source_portal)
+async def _job(db: AsyncSession, source_portal: str | None, published_at: datetime | None = None) -> Job:
+    job = Job(title="Testjob", company="Testfirma", source_portal=source_portal, published_at=published_at)
     db.add(job)
     await db.commit()
     await db.refresh(job)
@@ -164,3 +164,64 @@ class TestRecommendations:
         result = await get_response_rate_analysis(db)
 
         assert result["empfehlungen"] == []
+
+
+class TestByHour:
+    async def test_buckets_by_hour_of_day(self, db: AsyncSession):
+        job = await _job(db, "stepstone")
+        morgens = datetime(2026, 8, 24, 8, 0, tzinfo=timezone.utc)
+        abends = datetime(2026, 8, 24, 22, 0, tzinfo=timezone.utc)
+        await _application(db, job, "interview", applied_at=morgens)
+        await _application(db, job, "beworben", applied_at=abends)
+
+        result = await get_response_rate_analysis(db)
+
+        by_key = {e["key"]: e for e in result["by_hour"]}
+        assert by_key["morgens"]["total"] == 1
+        assert by_key["morgens"]["beantwortet"] == 1
+        assert by_key["abends"]["total"] == 1
+        assert by_key["abends"]["beantwortet"] == 0
+
+    async def test_missing_applied_at_not_counted(self, db: AsyncSession):
+        job = await _job(db, "stepstone")
+        await _application(db, job, "beworben", applied_at=None)
+
+        result = await get_response_rate_analysis(db)
+
+        assert all(e["total"] == 0 for e in result["by_hour"])
+
+
+class TestByDaysUntilApplied:
+    async def test_buckets_by_days_since_publication(self, db: AsyncSession):
+        published = datetime(2026, 8, 1, tzinfo=timezone.utc)
+        job = await _job(db, "stepstone", published_at=published)
+
+        sofort = await _application(db, job, "interview", applied_at=datetime(2026, 8, 1, 12, tzinfo=timezone.utc))
+        spaet = await _application(db, job, "beworben", applied_at=datetime(2026, 8, 20, 12, tzinfo=timezone.utc))
+        assert sofort.id and spaet.id
+
+        result = await get_response_rate_analysis(db)
+
+        by_key = {e["key"]: e for e in result["by_days_until_applied"]}
+        assert by_key["sofort"]["total"] == 1
+        assert by_key["sofort"]["beantwortet"] == 1
+        assert by_key["spaet"]["total"] == 1
+        assert by_key["spaet"]["beantwortet"] == 0
+
+    async def test_falls_back_to_job_created_at_when_published_at_missing(self, db: AsyncSession):
+        job = await _job(db, "stepstone", published_at=None)
+        assert job.created_at is not None
+        await _application(db, job, "beworben", applied_at=job.created_at)
+
+        result = await get_response_rate_analysis(db)
+
+        total = sum(e["total"] for e in result["by_days_until_applied"])
+        assert total == 1
+
+    async def test_missing_applied_at_not_counted(self, db: AsyncSession):
+        job = await _job(db, "stepstone", published_at=datetime(2026, 8, 1, tzinfo=timezone.utc))
+        await _application(db, job, "beworben", applied_at=None)
+
+        result = await get_response_rate_analysis(db)
+
+        assert all(e["total"] == 0 for e in result["by_days_until_applied"])

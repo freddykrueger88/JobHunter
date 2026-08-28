@@ -3,6 +3,8 @@
   "byPortal": "Nach Portal",
   "byWeekday": "Nach Wochentag",
   "byLength": "Nach Anschreiben-Länge",
+  "byHour": "Nach Tageszeit",
+  "byDaysUntilApplied": "Nach Tagen bis zur Bewerbung",
   "recommendations": "Empfehlungen",
   "notEnoughData": "Noch nicht genug abgeschickte Bewerbungen für eine Auswertung."
 }

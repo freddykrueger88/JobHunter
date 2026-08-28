@@ -3,6 +3,8 @@
   "byPortal": "By Portal",
   "byWeekday": "By Weekday",
   "byLength": "By Cover Letter Length",
+  "byHour": "By Time of Day",
+  "byDaysUntilApplied": "By Days Until Applied",
   "recommendations": "Recommendations",
   "notEnoughData": "Not enough submitted applications yet for an analysis."
 }

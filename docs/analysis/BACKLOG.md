@@ -610,8 +610,14 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Durchgang waere sinnvoll, bevor der naechste `alembic revision
       --autogenerate` versehentlich Dutzende falsche NOT-NULL-Aenderungen
       vorschlaegt.
-- [ ] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)
-      fuer Bewerbungsaktivitaet
+- [x] G.3.7 (#79) Aktivitaets-Heatmap (GitHub-Contribution-Graph-Stil)
+      fuer Bewerbungsaktivitaet. ERLEDIGT (2026-08-28): neuer Endpoint
+      GET /api/stats/activity-heatmap (ein Eintrag pro Tag inkl. 0er,
+      Default 365 Tage). Neue ActivityHeatmap.tsx als CSS-Grid (kein
+      Chart-Library-Einsatz, recharts unterstuetzt keine Kalender-
+      Heatmap), Montag-Start-Wochenraster, 4 Intensitaetsstufen, auf dem
+      Dashboard unter dem Wochenziel platziert. 6 neue Tests. Live
+      end-to-end verifiziert. Commit 8eb94d3.
 - [ ] G.3.8 (#78) Ruecklaufquoten-Tracker - welche Portale/Wochentage/
       Anschreiben-Laengen zu Antworten fuehren, mit Empfehlungen
 - [ ] G.3.9 (#76) Branchen-Radar - regionale Jobmarkt-Trends aus den

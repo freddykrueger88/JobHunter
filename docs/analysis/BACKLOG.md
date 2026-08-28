@@ -1017,15 +1017,29 @@ weiterverfolgt, damit sie den Rest des Backlogs nicht blockieren.
         oeffentlicher Solr-API-Zugang wird von Dritt-Scrapern erwaehnt,
         aber die konkrete Endpunkt-URL/Doku dazu wurde nicht gefunden -
         wuerde tieferes Reverse-Engineering brauchen.
-      - **Polen** (CBOP/ePraca, oferty.praca.gov.pl): moderne Angular-
-        SPA, keine offengelegte API im Haupt-JS-Bundle gefunden (nur die
-        Lazy-Load-Chunks nicht durchsucht) - dane.gov.pl als moeglicher
-        Fundort fuer einen offiziellen Datensatz noch nicht gezielt
-        durchsucht. Aehnlicher Aufwand wie service.bund.de, aber ohne
-        dessen RSS-Abkuerzung.
+      - **Polen** (CBOP/ePraca, oferty.praca.gov.pl) - VERTIEFT
+        recherchiert (2026-08-28), schlechter als urspruenglich
+        angenommen: dane.gov.pl fuehrte tatsaechlich zu einer offiziell
+        dokumentierten API ("Instrukcja pobierania danych z CBOP" +
+        Dataset 538 "Oferty pracy PSZ"), ABER es ist eine SOAP/WSDL-
+        Schnittstelle (https://oferty.praca.gov.pl/integration/services/
+        v2/oferta?wsdl, live erreichbar), nicht REST/JSON wie jede andere
+        Quelle in diesem Projekt. Liefert zudem keine live filterbare
+        Job-Suche, sondern nur einen Bulk-Datei-Export pro Wojewodztwo
+        (Region) als base64-kodierten Blob - Format des Blobs unbekannt,
+        keine Keyword-/Umkreis-Filterung serverseitig moeglich. Live per
+        rohem SOAP-Request getestet: Status "Niepoprawna autoryzacja"
+        (falsche Autorisierung) - der Pflicht-Parameter "Partner"
+        braucht eine echte Registrierung bei der Behoerde, kein
+        Self-Service wie France Travail. Damit in derselben
+        Schwierigkeitsklasse wie Daenemark/Finnland (manuelle Freigabe
+        noetig), plus SOAP-Protokoll (neue Abhaengigkeit) und
+        unbekanntes Datei-Format obendrauf - schlechter als der
+        urspruengliche "aehnlich wie service.bund.de"-Vergleich
+        vermuten liess. Kein Schnellgewinn, nicht weiter verfolgt.
       - **Naechster sinnvoller Schritt, falls spaeter wieder
-        aufgegriffen:** entweder (a) VDAB-Account anlegen und Freigabe-
-        Tempo live pruefen, (b) dane.gov.pl gezielt nach einem CBOP-
-        Datensatz/API durchsuchen, oder (c) die Lazy-Load-JS-Chunks der
-        beiden SPAs systematisch nach API-Calls durchsuchen. Keiner
-        dieser Schritte wurde bisher unternommen.
+        aufgegriffen:** (b) und (c) fuer Polen sind jetzt erledigt (siehe
+        oben, beide Wege gepruefte Sackgassen). Einzig verbleibende
+        Option: (a) VDAB-Account fuer Belgien anlegen und Freigabe-Tempo
+        live pruefen - noch nicht unternommen (echter Account mit den
+        eigenen Nutzerdaten noetig, bisher nicht ungefragt angelegt).

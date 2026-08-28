@@ -1050,15 +1050,36 @@ weiterverfolgt, damit sie den Rest des Backlogs nicht blockieren.
         unbekanntes Datei-Format obendrauf - schlechter als der
         urspruengliche "aehnlich wie service.bund.de"-Vergleich
         vermuten liess. Kein Schnellgewinn, nicht weiter verfolgt.
-      - **Stand (2026-08-28): alle 5 in Phase M gelisteten Laender sind
-        jetzt konkret recherchiert, keines bietet einen Schnellgewinn.**
-        Daenemark/Finnland/Belgien brauchen alle einen manuellen
-        Freigabeprozess mit der jeweiligen Behoerde (kein Self-Service),
-        Polen zusaetzlich SOAP statt REST/JSON, Spanien einen Server-
-        Fehler auf dem Standard-Einstiegspfad. Naechster sinnvoller
-        Schritt waere nur noch: (a) einen der Behoerden-Kontakte/
-        Freigabeprozesse tatsaechlich anstossen und abwarten (Wochen,
-        nicht Session-Dauer), oder (b) ein bisher komplett unrecherchiertes
-        Land pruefen (z.B. Italien, Portugal, Niederlande-Nachfolger o.ae.
-        - noch nicht angeschaut). Explizit NICHT von selbst weiter
-        vertiefen, ohne dass der Nutzer das priorisiert.
+      - **Italien** (ANPAL) - recherchiert (2026-08-28): anpal.gov.it
+        aktuell komplett unerreichbar (DNS-Timeout, von zwei unabhaengigen
+        Netzwerken aus reproduziert, kein Problem dieses Hosts), das
+        Arbeitsmarkt-Open-Data-Portal (dati.lavoro.gov.it) im
+        Wartungsmodus. Koennte ein temporaerer Ausfall sein - wert, es
+        bei Gelegenheit erneut zu pruefen, aber kein aktueller Kandidat.
+      - **Portugal** (IEFP) - recherchiert (2026-08-28): der offizielle
+        Open-Data-Datensatz auf dados.gov.pt ist nur eine monatliche
+        Aggregat-Statistik ("Anzahl neuer Stellen"), keine einzelnen
+        durchsuchbaren Jobs. Die echte Jobsuche laeuft nur ueber ein
+        klassisches HTML-Portal (iefponline.iefp.pt) ohne dokumentierte
+        API - wuerde HTML-Scraping brauchen wie bei StepStone.
+      - **Irland** (JobsIreland/Intreo) - recherchiert (2026-08-28):
+        api.jobsireland.ie sieht wie eine echte API aus, ist aber nur ein
+        alternativer Hostname fuer dieselbe alte AngularJS-Webseite
+        (jQuery 2.1.3, ca. 2015er Tech-Stack) - keine echte
+        Entwickler-API gefunden, JS-Bundle enthielt keine erkennbaren
+        API-Endpunkt-Strings. Gleiche Schwierigkeitsklasse wie Portugal:
+        nur ueber Scraping der alten Webseite moeglich.
+      - **Stand (2026-08-28): 8 Laender jetzt konkret recherchiert
+        (Daenemark/Finnland/Belgien/Spanien/Polen/Italien/Portugal/
+        Irland), keines bietet einen Schnellgewinn.** Drei Gruppen von
+        Blockaden: manuelle Behoerden-Freigabe noetig (DK/FI/BE), kein
+        oeffentliches API vorhanden - nur Scraping moeglich (PT/IE/PL-
+        aehnlich), oder aktuell technisch nicht erreichbar (IT, evtl.
+        temporaer). Naechster sinnvoller Schritt waere nur noch: (a)
+        einen der Behoerden-Kontakte tatsaechlich anstossen und abwarten
+        (Wochen, nicht Session-Dauer), (b) Italien in ein paar Tagen
+        erneut pruefen, (c) sich fuer HTML-Scraping bei PT/IE
+        entscheiden trotz hoeherem Wartungsaufwand, oder (d) ein noch
+        unrecherchiertes Land pruefen (z.B. Oesterreich, Tschechien).
+        Explizit NICHT von selbst weiter vertiefen, ohne dass der Nutzer
+        das priorisiert.

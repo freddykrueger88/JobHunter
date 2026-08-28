@@ -26,7 +26,11 @@ async def fetch_company_dossier(company_name: str) -> dict:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        # Wikimedia verlangt seit 2026 einen identifizierenden User-Agent
+        # (https://w.wiki/4wJS) - ohne ihn kommt ein 403 mit HTML-Body statt
+        # JSON zurueck, was .json() als generischen Fehler tarnte.
+        headers = {"User-Agent": "JobHunter/1.0 (https://github.com/freddykrueger88/JobHunter; self-hosted job tracker)"}
+        async with httpx.AsyncClient(timeout=10, headers=headers) as client:
             # Wikipedia-Suche (DE zuerst, dann EN)
             for lang in ("de", "en"):
                 search_url = (

@@ -657,8 +657,19 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       POST /api/jobs/165/culture-match gegen die laufende Instanz liefert
       korrekt die erwartete "Profil unvollstaendig"-Fehlermeldung, da das
       eigene UserProfile noch kein arbeitsstil/werte ausgefuellt hat.
-- [ ] G.3.11 (#74) Bewerbungs-Timing-KI - optimaler Wochentag/Uhrzeit
-      zum Absenden basierend auf Erfolgsquoten
+- [x] G.3.11 (#74) Bewerbungs-Timing-KI - optimaler Wochentag/Uhrzeit
+      zum Absenden basierend auf Erfolgsquoten. ERLEDIGT (2026-08-28):
+      "Wochentag" bereits durch G.3.8's by_weekday abgedeckt, hier nur die
+      neuen Teile - response_rate_analyzer.py um by_hour (nur applied_at,
+      kein Fallback) und by_days_until_applied (Job.published_at/
+      created_at vs. applied_at) erweitert, beide im ResponseRatePanel.tsx
+      im Dashboard sichtbar. Neues TimingHintBadge.tsx auf der Jobs-Seite
+      zeigt pro Job, ob sein Alter in die historisch beste Tage-bis-
+      Bewerbung-Kategorie faellt (clientseitig aus den Aggregat-Daten
+      abgeleitet, kein Backend-Feld pro Job). Die im Issue vorgeschlagene
+      "Jan/Feb Hochsaison"-Pauschalaussage bewusst NICHT uebernommen -
+      unbelegt, kein Bezug zu eigenen Daten. 5 neue Tests, live
+      end-to-end verifiziert. Commit 975a6ac.
 - [ ] G.3.12 (#73) Absagen-Analyse - Muster in erhaltenen Absagen
       erkennen, konkrete Empfehlungen ableiten
 - [ ] G.3.13 (#67) Kommunale Jobportale (Staedte/Gemeinden/Behoerden/

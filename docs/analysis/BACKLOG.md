@@ -629,8 +629,21 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       >=3 Bewerbungen je verglichener Kategorie. Neues ResponseRatePanel.tsx
       im Dashboard, 12 neue Tests, live end-to-end verifiziert. Commit
       441f55e.
-- [ ] G.3.9 (#76) Branchen-Radar - regionale Jobmarkt-Trends aus den
-      integrierten Portalen aggregiert
+- [x] G.3.9 (#76) Branchen-Radar - regionale Jobmarkt-Trends aus den
+      integrierten Portalen aggregiert. ERLEDIGT (2026-08-28): neue Seite
+      BranchenRadar.tsx (/branchen-radar), GET /api/stats/market-trends.
+      Kein Branchen-Feld auf Job vorhanden, KI-Klassifikation ueber alle
+      Jobs aus Performance-Gruenden verworfen (CPU-only Ollama) -
+      stattdessen mehrsprachige Substring-Keyword-Klassifikation
+      (backend/services/market_trends.py, 12 grobe Kategorien, keine
+      amtliche Klassifikation). Mehrsprachig noetig, weil ein Live-Check
+      der Produktions-DB zeigte, dass die meisten gespeicherten Jobtitel
+      NICHT deutsch sind (EURES/Arbetsformedlingen/France Travail).
+      Top-5 wachsend/schrumpfend ueber zwei 15-Tage-Fenster, Stadt/PLZ-
+      Filter. Zwei echte Fehltreffer beim Live-Verifizieren gefunden+
+      behoben ("sales" matchte "Salesforce", "care" haette "career"
+      getroffen). 14 neue Tests, live gegen die echte 135-Job-DB
+      verifiziert. Commit 50cd9e5.
 - [ ] G.3.10 (#75) Persoenlichkeits-Matching - KI schaetzt Firmenkultur
       aus Stellenbeschreibung ein, Abgleich mit kurzem Nutzer-Fragebogen
       beim Setup (5 Fragen) - UEBERSCHNEIDUNG mit dem vom Nutzer

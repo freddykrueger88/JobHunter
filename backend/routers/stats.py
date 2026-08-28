@@ -14,6 +14,7 @@ from sqlalchemy import select, func
 from backend.core.database import get_db
 from backend.models.application import Application
 from backend.models.settings import UserSettings
+from backend.services.response_rate_analyzer import get_response_rate_analysis
 
 router = APIRouter(prefix="/api/stats", tags=["Statistik"])
 
@@ -151,3 +152,11 @@ async def get_activity_heatmap(days: int = 365, db: AsyncSession = Depends(get_d
         key = d.isoformat()
         heatmap.append({"datum": key, "anzahl": counts.get(key, 0)})
     return heatmap
+
+
+@router.get("/response-rates")
+async def get_response_rates(db: AsyncSession = Depends(get_db)):
+    """Ruecklaufquoten-Tracker (#78, G.3.8): siehe
+    services/response_rate_analyzer.py fuer die Definitionen von
+    "beantwortet"/Bezugsdatum/Laengen-Buckets."""
+    return await get_response_rate_analysis(db)

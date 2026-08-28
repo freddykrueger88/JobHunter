@@ -8,6 +8,7 @@ import StatsChart from '../components/StatsChart'
 import WeeklyGoalWidget from '../components/WeeklyGoalWidget'
 import BurnoutWarning from '../components/BurnoutWarning'
 import ActivityHeatmap from '../components/ActivityHeatmap'
+import ResponseRatePanel from '../components/ResponseRatePanel'
 
 interface DueReminder {
   id: number
@@ -113,6 +114,11 @@ export default function Dashboard() {
       {/* Aktivitäts-Heatmap */}
       <div className="mb-8">
         <ActivityHeatmap />
+      </div>
+
+      {/* Ruecklaufquoten */}
+      <div className="mb-8">
+        <ResponseRatePanel />
       </div>
 
       {/* Abzeichen */}

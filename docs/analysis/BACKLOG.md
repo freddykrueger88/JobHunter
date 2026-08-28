@@ -746,11 +746,18 @@ noetig, nicht in einem Rutsch machbar.
       mit angebunden: Laender-Dropdown in Jobs.tsx (alle 31 EURES-
       Laender), Ortsnamen-Aufloesung ueber die offizielle Eurostat/
       GISCO-NUTS-2024-Referenztabelle (EURES liefert nur NUTS-Codes wie
-      "DE111", keine Klartext-Ortsnamen). Offen: der Detail-Link pro
-      Stellenanzeige ist aus der API-Konvention plausibel konstruiert,
-      aber NICHT mit einem echten Browser verifiziert (EURES ist eine
-      JS-SPA, HTTP-Statuscodes sind wegen Client-Routing-Fallback nicht
-      aussagekraeftig) - bei Gelegenheit einmal manuell pruefen.
+      "DE111", keine Klartext-Ortsnamen).
+      **Detail-Link jetzt echt verifiziert (2026-08-28):** WebFetch sah
+      nur die JS-Lade-Shell (EURES ist eine SPA), Claude-in-Chrome war
+      nicht verbunden - deshalb einmalig ein echter Headless-Chromium
+      per Docker (mcr.microsoft.com/playwright) genutzt, eine reale
+      Job-URL aus der laufenden Instanz geoeffnet und den gerenderten
+      Text extrahiert: zeigt korrekt eine vollstaendige echte
+      Stellenanzeige ("Backend Developer" bei activjob GmbH, komplette
+      Beschreibung/Arbeitgeber-Infos). Der Detail-Link ist damit
+      bestaetigt korrekt, kein unverifizierter Konstruktionsversuch
+      mehr. Image danach wieder entfernt (nur fuer diesen Check genutzt,
+      kein Teil des Projekt-Stacks).
       Nebenfund: ein zweiter, unabhaengiger EURES-Router
       (backend/routers/eures.py, GET /api/eures/search) haengte
       ebenfalls an der toten API und wurde von keinem Frontend je

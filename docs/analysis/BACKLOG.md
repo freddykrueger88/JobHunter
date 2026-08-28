@@ -618,8 +618,17 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       Heatmap), Montag-Start-Wochenraster, 4 Intensitaetsstufen, auf dem
       Dashboard unter dem Wochenziel platziert. 6 neue Tests. Live
       end-to-end verifiziert. Commit 8eb94d3.
-- [ ] G.3.8 (#78) Ruecklaufquoten-Tracker - welche Portale/Wochentage/
-      Anschreiben-Laengen zu Antworten fuehren, mit Empfehlungen
+- [x] G.3.8 (#78) Ruecklaufquoten-Tracker - welche Portale/Wochentage/
+      Anschreiben-Laengen zu Antworten fuehren, mit Empfehlungen.
+      ERLEDIGT (2026-08-28): GET /api/stats/response-rates gruppiert
+      tatsaechlich abgeschickte Bewerbungen (status != interessant) nach
+      Job.source_portal, Wochentag (applied_at/created_at) und
+      Anschreiben-Laenge in Woertern (Buckets an ai_prompts.py's eigener
+      Zielspanne 250-350 Woerter). "Beantwortet" = Status
+      interview/angenommen/absage erreicht. Textempfehlungen nur bei
+      >=3 Bewerbungen je verglichener Kategorie. Neues ResponseRatePanel.tsx
+      im Dashboard, 12 neue Tests, live end-to-end verifiziert. Commit
+      441f55e.
 - [ ] G.3.9 (#76) Branchen-Radar - regionale Jobmarkt-Trends aus den
       integrierten Portalen aggregiert
 - [ ] G.3.10 (#75) Persoenlichkeits-Matching - KI schaetzt Firmenkultur

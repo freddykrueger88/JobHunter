@@ -644,11 +644,19 @@ Quelle der Wahrheit fuer offene Punkte - das ist BACKLOG.md).
       behoben ("sales" matchte "Salesforce", "care" haette "career"
       getroffen). 14 neue Tests, live gegen die echte 135-Job-DB
       verifiziert. Commit 50cd9e5.
-- [ ] G.3.10 (#75) Persoenlichkeits-Matching - KI schaetzt Firmenkultur
+- [x] G.3.10 (#75) Persoenlichkeits-Matching - KI schaetzt Firmenkultur
       aus Stellenbeschreibung ein, Abgleich mit kurzem Nutzer-Fragebogen
       beim Setup (5 Fragen) - UEBERSCHNEIDUNG mit dem vom Nutzer
       gewuenschten KI-Hintergrundprofil (siehe Phase H), beim Bauen des
-      Profil-Fragebogens mitdenken statt zweimal zu bauen
+      Profil-Fragebogens mitdenken statt zweimal zu bauen.
+      STALE-CHECKBOX-KORREKTUR (2026-08-28): war bereits laengst erledigt
+      (Phase H.4, culture_match.py/CultureMatchPanel.tsx, Commit c8a4d66
+      vom 2026-08-26) - nur die Checkbox hier war nie aktualisiert worden,
+      gleiches Muster wie die Backlog-Hygiene-Session vom 2026-08-27.
+      Live re-verifiziert statt blind abgehakt: 5 Tests gruen, echter
+      POST /api/jobs/165/culture-match gegen die laufende Instanz liefert
+      korrekt die erwartete "Profil unvollstaendig"-Fehlermeldung, da das
+      eigene UserProfile noch kein arbeitsstil/werte ausgefuellt hat.
 - [ ] G.3.11 (#74) Bewerbungs-Timing-KI - optimaler Wochentag/Uhrzeit
       zum Absenden basierend auf Erfolgsquoten
 - [ ] G.3.12 (#73) Absagen-Analyse - Muster in erhaltenen Absagen
@@ -682,9 +690,11 @@ gemeinsames Datenmodell fuer beides nutzen statt zwei parallele Profile.
       docx_template_service.generate_cover_letter_text/PR-91-Pfad) um
       Profildaten erweitert, ueber gemeinsamen profile_service.py
       (kein Duplikat)
-- [ ] H.4 Persoenlichkeits-Matching (#75/G.3.10) auf demselben Profil
+- [x] H.4 Persoenlichkeits-Matching (#75/G.3.10) auf demselben Profil
       aufbauen statt eigenem Fragebogen - Datenmodell (arbeitsstil/werte)
-      ist vorbereitet, Matching-Logik selbst noch nicht gebaut
+      ist vorbereitet, Matching-Logik selbst noch nicht gebaut.
+      ERLEDIGT (bereits 2026-08-26, Commit c8a4d66 - Checkbox hier erst
+      2026-08-28 nachgetragen, siehe G.3.10 oben).
 
 ## Phase I - Grosses Vorhaben: EU-weite Jobboersen bis Kommunalebene (2026-08-25, Nutzervision)
 

@@ -33,7 +33,7 @@ rapidfuzz==3.14.5
 reportlab==4.2.2
 
 # Scheduler
-apscheduler==3.10.4
+apscheduler==3.11.3
 
 # Pydantic
 pydantic==2.7.4

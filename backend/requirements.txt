@@ -30,7 +30,7 @@ pytesseract==0.3.13
 rapidfuzz==3.14.5
 
 # PDF-Generierung
-reportlab==4.2.2
+reportlab==5.0.1
 
 # Scheduler
 apscheduler==3.10.4

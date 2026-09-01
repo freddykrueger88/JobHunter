@@ -3,6 +3,6 @@
 -r requirements.txt
 
 pytest==8.2.2
-pytest-asyncio==0.23.7
+pytest-asyncio==1.4.0
 aiosqlite==0.20.0          # In-Memory SQLite fuer Tests (kein Postgres noetig)
 httpx==0.28.1              # bereits in requirements.txt, hier explizit fuer TestClient

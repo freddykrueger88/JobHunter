@@ -114,6 +114,52 @@ class TestBlacklist:
         assert titles == ["Job C"]
 
 
+class TestHideZeitarbeit:
+    """Nutzerwunsch 2026-09-02 - Zeitarbeitsfirmen/private Arbeitsvermittler
+    sollen standardmaessig (hide_zeitarbeit default True) ausgeblendet
+    werden, Erkennung ueber Firmennamen-Abgleich gegen eine feste
+    Begriffsliste (backend/services/job_search/zeitarbeit_keywords.py)."""
+
+    async def test_default_hides_known_agency(self, client: httpx.AsyncClient, db: AsyncSession):
+        await _make_job(db, title="Lagerhelfer", company="Randstad Deutschland GmbH")
+        await _make_job(db, title="Lagerhelfer", company="Muster GmbH")
+
+        res = await client.get("/api/jobs/")
+
+        companies = [j["company"] for j in res.json()]
+        assert companies == ["Muster GmbH"]
+
+    async def test_default_hides_structural_keyword(self, client: httpx.AsyncClient, db: AsyncSession):
+        await _make_job(db, title="Bürokraft", company="ABC Personaldienstleistungen GmbH")
+        await _make_job(db, title="Bürokraft", company="Muster GmbH")
+
+        res = await client.get("/api/jobs/")
+
+        companies = [j["company"] for j in res.json()]
+        assert companies == ["Muster GmbH"]
+
+    async def test_case_insensitive(self, client: httpx.AsyncClient, db: AsyncSession):
+        await _make_job(db, title="Job", company="ZEITARBEIT XYZ")
+
+        res = await client.get("/api/jobs/")
+
+        assert res.json() == []
+
+    async def test_can_be_disabled(self, client: httpx.AsyncClient, db: AsyncSession):
+        await _make_job(db, title="Lagerhelfer", company="Randstad Deutschland GmbH")
+
+        res = await client.get("/api/jobs/", params={"hide_zeitarbeit": False})
+
+        assert len(res.json()) == 1
+
+    async def test_does_not_affect_unrelated_company_names(self, client: httpx.AsyncClient, db: AsyncSession):
+        await _make_job(db, title="Job", company="Musterfirma AG")
+
+        res = await client.get("/api/jobs/")
+
+        assert len(res.json()) == 1
+
+
 class TestCombinedFilters:
     async def test_whitelist_and_blacklist_together(self, client: httpx.AsyncClient, db: AsyncSession):
         await _make_job(db, title="Job A", description="Homeoffice, direkt angestellt.")

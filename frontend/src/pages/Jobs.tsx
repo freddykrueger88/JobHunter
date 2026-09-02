@@ -60,6 +60,7 @@ export default function Jobs() {
   const [radius, setRadius] = useState(25)
   const [countryCode, setCountryCode] = useState('DE')
   const [hideAusbildung, setHideAusbildung] = useState(true)
+  const [hideZeitarbeit, setHideZeitarbeit] = useState(true)
   const [benefitKeywordsInput, setBenefitKeywordsInput] = useState('')
   const [blacklistKeywordsInput, setBlacklistKeywordsInput] = useState('')
   const [benefitKeywords, setBenefitKeywords] = useState('')
@@ -80,10 +81,11 @@ export default function Jobs() {
   }, [blacklistKeywordsInput])
 
   const { data: jobs = [], isLoading: loadingJobs } = useQuery<Job[]>({
-    queryKey: ['jobs', hideAusbildung, benefitKeywords, blacklistKeywords],
+    queryKey: ['jobs', hideAusbildung, hideZeitarbeit, benefitKeywords, blacklistKeywords],
     queryFn: () => axios.get('/api/jobs/', {
       params: {
         hide_ausbildung: hideAusbildung,
+        hide_zeitarbeit: hideZeitarbeit,
         benefit_keywords: benefitKeywords || undefined,
         blacklist_keywords: blacklistKeywords || undefined,
       },
@@ -183,6 +185,18 @@ export default function Jobs() {
                   className="rounded"
                 />
                 Ausbildungsstellen ausblenden
+              </label>
+              <label
+                className="flex items-center gap-2 text-sm cursor-pointer"
+                title="Blendet Stellen aus, deren Firmenname auf eine Zeitarbeitsfirma oder einen privaten Arbeitsvermittler hindeutet (Begriffsliste, kein 100%ig vollständiger Abgleich)"
+              >
+                <input
+                  type="checkbox"
+                  checked={hideZeitarbeit}
+                  onChange={e => setHideZeitarbeit(e.target.checked)}
+                  className="rounded"
+                />
+                Zeitarbeit / private Arbeitsvermittler ausblenden
               </label>
               <button
                 onClick={() => setShowFilters(s => !s)}

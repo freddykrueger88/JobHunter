@@ -13,6 +13,7 @@ from backend.services.culture_match import analyze_culture_match
 from backend.services.ai_client import get_ai_client
 from backend.models.cv import CVData
 from backend.routers.blocklist import get_blocked_company_terms
+from backend.services.job_search.zeitarbeit_keywords import ZEITARBEIT_KEYWORDS
 import re
 
 router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
@@ -47,6 +48,10 @@ async def list_jobs(
         default=None,
         description="Komma-getrennte Begriffe (#88) - Stellen mit einem dieser Begriffe in Titel/Beschreibung ausblenden",
     ),
+    hide_zeitarbeit: bool = Query(
+        default=True,
+        description="Stellen von Zeitarbeitsfirmen/privaten Arbeitsvermittlern ausblenden (Firmenname-Abgleich gegen eine feste Begriffsliste, siehe zeitarbeit_keywords.py)",
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     q = select(Job)
@@ -75,6 +80,9 @@ async def list_jobs(
             )
             for kw in blacklist
         ]))
+
+    if hide_zeitarbeit:
+        q = q.where(and_(*[~Job.company.ilike(f"%{kw}%") for kw in ZEITARBEIT_KEYWORDS]))
 
     blocked_firmen = await get_blocked_company_terms(db)
     if blocked_firmen:
